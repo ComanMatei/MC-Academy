@@ -1,20 +1,13 @@
 import { useRef, useState, useEffect } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
-import useAuth from '../hooks/useAuth';
+import { Link } from 'react-router-dom'
 
-const LoginComponent = () => {
-
-    const { setAuth } = useAuth();
-
-    const navigate = useNavigate();
-    const location = useLocation();
-    const from = location.state?.from?.pathname || "/";
+const VerifyEmailComponent = () => {
 
     const userRef = useRef();
     const errRef = useRef();
 
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [confirmToken, setConfirmToken] = useState('');
     const [errMsg, setErrMsg] = useState('');
 
     useEffect(() => {
@@ -23,48 +16,43 @@ const LoginComponent = () => {
 
     useEffect(() => {
         setErrMsg('');
-    }, [email, password])
+    }, [email])
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        const user = { email, password }
+    
+        const user = { email }
         console.log(user);
-
+    
         try {
-            const response = await fetch('http://localhost:8080/api/v1/auth/authenticate', {
+            const response = await fetch('http://localhost:8080/api/v1/forgotpassword/request', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(user),
                 withCredentials: true
-            })
-
+            });
+    
             if (response.ok) {
                 const data = await response.json();
+                console.log("Aici sefule")
                 console.log(data);
-
-                const accessToken = data.token;
-                const roles = Array.isArray(data.role) ? data.role : [data.role];
-                setAuth({ email, password, roles, accessToken });     
-
-                setEmail('');
-                setPassword('');
-                console.log("Navigating to:", from);
-                navigate(from, { replace: true });
+                setConfirmToken(data)
+                setEmail(''); 
             } else {
                 console.error('Error:', response.status);
+                setErrMsg('Error sending request');
             }
         } catch (err) {
             if (!err?.response) {
                 setErrMsg('No Server Response');
             } else if (err.response?.status === 400) {
-                setErrMsg('Missing Username or Password');
+                setErrMsg('Missing Email');
             } else if (err.response?.status === 401) {
                 setErrMsg('Unauthorized');
             } else {
-                setErrMsg('Login Failed');
+                setErrMsg('Request Failed');
             }
             errRef.current.focus();
         }
@@ -73,10 +61,10 @@ const LoginComponent = () => {
     return (
         <section>
             <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
-            <h1>Log In</h1>
+            <h1>Verify your email</h1>
             <form onSubmit={handleSubmit}>
 
-                <label htmlFor="email">Email: comanmatei91@gmail.com</label>
+                <label htmlFor="email">Email:</label>
                 <input
                     type="text"
                     id="email"
@@ -87,16 +75,7 @@ const LoginComponent = () => {
                     required
                 />
 
-                <label htmlFor="password">Password: Coman123_</label>
-                <input
-                    type="password"
-                    id="password"
-                    onChange={(e) => setPassword(e.target.value)}
-                    value={password}
-                    required
-                />
-
-                <button>Log In</button>
+                <button>Verify</button>
             </form>
             <p>
                 Need an Account?<br />
@@ -104,14 +83,8 @@ const LoginComponent = () => {
                     <Link to="/register">Sign Up</Link>
                 </span>
             </p>
-            <p>
-                Forgot your password?<br />
-                <span className="line">
-                    <Link to="/verify-email">Forgot password</Link>
-                </span>
-            </p>
         </section>
     )
 }
 
-export default LoginComponent
+export default VerifyEmailComponent

@@ -278,7 +278,7 @@ const RegisterComponent = () => {
             </p>
 
         </section>
-    );
+    )
 }
 
 export default RegisterComponent

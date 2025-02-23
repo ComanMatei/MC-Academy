@@ -5,8 +5,12 @@ import com.academy.MCAcademy.auth.AuthenticationResponse;
 import com.academy.MCAcademy.auth.RegisterRequest;
 import com.academy.MCAcademy.service.AuthenticationService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
 
 @AllArgsConstructor
 @RestController
@@ -27,7 +31,15 @@ public class AuthenticationController {
     }
 
     @GetMapping(path = "confirm")
-    public ResponseEntity<String> confirmToken(@RequestParam("token") String token) {
-        return ResponseEntity.ok(authenticationService.confirmToken(token));
+    public ResponseEntity<Void> confirmToken(@RequestParam("token") String token) {
+        String response = authenticationService.confirmToken(token);
+
+        if (response.equals("confirmed")) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setLocation(URI.create("http://localhost:5173/login"));
+            return new ResponseEntity<>(headers, HttpStatus.FOUND);
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 }

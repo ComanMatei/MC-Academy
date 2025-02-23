@@ -1,5 +1,8 @@
 package com.academy.MCAcademy.service;
 
+import com.academy.MCAcademy.auth.EmailRequest;
+import com.academy.MCAcademy.auth.EmailResponse;
+import com.academy.MCAcademy.auth.ResetPasswordRequest;
 import com.academy.MCAcademy.entity.ConfirmationToken;
 import com.academy.MCAcademy.entity.User;
 import com.academy.MCAcademy.mailing.EmailSender;
@@ -45,19 +48,21 @@ public class ForgotPasswordService {
         confirmationTokenService.setConfirmedAt(token);
         userRepository.enableUser(confirmationToken.getUser().getEmail());
 
-        return "Token confirmed, you can now reset your password.";
+        return "confirmed";
     }
 
-    public String verifyEmail(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Please provide a valid email"));
+    public EmailResponse verifyEmail(EmailRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new IllegalStateException("Email not found"));
 
         String token = generateResetToken(user);
 
         String link = "http://localhost:8080/api/v1/forgotpassword/reset?token=" + token;
         emailSender.send(user.getEmail(), buildEmail(user.getFirstname(), link));
 
-        return "A reset password link has been sent to your email.";
+        return EmailResponse.builder()
+                .confirmToken(token)
+                .build();
     }
 
     public String generateResetToken(User user) {
@@ -75,7 +80,7 @@ public class ForgotPasswordService {
     }
 
     @Transactional
-    public String resetPassword(String token, String newPassword, String repetPassword) {
+    public String resetPassword(String token, ResetPasswordRequest request) {
         Optional<User> userOptional = confirmationTokenRepository.findUserByToken(token);
         if (userOptional.isEmpty()){
             throw new RuntimeException("This user dosen't exist!");
@@ -90,8 +95,8 @@ public class ForgotPasswordService {
         }
 
         User user = userOptional.get();
-        if(newPassword.equals(repetPassword)) {
-            user.setPassword(passwordEncoder.encode(newPassword));
+        if(request.getNewPassword().equals(request.getRepetPassword())) {
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
             userRepository.save(user);
         }
         else {

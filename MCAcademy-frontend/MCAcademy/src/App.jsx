@@ -1,4 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
+import { useSearchParams } from "react-router-dom";
+
 import HomeComponent from './components/HomeComponent'
 import RegisterComponent from './components/RegisterComponent'
 import LoginComponent from './components/LoginComponent'
@@ -13,6 +15,8 @@ import Home from './components/Home'
 import Unauthorized from './components/Unauthorized'
 
 import MailInformationComponent from './components/MailInformationComponent'
+import VerifyEmailComponent from './components/VerifyEmailComponent'
+import ChangePasswordComponent from './components/ChangePasswordComponent'
 
 const ROLES = {
   'Admin': 'ADMIN',
@@ -20,17 +24,21 @@ const ROLES = {
   'Student': 'STUDENT'
 }
 
-
 export default function App() {
+  //const [searchParams] = useSearchParams();
+  //const confirmToken = searchParams.get("token") || localStorage.getItem("confirmToken");
+
   return (
     <Routes>
       <Route path='/' element={<Layout />}>
         {/* public routes */}
         <Route path="register" element={<RegisterComponent />} />
         <Route path="login" element={<LoginComponent />} />
+        <Route path="verify-email" element={<VerifyEmailComponent />} />
         <Route path="linkpage" element={<LinkPage />} />
         <Route path="unauthorized" element={<Unauthorized />} />
-        <Route path="/mail-info" element={<MailInformationComponent />} />
+        <Route path="mail-info" element={<MailInformationComponent />} />
+        <Route path="/forgotpassword/reset" element={<ChangePasswordComponent />} />
 
         {/* ADMIN routes */}
         <Route element={<RequireAuth allowedRoles={[ROLES.Admin]}/>}>
