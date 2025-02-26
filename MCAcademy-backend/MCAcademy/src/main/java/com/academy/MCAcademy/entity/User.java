@@ -36,17 +36,13 @@ public class User implements UserDetails{
 
     private String password;
 
-    @Builder.Default
-    private Boolean locked = false;
+    private Boolean locked;
 
     @Builder.Default
     private Boolean enabled = false;
 
     @Enumerated(EnumType.STRING)
     private Role role;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<ConfirmationToken> confirmationTokens;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

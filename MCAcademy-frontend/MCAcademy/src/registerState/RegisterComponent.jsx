@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { faCheck, faTimes, faInfoCircle } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import '../registerState/register.css'
+
 const EMAIL_REGEX = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%_]).{8,24}$/;
 const NAME_REGEX = /^[A-Z][a-z'-]+(?: [A-Z][a-z'-]+)*$/;
@@ -39,6 +41,7 @@ const RegisterComponent = () => {
 
     const [errMsg, setErrMsg] = useState('');
     const [success, setSuccess] = useState(false);
+    const [role, setRole] = useState('');
 
     useEffect(() => {
         userRef.current.focus();
@@ -64,6 +67,10 @@ const RegisterComponent = () => {
         setErrMsg('');
     }, [firstname, lastname, dateOfBirth, email, password, matchPwd])
 
+    const handleRoleSelect = (role) => {
+        setRole(role)
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -76,8 +83,8 @@ const RegisterComponent = () => {
             setErrMsg("Invalid Entry");
             return;
         }
-        const role = "INSTRUCTOR"
-        const user = {firstname, lastname, dateOfBirth, email, password, role}
+        
+        const user = { firstname, lastname, dateOfBirth, email, password, role }
         console.log(user);
         setSuccess(true);
 
@@ -87,14 +94,14 @@ const RegisterComponent = () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body:JSON.stringify(user),
+                body: JSON.stringify(user),
                 withCredentials: true
             })
 
             if (response.ok) {
-                const data = await response.json(); 
-                console.log(data); 
-                console.log(data.token); 
+                const data = await response.json();
+                console.log(data);
+                console.log(data.token);
                 //localStorage.setItem('token', data.token); // Salvează tokenul în localStorage (dacă vrei să îl folosești pentru cereri ulterioare)
             } else {
                 console.error('Error:', response.status); // Dacă răspunsul nu este OK
@@ -109,7 +116,7 @@ const RegisterComponent = () => {
             setPassword('');
             setMatchPwd('');
 
-            navigate('/mail-info');  
+            navigate('/mail-info');
         } catch (err) {
             if (!err?.response) {
                 setErrMsg('No Server Response');
@@ -127,6 +134,9 @@ const RegisterComponent = () => {
             <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
             <h1>Register</h1>
             <form onSubmit={handleSubmit}>
+
+                <button onClick={() => handleRoleSelect("INSTRUCTOR")}> Instructor </button>
+                <button onClick={() => handleRoleSelect("STUDENT")}> Student </button>
 
                 <label htmlFor="firstname">
                     Firstname:

@@ -1,15 +1,12 @@
-import { Link } from "react-router-dom"
+
 
 const AdminComponent = () => {
 
     return (
         <section>
-            <h1>Admins Page</h1>
-            <br />
-            <p>You must have been assigned an Admin role.</p>
-            <div className="flexGrow">
-                <Link to="/">Home</Link>
-            </div>
+            <button>Instructor validation</button>
+            <button>List of all users</button>
+            <button>Back to menu</button>
         </section>
     )
 }

@@ -1,8 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
-import { useSearchParams } from "react-router-dom";
 
 import HomeComponent from './components/HomeComponent'
-import RegisterComponent from './components/RegisterComponent'
+import RegisterComponent from './registerState/RegisterComponent'
 import LoginComponent from './components/LoginComponent'
 import Layout from './context/Layout'
 
@@ -17,6 +16,8 @@ import Unauthorized from './components/Unauthorized'
 import MailInformationComponent from './components/MailInformationComponent'
 import VerifyEmailComponent from './components/VerifyEmailComponent'
 import ChangePasswordComponent from './components/ChangePasswordComponent'
+
+import AdminValidComponent from './components/AdminValidComponent';
 
 const ROLES = {
   'Admin': 'ADMIN',
@@ -43,6 +44,7 @@ export default function App() {
         {/* ADMIN routes */}
         <Route element={<RequireAuth allowedRoles={[ROLES.Admin]}/>}>
           <Route path="admin" element={<AdminComponent />} />
+          <Route path="validate" element={<AdminValidComponent />} />
         </Route>
 
         {/* INSTRUCTOR routes */}

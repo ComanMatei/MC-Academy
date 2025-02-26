@@ -18,5 +18,6 @@ public class RegisterRequest {
     private LocalDate dateOfBirth;
     private String email;
     private String password;
+    private Boolean locked;
     private Role role;
 }

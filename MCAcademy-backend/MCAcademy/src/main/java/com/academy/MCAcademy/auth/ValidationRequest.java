@@ -1,6 +1,5 @@
 package com.academy.MCAcademy.auth;
 
-import com.academy.MCAcademy.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,11 +7,9 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class AuthenticationResponse {
+@AllArgsConstructor
+public class ValidationRequest {
 
-    private String token;
-
-    private Role role;
+    private Boolean validation;
 }

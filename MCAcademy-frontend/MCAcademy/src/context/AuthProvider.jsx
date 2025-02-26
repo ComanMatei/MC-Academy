@@ -5,7 +5,7 @@ const AuthContext = createContext({});
 export const AuthProvider = ({ children }) => {
     const [auth, setAuth] = useState(() => {
         const savedAuth = localStorage.getItem("auth");
-        return savedAuth ? JSON.parse(savedAuth) : {};
+        return savedAuth ? JSON.parse(savedAuth) : { adminId: null, email: '', roles: [], accessToken: '' };
     });
 
     useEffect(() => {

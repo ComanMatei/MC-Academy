@@ -4,6 +4,7 @@ import com.academy.MCAcademy.auth.AuthenticationRequest;
 import com.academy.MCAcademy.auth.AuthenticationResponse;
 import com.academy.MCAcademy.auth.RegisterRequest;
 import com.academy.MCAcademy.entity.ConfirmationToken;
+import com.academy.MCAcademy.entity.Role;
 import com.academy.MCAcademy.entity.User;
 import com.academy.MCAcademy.mailing.EmailSender;
 import com.academy.MCAcademy.mailing.EmailValidator;
@@ -51,6 +52,13 @@ public class AuthenticationService {
                 .role(request.getRole())
                 .build();
 
+        if (user.getRole() == Role.STUDENT) {
+            user.setLocked(false);
+        }
+        else if (user.getRole() == Role.ADMIN) {
+            user.setLocked(false);
+        }
+
         String token = signUpUser(user);
 
         String link = "http://localhost:8080/api/v1/auth/confirm?token=" + token;
@@ -96,6 +104,10 @@ public class AuthenticationService {
 
         if (user.getEnabled() != true) {
             throw new IllegalStateException("Email not confirmed. Please activate your account.");
+        }
+
+        if (user.getLocked() == null || user.getLocked() == true) {
+            throw new IllegalStateException("You don't have permission to authenticate!");
         }
 
         var jwtToken = jwtService.generateToken(user);
