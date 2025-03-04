@@ -2,6 +2,7 @@ package com.academy.MCAcademy.controller;
 
 import com.academy.MCAcademy.auth.ValidationRequest;
 import com.academy.MCAcademy.entity.InstructorValidation;
+import com.academy.MCAcademy.entity.Status;
 import com.academy.MCAcademy.entity.User;
 import com.academy.MCAcademy.service.InstructorValidationService;
 import com.academy.MCAcademy.service.UserService;
@@ -28,13 +29,13 @@ public class InstructorValidationController {
         return ResponseEntity.ok(instructorValidationService.validateInstructor(adminId, instructorId, request));
     }
 
-    @GetMapping("/lockedinstructors")
-    public List<User> getAllLockedInstructors() {
-        return userService.getAllLockedInstructors(null, true);
+    @GetMapping("/pendinginstructors")
+    public List<User> getAllPendingInstructors() {
+        return userService.getAllPendingInstructors(Status.PENDING, true);
     }
 
     @GetMapping("/{email}")
     public ResponseEntity<User> getAdmin(@PathVariable String email) {
-        return ResponseEntity.ok(userService.getUser(email));
+        return ResponseEntity.ok(instructorValidationService.getAdmin(email));
     }
 }

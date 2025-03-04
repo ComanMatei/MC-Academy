@@ -133,10 +133,10 @@ const RegisterComponent = () => {
         <section>
             <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
             <h1>Register</h1>
-            <form onSubmit={handleSubmit}>
 
-                <button onClick={() => handleRoleSelect("INSTRUCTOR")}> Instructor </button>
-                <button onClick={() => handleRoleSelect("STUDENT")}> Student </button>
+            <button onClick={() => handleRoleSelect("INSTRUCTOR")}> Instructor </button>
+            <button onClick={() => handleRoleSelect("STUDENT")}> Student </button>
+            <form onSubmit={handleSubmit}>
 
                 <label htmlFor="firstname">
                     Firstname:

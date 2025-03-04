@@ -1,5 +1,6 @@
 package com.academy.MCAcademy.auth;
 
+import com.academy.MCAcademy.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +10,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ValidationRequest {
-
-    private Boolean answer;
+public class RoleRequest {
+    private Role role;
 }

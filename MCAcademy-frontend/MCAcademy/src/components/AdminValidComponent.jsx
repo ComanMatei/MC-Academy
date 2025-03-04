@@ -2,6 +2,7 @@ import DataTable from "react-data-table-component";
 import { useState, useEffect } from 'react';
 
 const AdminValidComponent = () => {
+
     const [instructors, setInstructors] = useState([]);
     const [loading, setLoading] = useState(false);
     const [perPage, setPerPage] = useState(10);
@@ -10,9 +11,9 @@ const AdminValidComponent = () => {
     useEffect(() => {
         fetchTableData();
 
-        const authData = localStorage.getItem("auth");  
-        const parsedAuth = authData ? JSON.parse(authData) : null;  
-        const email = parsedAuth?.email || null;  
+        const authData = localStorage.getItem("auth");
+        const parsedAuth = authData ? JSON.parse(authData) : null;
+        const email = parsedAuth?.email || null;
 
         findAdmin(email);
     }, []);
@@ -26,15 +27,15 @@ const AdminValidComponent = () => {
                 },
                 withCredentials: true
             });
-    
+
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-    
+
             const data = await response.json();
-            console.log("Admin Data:", data); 
+            console.log("Admin Data:", data);
             setAdminId(data.id);
-    
+
         } catch (err) {
             console.error("Eroare la fetch:", err);
         }
@@ -44,7 +45,7 @@ const AdminValidComponent = () => {
         setLoading(true);
 
         try {
-            const response = await fetch('http://localhost:8080/api/v1/admin/lockedinstructors', {
+            const response = await fetch('http://localhost:8080/api/v1/admin/pendinginstructors', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
@@ -69,7 +70,7 @@ const AdminValidComponent = () => {
 
     const handleValidation = async (instructorId, answer) => {
 
-        const validationObj = {adminId, instructorId, validation: answer}
+        const validationObj = { adminId, instructorId, answer }
 
         try {
             const response = await fetch(`http://localhost:8080/api/v1/admin/validation/${adminId}/${instructorId}`, {
@@ -85,7 +86,7 @@ const AdminValidComponent = () => {
                 const data = await response.json();
                 console.log(data);
 
-                setInstructors((prevInstructors) => 
+                setInstructors((prevInstructors) =>
                     prevInstructors.filter(instructor => instructor.id !== instructorId)
                 );
             } else {
@@ -114,23 +115,23 @@ const AdminValidComponent = () => {
         {
             name: "Email",
             selector: (row) => row.email,
-          },
-          {
+        },
+        {
             name: "Unlocking",
             cell: (row) => (
                 <button onClick={() => handleValidation(row.id, true)}>
                     Unlock
                 </button>
             ),
-          },
-          {
+        },
+        {
             name: "Locking",
             cell: (row) => (
-              <button onClick={() => handleValidation(row.id, false)}>
-                Lock
-              </button>
+                <button onClick={() => handleValidation(row.id, false)}>
+                    Lock
+                </button>
             ),
-          },
+        },
     ];
 
     return (
@@ -142,7 +143,7 @@ const AdminValidComponent = () => {
                 progressPending={loading}
             />
         </div>
-    );
-};
+    )
+}
 
 export default AdminValidComponent;

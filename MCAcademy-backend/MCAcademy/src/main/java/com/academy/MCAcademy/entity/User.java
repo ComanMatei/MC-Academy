@@ -36,7 +36,8 @@ public class User implements UserDetails{
 
     private String password;
 
-    private Boolean locked;
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     @Builder.Default
     private Boolean enabled = false;

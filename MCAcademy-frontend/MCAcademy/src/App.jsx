@@ -10,7 +10,6 @@ import AdminComponent from './components/AdminComponent'
 import InstructorComponent from './components/InstructorComponent'
 import StudentComponent from './components/StudentComponent'
 import LinkPage from './components/LinkPage'
-import Home from './components/Home'
 import Unauthorized from './components/Unauthorized'
 
 import MailInformationComponent from './components/MailInformationComponent'
@@ -18,6 +17,11 @@ import VerifyEmailComponent from './components/VerifyEmailComponent'
 import ChangePasswordComponent from './components/ChangePasswordComponent'
 
 import AdminValidComponent from './components/AdminValidComponent';
+
+import InstrumentSpecComponent from './components/InstrumentSpecComponent'
+import ValidateStudentSpecComponent from './components/ValidateStudentSpecComponent'
+
+import AssignStudentComponent from './components/AssignStudentComponent'
 
 const ROLES = {
   'Admin': 'ADMIN',
@@ -44,21 +48,23 @@ export default function App() {
         {/* ADMIN routes */}
         <Route element={<RequireAuth allowedRoles={[ROLES.Admin]}/>}>
           <Route path="admin" element={<AdminComponent />} />
-          <Route path="validate" element={<AdminValidComponent />} />
+          <Route path="/validate-instr" element={<AdminValidComponent />} />
         </Route>
 
         {/* INSTRUCTOR routes */}
         <Route element={<RequireAuth allowedRoles={[ROLES.Instructor]}/>}>
           <Route path="instructor" element={<InstructorComponent />} />
+          <Route path="/assign-instrument" element={<InstrumentSpecComponent />} />
+          <Route path="/validate-student" element={<ValidateStudentSpecComponent />} />
         </Route>
 
         {/* STUDENT routes */}
         <Route element={<RequireAuth allowedRoles={[ROLES.Student]}/>}>
-          <Route path='/student' element={<StudentComponent />} />
+          <Route path='/assign-spec' element={<AssignStudentComponent />} />
         </Route>
 
         <Route element={<RequireAuth allowedRoles={[ROLES.Admin, ROLES.Instructor, ROLES.Student]}/>}>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<HomeComponent />} />
         </Route>
 
       </Route>

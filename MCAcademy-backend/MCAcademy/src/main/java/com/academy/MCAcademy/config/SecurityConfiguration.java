@@ -26,6 +26,8 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/api/v1/forgotpassword/**").permitAll()
                         .requestMatchers("/api/v1/admin/**").permitAll()
+                        .requestMatchers("/api/v1/instructor/**").permitAll()
+                        .requestMatchers("/api/v1/student/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

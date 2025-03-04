@@ -5,6 +5,7 @@ import com.academy.MCAcademy.auth.AuthenticationResponse;
 import com.academy.MCAcademy.auth.RegisterRequest;
 import com.academy.MCAcademy.entity.ConfirmationToken;
 import com.academy.MCAcademy.entity.Role;
+import com.academy.MCAcademy.entity.Status;
 import com.academy.MCAcademy.entity.User;
 import com.academy.MCAcademy.mailing.EmailSender;
 import com.academy.MCAcademy.mailing.EmailValidator;
@@ -53,10 +54,13 @@ public class AuthenticationService {
                 .build();
 
         if (user.getRole() == Role.STUDENT) {
-            user.setLocked(false);
+            user.setStatus(Status.APPROVED);
         }
         else if (user.getRole() == Role.ADMIN) {
-            user.setLocked(false);
+            user.setStatus(Status.APPROVED);
+        }
+        else {
+            user.setStatus(Status.PENDING);
         }
 
         String token = signUpUser(user);
@@ -106,7 +110,7 @@ public class AuthenticationService {
             throw new IllegalStateException("Email not confirmed. Please activate your account.");
         }
 
-        if (user.getLocked() == null || user.getLocked() == true) {
+        if (user.getStatus() == Status.PENDING || user.getStatus() == Status.DECLINED) {
             throw new IllegalStateException("You don't have permission to authenticate!");
         }
 

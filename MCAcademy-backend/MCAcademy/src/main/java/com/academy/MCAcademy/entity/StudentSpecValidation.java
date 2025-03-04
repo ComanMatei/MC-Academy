@@ -11,20 +11,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "instructor_validation")
-public class InstructorValidation {
+@Table(name = "student_validation")
+public class StudentSpecValidation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "admin_id", nullable = false)
-    private User admin;
-
-    @ManyToOne
     @JoinColumn(name = "instructor_id", nullable = false)
     private User instructor;
+
+    @ManyToOne
+    @JoinColumn(name = "assign_student_id", nullable = false)
+    private AssignStudent assignStudent;
 
     private Boolean answer;
 }

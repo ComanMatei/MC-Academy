@@ -78,7 +78,7 @@ const LoginComponent = () => {
             <h1>Log In</h1>
             <form onSubmit={handleSubmit}>
 
-                <label htmlFor="email">Email: comanmatei91@gmail.com</label>
+                <label htmlFor="email">Email:</label>
                 <input
                     type="text"
                     id="email"
@@ -89,7 +89,7 @@ const LoginComponent = () => {
                     required
                 />
 
-                <label htmlFor="password">Password: Coman123_</label>
+                <label htmlFor="password">Password:</label>
                 <input
                     type="password"
                     id="password"

@@ -3,6 +3,7 @@ package com.academy.MCAcademy.service;
 import com.academy.MCAcademy.auth.ValidationRequest;
 import com.academy.MCAcademy.entity.InstructorValidation;
 import com.academy.MCAcademy.entity.Role;
+import com.academy.MCAcademy.entity.Status;
 import com.academy.MCAcademy.entity.User;
 import com.academy.MCAcademy.repository.InstructorValidationRepository;
 import com.academy.MCAcademy.repository.UserRepository;
@@ -35,15 +36,15 @@ public class InstructorValidationService {
         InstructorValidation instructorValidation = InstructorValidation.builder()
                 .admin(admin)
                 .instructor(instructor)
-                .validation(request.getValidation())
+                .answer(request.getAnswer())
                 .build();
 
-        if(request.getValidation()) {
-            instructor.setLocked(false);
+        if(request.getAnswer()) {
+            instructor.setStatus(Status.APPROVED);
             userRepository.save(instructor);
         }
-        else if (request.getValidation() == false){
-            instructor.setLocked(true);
+        else if (request.getAnswer() == false){
+            instructor.setStatus(Status.DECLINED);
             userRepository.save(instructor);
         }
         else {
@@ -51,5 +52,16 @@ public class InstructorValidationService {
         }
 
         return instructorValidationRepository.save(instructorValidation);
+    }
+
+    public User getAdmin(String email) {
+        User admin = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("This user doesn't exist"));
+
+        if (admin.getRole() != Role.ADMIN) {
+            throw new RuntimeException("This user is not an admin!");
+        }
+
+        return admin;
     }
 }
