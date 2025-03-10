@@ -1,4 +1,4 @@
-package com.academy.MCAcademy.auth;
+package com.academy.MCAcademy.response;
 
 import com.academy.MCAcademy.entity.Role;
 import lombok.AllArgsConstructor;

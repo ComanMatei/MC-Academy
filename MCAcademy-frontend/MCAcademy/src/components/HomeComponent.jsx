@@ -10,7 +10,7 @@ const HomeComponent = () => {
         // if used in more components, this should be in context 
         // axios to /logout endpoint 
         setAuth({});
-        sessionStorage.removeItem("auth");
+        localStorage.removeItem("auth");
         navigate('/linkpage');
     }
 

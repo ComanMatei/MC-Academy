@@ -1,4 +1,4 @@
-package com.academy.MCAcademy.auth;
+package com.academy.MCAcademy.request;
 
 import com.academy.MCAcademy.entity.InstructorSpecialization;
 import com.academy.MCAcademy.entity.Status;

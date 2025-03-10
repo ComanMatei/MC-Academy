@@ -1,4 +1,4 @@
-package com.academy.MCAcademy.auth;
+package com.academy.MCAcademy.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class EmailResponse {
-    private String confirmToken;
+public class ResetPasswordRequest {
+    private String newPassword;
+
+    private String repetPassword;
 }

@@ -28,6 +28,8 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/v1/admin/**").permitAll()
                         .requestMatchers("/api/v1/instructor/**").permitAll()
                         .requestMatchers("/api/v1/student/**").permitAll()
+                        .requestMatchers("/api/v1/course/**").permitAll()
+                        .requestMatchers("/api/v1/file/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

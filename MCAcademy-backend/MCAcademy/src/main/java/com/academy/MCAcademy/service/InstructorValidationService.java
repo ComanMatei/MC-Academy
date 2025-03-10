@@ -1,6 +1,6 @@
 package com.academy.MCAcademy.service;
 
-import com.academy.MCAcademy.auth.ValidationRequest;
+import com.academy.MCAcademy.request.ValidationRequest;
 import com.academy.MCAcademy.entity.InstructorValidation;
 import com.academy.MCAcademy.entity.Role;
 import com.academy.MCAcademy.entity.Status;

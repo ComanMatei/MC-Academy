@@ -1,8 +1,7 @@
 package com.academy.MCAcademy.controller;
 
-import com.academy.MCAcademy.auth.AssignStudentRequest;
+import com.academy.MCAcademy.request.AssignStudentRequest;
 import com.academy.MCAcademy.entity.AssignStudent;
-import com.academy.MCAcademy.entity.InstructorSpecialization;
 import com.academy.MCAcademy.entity.Status;
 import com.academy.MCAcademy.entity.User;
 import com.academy.MCAcademy.service.AssignStudentService;

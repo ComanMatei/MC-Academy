@@ -1,8 +1,8 @@
 package com.academy.MCAcademy.controller;
 
-import com.academy.MCAcademy.auth.AuthenticationRequest;
-import com.academy.MCAcademy.auth.AuthenticationResponse;
-import com.academy.MCAcademy.auth.RegisterRequest;
+import com.academy.MCAcademy.request.AuthenticationRequest;
+import com.academy.MCAcademy.response.AuthenticationResponse;
+import com.academy.MCAcademy.request.RegisterRequest;
 import com.academy.MCAcademy.service.AuthenticationService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;

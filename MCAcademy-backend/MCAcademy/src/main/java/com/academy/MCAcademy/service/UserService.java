@@ -1,6 +1,5 @@
 package com.academy.MCAcademy.service;
 
-import com.academy.MCAcademy.auth.RoleRequest;
 import com.academy.MCAcademy.entity.Role;
 import com.academy.MCAcademy.entity.Status;
 import com.academy.MCAcademy.entity.User;

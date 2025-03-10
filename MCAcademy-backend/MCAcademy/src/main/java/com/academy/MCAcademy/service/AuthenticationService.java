@@ -1,8 +1,8 @@
 package com.academy.MCAcademy.service;
 
-import com.academy.MCAcademy.auth.AuthenticationRequest;
-import com.academy.MCAcademy.auth.AuthenticationResponse;
-import com.academy.MCAcademy.auth.RegisterRequest;
+import com.academy.MCAcademy.request.AuthenticationRequest;
+import com.academy.MCAcademy.response.AuthenticationResponse;
+import com.academy.MCAcademy.request.RegisterRequest;
 import com.academy.MCAcademy.entity.ConfirmationToken;
 import com.academy.MCAcademy.entity.Role;
 import com.academy.MCAcademy.entity.Status;

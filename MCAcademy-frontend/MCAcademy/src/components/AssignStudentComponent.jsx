@@ -30,7 +30,7 @@ const AssignStudentComponent = () => {
         setSelectedInstructor(instructor);
 
         if (instructor) {
-            findSpec(instructorId); // Căutăm instrumentele instructorului selectat
+            findAllSpec(instructorId); // Căutăm instrumentele instructorului selectat
         }
     }
 
@@ -90,7 +90,7 @@ const AssignStudentComponent = () => {
         }
     }
 
-    const findSpec = async (instructorId) => {
+    const findAllSpec = async (instructorId) => {
         try {
             const response = await fetch(`http://localhost:8080/api/v1/instructor/instr-assign/${instructorId}`, {
                 method: 'GET',
@@ -103,7 +103,7 @@ const AssignStudentComponent = () => {
             if (response.ok) {
                 const data = await response.json();
                 console.log(data);
-
+                console.log("aici sefule")
                 setInstruments(data);
             } else {
                 console.error('Error:', response.status);

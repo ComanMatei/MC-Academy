@@ -1,5 +1,6 @@
-package com.academy.MCAcademy.auth;
+package com.academy.MCAcademy.request;
 
+import com.academy.MCAcademy.entity.Instrument;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ValidationRequest {
+public class AssignInstrumentRequest {
 
-    private Boolean answer;
+    private Instrument instrument;
 }

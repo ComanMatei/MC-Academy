@@ -1,6 +1,6 @@
-package com.academy.MCAcademy.auth;
+package com.academy.MCAcademy.request;
 
-import com.academy.MCAcademy.entity.Instrument;
+import com.academy.MCAcademy.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AssignInstrumentRequest {
-
-    private Instrument instrument;
+public class RoleRequest {
+    private Role role;
 }

@@ -1,6 +1,6 @@
 package com.academy.MCAcademy.service;
 
-import com.academy.MCAcademy.auth.AssignInstrumentRequest;
+import com.academy.MCAcademy.request.AssignInstrumentRequest;
 import com.academy.MCAcademy.entity.InstructorSpecialization;
 import com.academy.MCAcademy.entity.Role;
 import com.academy.MCAcademy.entity.User;

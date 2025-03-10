@@ -1,6 +1,6 @@
 package com.academy.MCAcademy.service;
 
-import com.academy.MCAcademy.auth.AssignStudentRequest;
+import com.academy.MCAcademy.request.AssignStudentRequest;
 import com.academy.MCAcademy.entity.*;
 import com.academy.MCAcademy.repository.AssignStudentRepository;
 import com.academy.MCAcademy.repository.UserRepository;

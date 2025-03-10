@@ -23,6 +23,9 @@ import ValidateStudentSpecComponent from './components/ValidateStudentSpecCompon
 
 import AssignStudentComponent from './components/AssignStudentComponent'
 
+import SpotifySearch from './components/SpotifySearch'
+import CourseComponent from './components/CourseComponent'
+
 const ROLES = {
   'Admin': 'ADMIN',
   'Instructor': 'INSTRUCTOR',
@@ -44,6 +47,7 @@ export default function App() {
         <Route path="unauthorized" element={<Unauthorized />} />
         <Route path="mail-info" element={<MailInformationComponent />} />
         <Route path="/forgotpassword/reset" element={<ChangePasswordComponent />} />
+        <Route path="/search" element={<SpotifySearch />} />
 
         {/* ADMIN routes */}
         <Route element={<RequireAuth allowedRoles={[ROLES.Admin]}/>}>
@@ -56,6 +60,7 @@ export default function App() {
           <Route path="instructor" element={<InstructorComponent />} />
           <Route path="/assign-instrument" element={<InstrumentSpecComponent />} />
           <Route path="/validate-student" element={<ValidateStudentSpecComponent />} />
+          <Route path="/course" element={<CourseComponent />} />
         </Route>
 
         {/* STUDENT routes */}

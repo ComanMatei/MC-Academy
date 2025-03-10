@@ -1,8 +1,8 @@
 package com.academy.MCAcademy.service;
 
-import com.academy.MCAcademy.auth.EmailRequest;
-import com.academy.MCAcademy.auth.EmailResponse;
-import com.academy.MCAcademy.auth.ResetPasswordRequest;
+import com.academy.MCAcademy.request.EmailRequest;
+import com.academy.MCAcademy.response.EmailResponse;
+import com.academy.MCAcademy.request.ResetPasswordRequest;
 import com.academy.MCAcademy.entity.ConfirmationToken;
 import com.academy.MCAcademy.entity.User;
 import com.academy.MCAcademy.mailing.EmailSender;
