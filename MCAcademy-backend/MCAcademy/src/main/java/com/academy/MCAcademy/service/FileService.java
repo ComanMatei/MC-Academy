@@ -1,6 +1,8 @@
 package com.academy.MCAcademy.service;
 
+import com.academy.MCAcademy.entity.Course;
 import com.academy.MCAcademy.entity.File;
+import com.academy.MCAcademy.repository.CourseRepository;
 import com.academy.MCAcademy.repository.FileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -9,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -17,33 +20,29 @@ public class FileService {
 
     private final FileRepository fileRepository;
 
+    private final CourseRepository courseRepository;
+
     public List<File> createImages(List<MultipartFile> multipartFiles) throws IOException {
         List<File> savedFiles = new ArrayList<>();
 
-        // Verificăm dacă toate fișierele sunt videoclipuri
         for (MultipartFile multipartFile : multipartFiles) {
-            // Verificăm dacă fiecare fișier este un videoclip
             if (!isImage(multipartFile.getOriginalFilename())) {
-                // Dacă găsim un fișier care nu este video, aruncăm o excepție
                 throw new RuntimeException("File " + multipartFile.getOriginalFilename() + " is not an image!");
             }
         }
 
         for (MultipartFile multipartFile : multipartFiles) {
+            String fileExtension = getFileExtension(multipartFile.getOriginalFilename());
+            String uniqueFileName = "image_" + UUID.randomUUID().toString() + fileExtension;
+
             File newFile = File
                     .builder()
-                    .name(multipartFile.getOriginalFilename())
+                    .name(uniqueFileName)
                     .type("image")
                     .fileData(multipartFile.getBytes())
                     .build();
 
-            // Verifică dacă fișierul există deja
-            File existingFile = fileRepository.findByName(multipartFile.getOriginalFilename());
-            if (existingFile == null) {
-                savedFiles.add(fileRepository.save(newFile));
-            } else {
-                throw new RuntimeException("This file already exists with the name: " + multipartFile.getOriginalFilename());
-            }
+            savedFiles.add(fileRepository.save(newFile));
         }
 
         return savedFiles;
@@ -52,25 +51,23 @@ public class FileService {
     public List<File> createVideos(List<MultipartFile> multipartFiles) throws IOException {
         List<File> savedFiles = new ArrayList<>();
 
-        // Verificăm dacă toate fișierele sunt videoclipuri
         for (MultipartFile multipartFile : multipartFiles) {
-            // Verificăm dacă fiecare fișier este un videoclip
             if (!isVideo(multipartFile.getOriginalFilename())) {
-                // Dacă găsim un fișier care nu este video, aruncăm o excepție
                 throw new RuntimeException("File " + multipartFile.getOriginalFilename() + " is not a video!");
             }
         }
 
-        // Dacă toate fișierele sunt videoclipuri, le salvăm
         for (MultipartFile multipartFile : multipartFiles) {
+            String fileExtension = getFileExtension(multipartFile.getOriginalFilename());
+            String uniqueFileName = "video_" + UUID.randomUUID().toString() + fileExtension;
+
             File newFile = File
                     .builder()
-                    .name(multipartFile.getOriginalFilename())
-                    .type("video") // Setăm tipul ca video
+                    .name(uniqueFileName)
+                    .type("video")
                     .fileData(multipartFile.getBytes())
                     .build();
 
-            // Verifică dacă fișierul există deja în baza de date
             File existingFile = fileRepository.findByName(multipartFile.getOriginalFilename());
             if (existingFile == null) {
                 savedFiles.add(fileRepository.save(newFile));
@@ -82,13 +79,38 @@ public class FileService {
         return savedFiles;
     }
 
+    public void deleteFileFromCourse(Long fileId, Long courseId) {
+        File file = fileRepository.findById(fileId)
+                .orElseThrow(() -> new RuntimeException("The file with this id doesn't exist!"));
+
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("The course with this id doesn't exist!"));
+
+        if (file.getType().equals("image")) {
+            course.getImages().removeIf(image -> image.getId().equals(fileId));
+            fileRepository.delete(file);
+        }
+
+        if (file.getType().equals("video")) {
+            course.getVideos().removeIf(video -> video.getId().equals(fileId));
+            fileRepository.delete(file);
+        }
+
+        courseRepository.save(course);
+    }
+
+    public void deleteFile(Long fileId) {
+        File file = fileRepository.findById(fileId)
+                .orElseThrow(() -> new RuntimeException("The file with this id doesn't exist!"));
+
+        fileRepository.delete(file);
+    }
+
     public List<File> getFilesByIds(List<Long> fileIds, String fileType) {
-        // Obținem toate fișierele folosind ID-urile
         List<File> files = fileRepository.findAllById(fileIds);
 
-        // Filtrăm fișierele pe baza tipului (image sau video)
         return files.stream()
-                .filter(file -> file.getType().equalsIgnoreCase(fileType))  // Filtrăm pe baza tipului
+                .filter(file -> file.getType().equalsIgnoreCase(fileType))
                 .collect(Collectors.toList());
     }
 
@@ -118,19 +140,19 @@ public class FileService {
     }
 
     public List<File> getAllImages() {
-        // Obține toate fișierele din baza de date
         List<File> allFiles = fileRepository.findAll();
         List<File> filteredFiles = new ArrayList<>();
 
-        // Iterează prin toate fișierele și adaugă-le la lista filtrată dacă sunt imagini
         for (File file : allFiles) {
-            // Folosește metoda isImage pentru a verifica dacă fișierul este o imagine
             if (isImage(file.getName())) {
                 filteredFiles.add(file);
-                System.out.println("Imagine găsită: " + file.getName());  // Afișează numele fișierului
             }
         }
 
         return filteredFiles;
+    }
+
+    private String getFileExtension(String fileName) {
+        return fileName.substring(fileName.lastIndexOf("."));
     }
 }

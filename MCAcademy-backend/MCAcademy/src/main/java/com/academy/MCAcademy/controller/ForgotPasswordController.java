@@ -40,7 +40,7 @@ public class ForgotPasswordController {
     @PostMapping("reset")
     public ResponseEntity<String> resetPassword(@RequestParam("token") String token, @RequestBody ResetPasswordRequest request) {
         ResponseEntity.ok(forgotPasswordService.resetPassword(token, request));
-        return ResponseEntity.ok("Parola a fost resetată cu succes!");
+        return ResponseEntity.ok("Password reset successfully!");
     }
 
 }

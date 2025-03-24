@@ -1,5 +1,6 @@
 package com.academy.MCAcademy.request;
 
+import com.academy.MCAcademy.entity.File;
 import com.academy.MCAcademy.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,6 +19,8 @@ public class RegisterRequest {
     private LocalDate dateOfBirth;
     private String email;
     private String password;
+    private String description;
+    private File profilePicture;
     private Boolean locked;
     private Role role;
 }

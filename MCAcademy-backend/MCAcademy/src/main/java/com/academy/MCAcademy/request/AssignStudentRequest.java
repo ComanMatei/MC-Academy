@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AssignStudentRequest {
+
     private InstructorSpecialization instructorSpec;
 
     private Status status;

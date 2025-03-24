@@ -1,15 +1,15 @@
 package com.academy.MCAcademy.request;
 
+import com.academy.MCAcademy.entity.File;
 import com.academy.MCAcademy.entity.Instrument;
 import com.academy.MCAcademy.entity.SpotifyTrack;
-import com.academy.MCAcademy.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -29,7 +29,7 @@ public class CourseRequest {
 
     private SpotifyTrack spotifyTrack;
 
-    private List<Long> imageIds;
+    private Set<File> images;
 
-    private List<Long> videoIds;
+    private Set<File> videos;
 }

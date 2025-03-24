@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @Table(name = "instructor_validation")
-public class InstructorValidation {
+public class UserValidation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -23,8 +23,8 @@ public class InstructorValidation {
     private User admin;
 
     @ManyToOne
-    @JoinColumn(name = "instructor_id", nullable = false)
-    private User instructor;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     private Boolean answer;
 }

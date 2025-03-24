@@ -1,10 +1,10 @@
 package com.academy.MCAcademy.controller;
 
 import com.academy.MCAcademy.request.ValidationRequest;
-import com.academy.MCAcademy.entity.InstructorValidation;
+import com.academy.MCAcademy.entity.UserValidation;
 import com.academy.MCAcademy.entity.Status;
 import com.academy.MCAcademy.entity.User;
-import com.academy.MCAcademy.service.InstructorValidationService;
+import com.academy.MCAcademy.service.UserValidationService;
 import com.academy.MCAcademy.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,22 +16,17 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/admin")
 @CrossOrigin(origins = "http://localhost:5173")
-public class InstructorValidationController {
-    private final InstructorValidationService instructorValidationService;
+public class UserValidationController {
 
-    private final UserService userService;
+    private final UserValidationService instructorValidationService;
 
-    @PostMapping("/validation/{adminId}/{instructorId}")
-    public ResponseEntity<InstructorValidation> validateInstructor(
+
+    @PostMapping("/validation/{adminId}/{userId}")
+    public ResponseEntity<UserValidation> validateInstructor(
             @PathVariable Long adminId,
-            @PathVariable Long instructorId,
+            @PathVariable Long userId,
             @RequestBody ValidationRequest request) {
-        return ResponseEntity.ok(instructorValidationService.validateInstructor(adminId, instructorId, request));
-    }
-
-    @GetMapping("/pendinginstructors")
-    public List<User> getAllPendingInstructors() {
-        return userService.getAllPendingInstructors(Status.PENDING, true);
+        return ResponseEntity.ok(instructorValidationService.validateUser(adminId, userId, request));
     }
 
     @GetMapping("/{email}")

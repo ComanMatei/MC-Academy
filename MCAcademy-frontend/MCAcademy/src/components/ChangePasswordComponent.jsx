@@ -133,7 +133,6 @@ const ChangePasswordComponent = () => {
             <p>
                 Already registered?<br />
                 <span className="line">
-                    {/*put router link here*/}
                     <a href="http://localhost:5173/login">Sign In</a>
                 </span>
             </p>

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -18,7 +19,7 @@ public class AssignStudentService {
     private final AssignStudentRepository assignStudentRepository;
     public AssignStudent assignStudent(Long studentId, AssignStudentRequest request) {
         User student = userRepository.findById(studentId)
-                .orElseThrow(() -> new RuntimeException("This user dosen't exist"));
+                .orElseThrow(() -> new RuntimeException("This user doesn't exist"));
 
         if (student.getRole() != Role.STUDENT) {
             throw new RuntimeException("Only students can assign to a specializations!");
@@ -52,5 +53,20 @@ public class AssignStudentService {
     public List<AssignStudent> getAllAssignedStudent(Status status, Long instructorId, Instrument instrument) {
         return assignStudentRepository.findAllByStatusAndInstructorSpec_Instructor_IdAndInstructorSpec_Instrument(status,
                 instructorId, instrument);
+    }
+
+    public List<User> getAssignedStudents(Status status, Long instructorId, Instrument instrument) {
+        List<AssignStudent> assignedStudents = assignStudentRepository.findAllByStatusAndInstructorSpec_Instructor_IdAndInstructorSpec_Instrument(
+                status, instructorId, instrument);
+        return assignedStudents.stream()
+                .map(AssignStudent::getStudent)
+                .collect(Collectors.toList());
+    }
+
+    public AssignStudent getAssign(Long studentId, Long instructorSpecId) {
+        System.out.println("Service - studentId: " + studentId);
+        System.out.println("Service - instructorSpecId: " + instructorSpecId);
+
+        return assignStudentRepository.findByStudent_IdAndInstructorSpec_Id(studentId, instructorSpecId);
     }
 }

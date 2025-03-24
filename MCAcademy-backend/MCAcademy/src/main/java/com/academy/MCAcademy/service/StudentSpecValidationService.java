@@ -29,7 +29,8 @@ public class StudentSpecValidationService {
         AssignStudent assignStudent = assignStudentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Student assign was not found with this id!"));
 
-        StudentSpecValidation studentValidation = StudentSpecValidation.builder()
+        StudentSpecValidation studentValidation = StudentSpecValidation
+                .builder()
                 .instructor(instructor)
                 .assignStudent(assignStudent)
                 .answer(request.getAnswer())
@@ -44,7 +45,7 @@ public class StudentSpecValidationService {
             assignStudentRepository.save(assignStudent);
         }
         else {
-            throw new RuntimeException("Something este gresit!");
+            throw new RuntimeException("Something is wrong!");
         }
 
         return studentValidationRepository.save(studentValidation);

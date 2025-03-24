@@ -16,15 +16,20 @@ import MailInformationComponent from './components/MailInformationComponent'
 import VerifyEmailComponent from './components/VerifyEmailComponent'
 import ChangePasswordComponent from './components/ChangePasswordComponent'
 
-import AdminValidComponent from './components/AdminValidComponent';
-
 import InstrumentSpecComponent from './components/InstrumentSpecComponent'
 import ValidateStudentSpecComponent from './components/ValidateStudentSpecComponent'
 
 import AssignStudentComponent from './components/AssignStudentComponent'
 
 import SpotifySearch from './components/SpotifySearch'
-import CourseComponent from './components/CourseComponent'
+import CourseComponent from './course/CourseComponent'
+import CoursesComponent from './listOfCourses/CoursesComponent'
+import SeeCourseComponent from './course/SeeCourseComponent'
+
+import ProfileComponent from './components/ProfileComponent'
+import ListOfUsersComponent from './components/ListOfUsersComponent'
+
+import { InstrumentProvider } from "./context/InstrumentContext";
 
 const ROLES = {
   'Admin': 'ADMIN',
@@ -33,47 +38,51 @@ const ROLES = {
 }
 
 export default function App() {
-  //const [searchParams] = useSearchParams();
-  //const confirmToken = searchParams.get("token") || localStorage.getItem("confirmToken");
 
   return (
-    <Routes>
-      <Route path='/' element={<Layout />}>
-        {/* public routes */}
-        <Route path="register" element={<RegisterComponent />} />
-        <Route path="login" element={<LoginComponent />} />
-        <Route path="verify-email" element={<VerifyEmailComponent />} />
-        <Route path="linkpage" element={<LinkPage />} />
-        <Route path="unauthorized" element={<Unauthorized />} />
-        <Route path="mail-info" element={<MailInformationComponent />} />
-        <Route path="/forgotpassword/reset" element={<ChangePasswordComponent />} />
-        <Route path="/search" element={<SpotifySearch />} />
+    <InstrumentProvider>
+      <Routes>
+        <Route path='/' element={<Layout />}>
+          {/* public routes */}
+          <Route path="register" element={<RegisterComponent />} />
+          <Route path="login" element={<LoginComponent />} />
+          <Route path="verify-email" element={<VerifyEmailComponent />} />
+          <Route path="linkpage" element={<LinkPage />} />
+          <Route path="unauthorized" element={<Unauthorized />} />
+          <Route path="mail-info" element={<MailInformationComponent />} />
+          <Route path="/forgotpassword/reset" element={<ChangePasswordComponent />} />
+          <Route path="/search" element={<SpotifySearch />} />
+          <Route path="/course/:id" element={<SeeCourseComponent />} />
 
-        {/* ADMIN routes */}
-        <Route element={<RequireAuth allowedRoles={[ROLES.Admin]}/>}>
-          <Route path="admin" element={<AdminComponent />} />
-          <Route path="/validate-instr" element={<AdminValidComponent />} />
+          <Route path="/profile/:id" element={<ProfileComponent />} />
+
+          {/* ADMIN routes */}
+          <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
+            <Route path="admin" element={<AdminComponent />} />
+            <Route path="/users" element={<ListOfUsersComponent />} />
+          </Route>
+
+          {/* INSTRUCTOR routes */}
+          <Route element={<RequireAuth allowedRoles={[ROLES.Instructor]} />}>
+            <Route path="instructor" element={<InstructorComponent />} />
+            <Route path="/assign-instrument" element={<InstrumentSpecComponent />} />
+            <Route path="/validate-student" element={<ValidateStudentSpecComponent />} />
+            <Route path="/course" element={<CourseComponent />} />
+            <Route path="/courses" element={<CoursesComponent />} />
+          </Route>
+
+          {/* STUDENT routes */}
+          <Route element={<RequireAuth allowedRoles={[ROLES.Student]} />}>
+            <Route path='/assign-spec' element={<AssignStudentComponent />} />
+          </Route>
+
+          <Route element={<RequireAuth allowedRoles={[ROLES.Admin, ROLES.Instructor, ROLES.Student]} />}>
+            <Route path="/" element={<HomeComponent />} />
+          </Route>
+
         </Route>
-
-        {/* INSTRUCTOR routes */}
-        <Route element={<RequireAuth allowedRoles={[ROLES.Instructor]}/>}>
-          <Route path="instructor" element={<InstructorComponent />} />
-          <Route path="/assign-instrument" element={<InstrumentSpecComponent />} />
-          <Route path="/validate-student" element={<ValidateStudentSpecComponent />} />
-          <Route path="/course" element={<CourseComponent />} />
-        </Route>
-
-        {/* STUDENT routes */}
-        <Route element={<RequireAuth allowedRoles={[ROLES.Student]}/>}>
-          <Route path='/assign-spec' element={<AssignStudentComponent />} />
-        </Route>
-
-        <Route element={<RequireAuth allowedRoles={[ROLES.Admin, ROLES.Instructor, ROLES.Student]}/>}>
-          <Route path="/" element={<HomeComponent />} />
-        </Route>
-
-      </Route>
-    </Routes>
+      </Routes>
+    </InstrumentProvider>
   )
 }
 

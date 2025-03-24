@@ -1,9 +1,8 @@
 package com.academy.MCAcademy.service;
 
+import com.academy.MCAcademy.entity.*;
+import com.academy.MCAcademy.repository.AssignStudentRepository;
 import com.academy.MCAcademy.request.AssignInstrumentRequest;
-import com.academy.MCAcademy.entity.InstructorSpecialization;
-import com.academy.MCAcademy.entity.Role;
-import com.academy.MCAcademy.entity.User;
 import com.academy.MCAcademy.repository.InstructorSpecializationRepository;
 import com.academy.MCAcademy.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -59,5 +58,9 @@ public class InstructorSpecializationService {
 
     public List<String> getInstrInstruments(Long instructorId) {
         return instructorSpecializationRepository.findAllInstrumentByInstructorId(instructorId);
+    }
+
+    public InstructorSpecialization getInstructorSpec(Long instructorId, Instrument instrument) {
+        return instructorSpecializationRepository.findByInstructorIdAndInstrument(instructorId, instrument);
     }
 }

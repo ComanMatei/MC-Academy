@@ -4,11 +4,13 @@ import { faCheck, faTimes, faInfoCircle } from "@fortawesome/free-solid-svg-icon
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import '../registerState/register.css'
+import PictureUploadDialog from "./PictureUploadDialog";
 
 const EMAIL_REGEX = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%_]).{8,24}$/;
 const NAME_REGEX = /^[A-Z][a-z'-]+(?: [A-Z][a-z'-]+)*$/;
 const DATE_REGEX = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
+const DESCRIPTION_REGEX = /^.{1,254}$/;
 
 const RegisterComponent = () => {
     const userRef = useRef();
@@ -31,6 +33,13 @@ const RegisterComponent = () => {
     const [validEmail, setValidEmail] = useState(false);
     const [emailFocus, setEmailFocus] = useState(false);
 
+    const [description, setDescription] = useState('');
+    const [validDescription, setValidDescription] = useState(false);
+    const [descriptionFocus, setDescriptionFocus] = useState(false);
+
+    const [profilePicture, setProfilePicture] = useState('');
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+
     const [password, setPassword] = useState('');
     const [validPassword, setValidPassword] = useState(false);
     const [passwordFocus, setPasswordFocus] = useState(false);
@@ -39,9 +48,11 @@ const RegisterComponent = () => {
     const [validMatch, setValidMatch] = useState(false);
     const [matchFocus, setMatchFocus] = useState(false);
 
+    const [role, setRole] = useState('');
+    const [validRole, setValidRole] = useState(false);
+
     const [errMsg, setErrMsg] = useState('');
     const [success, setSuccess] = useState(false);
-    const [role, setRole] = useState('');
 
     useEffect(() => {
         userRef.current.focus();
@@ -52,7 +63,8 @@ const RegisterComponent = () => {
         setValidLastname(NAME_REGEX.test(lastname));
         setValidDateOfBirth(DATE_REGEX.test(dateOfBirth));
         setValidEmail(EMAIL_REGEX.test(email));
-    }, [email, firstname, lastname, dateOfBirth])
+        setValidDescription(DESCRIPTION_REGEX.test(description))
+    }, [email, firstname, lastname, dateOfBirth, description])
 
     useEffect(() => {
         const result = PASSWORD_REGEX.test(password);
@@ -65,11 +77,41 @@ const RegisterComponent = () => {
 
     useEffect(() => {
         setErrMsg('');
-    }, [firstname, lastname, dateOfBirth, email, password, matchPwd])
+    }, [firstname, lastname, dateOfBirth, email, password, matchPwd, description])
 
     const handleRoleSelect = (role) => {
+        setValidRole(true);
         setRole(role)
     }
+
+    const createImages = async () => {
+        if (!profilePicture) {
+            console.log("No file has been selected!");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', profilePicture);
+
+        try {
+            const response = await fetch('http://localhost:8080/api/v1/file/create-image', {
+                method: 'POST',
+                body: formData,
+                withCredentials: true
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log("Profile picture:", data);
+
+                setProfilePicture(data);
+            } else {
+                console.error('Request failed with status:', response.status);
+            }
+        } catch (error) {
+            console.error('Failed to upload files:', error);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -79,12 +121,13 @@ const RegisterComponent = () => {
         const v3 = DATE_REGEX.test(dateOfBirth);
         const v4 = EMAIL_REGEX.test(email);
         const v5 = PASSWORD_REGEX.test(password);
-        if (!v1 || !v2 || !v3 || !v4 || !v5) {
+        const v6 = DESCRIPTION_REGEX.test(description)
+        if (!v1 || !v2 || !v3 || !v4 || !v5 || !v6) {
             setErrMsg("Invalid Entry");
             return;
         }
-        
-        const user = { firstname, lastname, dateOfBirth, email, password, role }
+
+        const user = { firstname, lastname, dateOfBirth, email, password, role, description, profilePicture: profilePicture[0] }
         console.log(user);
         setSuccess(true);
 
@@ -102,9 +145,8 @@ const RegisterComponent = () => {
                 const data = await response.json();
                 console.log(data);
                 console.log(data.token);
-                //localStorage.setItem('token', data.token); // Salvează tokenul în localStorage (dacă vrei să îl folosești pentru cereri ulterioare)
             } else {
-                console.error('Error:', response.status); // Dacă răspunsul nu este OK
+                console.error('Error:', response.status);
             }
 
             setSuccess(true);
@@ -115,6 +157,8 @@ const RegisterComponent = () => {
             setEmail('');
             setPassword('');
             setMatchPwd('');
+            setDescription('');
+            setProfilePicture('');
 
             navigate('/mail-info');
         } catch (err) {
@@ -128,6 +172,18 @@ const RegisterComponent = () => {
             errRef.current.focus();
         }
     }
+
+    const handleProfilePictureChange = (event) => {
+        setProfilePicture(event.target.files[0]);
+    };
+
+    const handleOpenDialog = () => {
+        setIsDialogOpen(true);
+    };
+
+    const handleCloseDialog = () => {
+        setIsDialogOpen(false);
+    };
 
     return (
         <section>
@@ -229,6 +285,60 @@ const RegisterComponent = () => {
                     Letters, numbers, underscores, hyphens allowed.
                 </p>
 
+                <label htmlFor="description">Description:
+                    <span className={validDescription ? "valid" : "hide"}>
+                        <FontAwesomeIcon icon={faCheck} />
+                    </span>
+                    <span className={validDescription || !description ? "hide" : "invalid"}>
+                        <FontAwesomeIcon icon={faTimes} />
+                    </span>
+                </label>
+                <textarea
+                    placeholder="Describe yourself..."
+                    id="description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    required
+                    aria-invalid={validEmail ? "false" : "true"}
+                    aria-describedby="uidnote"
+                    onFocus={() => setDescriptionFocus(true)}
+                    onBlur={() => setDescriptionFocus(false)}
+                >
+                </textarea>
+                <p id="uidnote" className={descriptionFocus && description && !validDescription ? "instructions" : "offscreen"}>
+                    <FontAwesomeIcon icon={faInfoCircle} />
+                    Minimum 100 characters
+                </p>
+
+                <label htmlFor="profilePicture">Profile Picture:</label>
+                <input
+                    type="file"
+                    id="profilePicture"
+                    onChange={handleProfilePictureChange}
+                    accept="image/*"
+                    style={{ display: "none" }}
+                />
+                {profilePicture && <p>Profile picture uploaded successfully!</p>}
+
+                <button type="button" onClick={handleOpenDialog}>
+                    Open Dialog
+                </button>
+
+                {isDialogOpen && (
+                    <div className="dialog-overlay" onClick={handleCloseDialog}>
+                        <div className="dialog">
+                            <h2>Încarcă poza de profil</h2>
+                            <PictureUploadDialog
+                                isOpen={isDialogOpen}
+                                onClose={handleCloseDialog}
+                                createImages={createImages}
+                                profilePicture={profilePicture}
+                                setProfilePicture={setProfilePicture}
+                            />
+                        </div>
+                    </div>
+                )}
+
                 <label htmlFor="password">
                     Password:
                     <FontAwesomeIcon icon={faCheck} className={validPassword ? "valid" : "hide"} />
@@ -276,13 +386,12 @@ const RegisterComponent = () => {
                     Must match the first password input field.
                 </p>
 
-                <button disabled={!validFirstname || !validLastname || !validDateOfBirth
-                    || !validEmail || !validPassword || !validMatch ? true : false}>Sign Up</button>
+                <button disabled={!validFirstname || !validLastname || !validDateOfBirth || !validRole
+                    || !validEmail || !validDescription || !validPassword || !validMatch ? true : false}>Sign Up</button>
             </form>
             <p>
                 Already registered?<br />
                 <span className="line">
-                    {/*put router link here*/}
                     <a href="http://localhost:5173/login">Sign In</a>
                 </span>
             </p>

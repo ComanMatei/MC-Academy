@@ -1,19 +1,22 @@
 import DataTable from "react-data-table-component";
 import { useState, useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
+
+import { useInstrument } from "../context/InstrumentContext";
 
 const ValidateStudentSpecComponent = () => {
+    
+    const navigate = useNavigate();
+    const { setInstrument } = useInstrument();
 
     const [assignedStudents, setAssignedStudents] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [perPage, setPerPage] = useState(10);
     const [instructorId, setInstructorId] = useState('');
-
     const [instruments, setInstruments] = useState([]);
-    const [selectedInstrment, setSelectedInstrument] = useState("");
+    const [selectedInstrument, setSelectedInstrument] = useState("");
+    const [selectedStatus, setSelectedStatus] = useState("PENDING");
 
     useEffect(() => {
-        fetchTableData()
-
         const authData = localStorage.getItem("auth");
         const parsedAuth = authData ? JSON.parse(authData) : null;
         const email = parsedAuth?.email || null;
@@ -28,54 +31,43 @@ const ValidateStudentSpecComponent = () => {
     }, [instructorId]);
 
     useEffect(() => {
-        console.log("State-ul instrumentelor actualizat:", instruments);
-    }, [instruments]);
+        if (instructorId && selectedInstrument) {
+            fetchTableData(instructorId, selectedInstrument, selectedStatus);
+        }
+    }, [instructorId, selectedInstrument, selectedStatus]);
 
     const findInstructor = async (email) => {
         try {
             const response = await fetch(`http://localhost:8080/api/v1/instructor/${email}`, {
                 method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 withCredentials: true
             });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
             const data = await response.json();
-            console.log("Instructor Data:", data);
             setInstructorId(data.id);
-
         } catch (err) {
             console.error("Eroare la fetch:", err);
         }
-    }
+    };
 
-    const fetchTableData = async (instructorId, selectedInstrument) => {
+    const fetchTableData = async (instructorId, selectedInstrument, status) => {
         setLoading(true);
 
-        console.log("Apelarea pentru instrumentul selectat:", selectedInstrument);
-        console.log("Apelarea pentru id:", instructorId);
-
         try {
-            const response = await fetch(`http://localhost:8080/api/v1/instructor/assigned/${instructorId}?instrument=${selectedInstrument}`, {
+            const response = await fetch(`http://localhost:8080/api/v1/instructor/assigning/${instructorId}/${status}?instrument=${selectedInstrument}`, {
                 method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 withCredentials: true
             });
 
             if (response.ok) {
                 const data = await response.json();
-                console.log(data);
-
                 const transformedData = data.map(item => ({
-                    id: item.student.id, 
-                    firstname: item.student.firstname, 
+                    id: item.student.id,
+                    firstname: item.student.firstname,
                     lastname: item.student.lastname,
                     assignStudentId: item.id
                 }));
@@ -89,109 +81,91 @@ const ValidateStudentSpecComponent = () => {
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     const getInstrInstruments = async (instructorId) => {
         try {
             const response = await fetch(`http://localhost:8080/api/v1/instructor/instruments/${instructorId}`, {
                 method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 withCredentials: true
-            })
+            });
 
             if (response.ok) {
                 const data = await response.json();
                 setInstruments(data);
-                console.log("Instrumentele instructorului:", data);
+                setSelectedInstrument(data[0] || "");
             }
         } catch (err) {
             console.error("Eroare la fetch:", err);
         }
-    }
+    };
 
-    const handleValidation = async (instructorId, answer, assignStudentId) => {
-        try {
-            const response = await fetch(`http://localhost:8080/api/v1/instructor/validation/${instructorId}/${assignStudentId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(answer),
-                withCredentials: true
-            })
-
-            if (response.ok) {
-                const data = response.json();
-                console.log(data);
-                setAssignedStudents(prevStudents =>
-                    prevStudents.filter(student => student.assignStudentId !== assignStudentId)
-                );
-            }
-        } catch (err) {
-            console.error("Eroare la fetch:", err);
-        }
+    const handleUserProfile = (userId, selectedInstrument) => {
+        setInstrument(selectedInstrument);
+        navigate(`/profile/${userId}`);
     }
 
     const columns = [
+        { name: "Firstname", selector: (row) => row.firstname },
+        { name: "Lastname", selector: (row) => row.lastname },
         {
-            name: "Firstname",
-            selector: (row) => row.firstname,
-        },
-        {
-            name: "Lastname",
-            selector: (row) => row.lastname,
-        },
-        {
-            name: "Unlocking",
+            name: "Profile",
             cell: (row) => (
-                <button onClick={() => handleValidation(instructorId, true, row.assignStudentId)}>
-                    Unlock
+                <button onClick={() => handleUserProfile(row.id, selectedInstrument)}>
+                    See Profile
                 </button>
             ),
         },
-        {
-            name: "Locking",
-            cell: (row) => (
-                <button onClick={() => handleValidation(instructorId, false, row.assignStudentId)}>
-                    Lock
-                </button>
-            ),
-        },
-    ]
+    ];
 
     return (
         <div>
             <h2>Assigned students</h2>
-            {
-                instruments.length > 0 ? (
-                    instruments.map((instrument, index) => (
-                        <button
-                            key={index}
-                            onClick={() => {
-                                setSelectedInstrument(instrument);
-                                fetchTableData(instructorId, instrument);
-                            }}
-                        >
-                            {instrument}
-                        </button>
-                    ))
-                ) : (
-                    <p>Nu există instrumente asignate.</p>
-                )
-            }
 
+            {/* Butoane pentru selectarea instrumentelor */}
+            {instruments.length > 0 ? (
+                instruments.map((instrument, index) => (
+                    <button
+                        key={index}
+                        onClick={() => setSelectedInstrument(instrument)}
+                        style={{
+                            margin: "5px",
+                            backgroundColor: selectedInstrument === instrument ? "lightblue" : "white",
+                        }}
+                    >
+                        {instrument}
+                    </button>
+                ))
+            ) : (
+                <p>Nu există instrumente asignate.</p>
+            )}
+
+            {/* Select dropdown pentru status */}
+            <div>
+                <h4>Select students status</h4>
+                <select
+                    name="status"
+                    value={selectedStatus}
+                    onChange={(e) => setSelectedStatus(e.target.value)}
+                >
+                    <option value="PENDING">Pending</option>
+                    <option value="APPROVED">Approved</option>
+                    <option value="DECLINED">Declined</option>
+                </select>
+            </div>
+
+            {/* Tabelul cu studenții */}
             <div>
                 <DataTable
-                    title="List of locked instructors"
+                    title="List of assigned students"
                     columns={columns}
                     data={assignedStudents}
                     progressPending={loading}
                 />
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default ValidateStudentSpecComponent;

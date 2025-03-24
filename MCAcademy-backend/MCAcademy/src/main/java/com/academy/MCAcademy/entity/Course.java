@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -31,27 +32,35 @@ public class Course {
     @Enumerated(EnumType.STRING)
     private Instrument instrument;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "instructor_id")
     private User instructor;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "spotify_track_id")
     private SpotifyTrack spotifyTrack;
 
-    @ManyToMany
+    @OneToMany
     @JoinTable(
             name = "course_images",
             joinColumns = @JoinColumn(name = "course_id"),
             inverseJoinColumns = @JoinColumn(name = "image_id")
     )
-    private List<File> images;
+    private Set<File> images;
 
-    @ManyToMany
+    @OneToMany
     @JoinTable(
             name = "course_videos",
             joinColumns = @JoinColumn(name = "course_id"),
             inverseJoinColumns = @JoinColumn(name = "video_id")
     )
-    private List<File> videos;
+    private Set<File> videos;
+
+    @ManyToMany
+    @JoinTable(
+            name = "course_student",
+            joinColumns = @JoinColumn(name = "course_id"),
+            inverseJoinColumns = @JoinColumn(name = "student_id")
+    )
+    private List<User> students;
 }

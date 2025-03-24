@@ -44,19 +44,26 @@ public class AuthenticationService {
             throw new IllegalStateException("Email not valid");
         }
 
+//        if (request.getProfilePicture() == null) {
+//            throw new IllegalStateException("Must have a profile picture!");
+//        }
+
+//        if (request.getProfilePicture().getType() == "video") {
+//            throw new IllegalStateException("This file is not an image!");
+//        }
+
         var user = User.builder()
                 .firstname(request.getFirstname())
                 .lastname(request.getLastname())
                 .dateOfBirth(request.getDateOfBirth())
                 .email(request.getEmail())
                 .password(request.getPassword())
+                .description(request.getDescription())
+                .profilePicture(request.getProfilePicture())
                 .role(request.getRole())
                 .build();
 
-        if (user.getRole() == Role.STUDENT) {
-            user.setStatus(Status.APPROVED);
-        }
-        else if (user.getRole() == Role.ADMIN) {
+        if (user.getRole() == Role.ADMIN) {
             user.setStatus(Status.APPROVED);
         }
         else {
@@ -75,7 +82,6 @@ public class AuthenticationService {
                 .role(user.getRole())
                 .build();
     }
-
 
     public String signUpUser(User user) {
         boolean userExists = userRepository.findByEmail(user.getEmail()).isPresent();

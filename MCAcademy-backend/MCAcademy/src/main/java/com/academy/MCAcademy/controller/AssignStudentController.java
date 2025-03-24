@@ -37,4 +37,11 @@ public class AssignStudentController {
     public ResponseEntity<User> getStudent(@PathVariable String email) {
         return ResponseEntity.ok(assignStudentService.getStudent(email));
     }
+
+    // This finds student assign to permit instructor to accept or decline request
+    @GetMapping("/assign/{studentId}/{instructorSpecId}")
+    public ResponseEntity<AssignStudent> getAssign(@PathVariable Long studentId,
+                                                   @PathVariable Long instructorSpecId) {
+        return ResponseEntity.ok(assignStudentService.getAssign(studentId, instructorSpecId));
+    }
 }

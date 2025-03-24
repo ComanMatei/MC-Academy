@@ -1,54 +1,50 @@
 package com.academy.MCAcademy.service;
 
 import com.academy.MCAcademy.request.ValidationRequest;
-import com.academy.MCAcademy.entity.InstructorValidation;
+import com.academy.MCAcademy.entity.UserValidation;
 import com.academy.MCAcademy.entity.Role;
 import com.academy.MCAcademy.entity.Status;
 import com.academy.MCAcademy.entity.User;
-import com.academy.MCAcademy.repository.InstructorValidationRepository;
+import com.academy.MCAcademy.repository.UserValidationRepository;
 import com.academy.MCAcademy.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class InstructorValidationService {
+public class UserValidationService {
 
     private final UserRepository userRepository;
 
-    private final InstructorValidationRepository instructorValidationRepository;
+    private final UserValidationRepository instructorValidationRepository;
 
-    public InstructorValidation validateInstructor(Long adminId, Long instructorId, ValidationRequest request) {
+    public UserValidation validateUser(Long adminId, Long userId, ValidationRequest request) {
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new RuntimeException("Admin doesn't exist"));
 
-        User instructor = userRepository.findById(instructorId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Instructor doesn't exist"));
 
         if (admin.getRole() != Role.ADMIN) {
-            throw new RuntimeException("Only admins can validate instructors");
+            throw new RuntimeException("Only admins can validate users account!");
         }
 
-        if (instructor.getRole() != Role.INSTRUCTOR) {
-            throw new RuntimeException("Only instructors can be validated!");
-        }
-
-        InstructorValidation instructorValidation = InstructorValidation.builder()
+        UserValidation instructorValidation = UserValidation.builder()
                 .admin(admin)
-                .instructor(instructor)
+                .user(user)
                 .answer(request.getAnswer())
                 .build();
 
         if(request.getAnswer()) {
-            instructor.setStatus(Status.APPROVED);
-            userRepository.save(instructor);
+            user.setStatus(Status.APPROVED);
+            userRepository.save(user);
         }
         else if (request.getAnswer() == false){
-            instructor.setStatus(Status.DECLINED);
-            userRepository.save(instructor);
+            user.setStatus(Status.DECLINED);
+            userRepository.save(user);
         }
         else {
-            throw new RuntimeException("Something este gresit!");
+            throw new RuntimeException("Something is wrong!");
         }
 
         return instructorValidationRepository.save(instructorValidation);

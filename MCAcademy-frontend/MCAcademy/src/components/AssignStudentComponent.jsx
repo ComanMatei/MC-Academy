@@ -30,14 +30,14 @@ const AssignStudentComponent = () => {
         setSelectedInstructor(instructor);
 
         if (instructor) {
-            findAllSpec(instructorId); // Căutăm instrumentele instructorului selectat
+            findAllSpec(instructorId);
         }
     }
 
     const handleSelectInstrument = (event) => {
-        const instrumentId = event.target.value;  // Trebuie să folosești valoarea
-        const selectedInst = instruments.find(inst => inst.id === parseInt(instrumentId));  // Căutăm instrumentul pe baza ID-ului
-        setSelectedInstrument(selectedInst); // Setează întregul obiect instrument
+        const instrumentId = event.target.value;
+        const selectedInst = instruments.find(inst => inst.id === parseInt(instrumentId));
+        setSelectedInstrument(selectedInst);
     };
 
     const findStudent = async (email) => {
@@ -59,7 +59,7 @@ const AssignStudentComponent = () => {
             setStudentId(data.id);
     
         } catch (err) {
-            console.error("Eroare la fetch:", err);
+            console.error("Erorr to fetch:", err);
         }
     };
 
@@ -84,7 +84,7 @@ const AssignStudentComponent = () => {
                 console.error('Error:', response.status);
             }
         } catch (err) {
-            console.error("Eroare:", err);
+            console.error("Erorr:", err);
         } finally {
             setLoading(false);
         }
@@ -109,7 +109,7 @@ const AssignStudentComponent = () => {
                 console.error('Error:', response.status);
             }
         } catch (err) {
-            console.error("Eroare:", err);
+            console.error("Erorr:", err);
         }
     }
 
@@ -138,7 +138,7 @@ const AssignStudentComponent = () => {
                 console.error('Error:', response.status);
             }
         } catch (err) {
-            console.error("Eroare:", err);
+            console.error("Erorr:", err);
         }
     }
 

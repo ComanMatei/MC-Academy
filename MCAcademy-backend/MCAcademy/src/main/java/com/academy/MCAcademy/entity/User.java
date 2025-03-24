@@ -12,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @Builder
@@ -35,6 +34,12 @@ public class User implements UserDetails{
     private String email;
 
     private String password;
+
+    private String description;
+
+    @OneToOne
+    @JoinColumn(name = "profile_pic_id")
+    private File profilePicture;
 
     @Enumerated(EnumType.STRING)
     private Status status;

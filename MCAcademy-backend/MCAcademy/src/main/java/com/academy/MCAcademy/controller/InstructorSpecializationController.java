@@ -47,14 +47,29 @@ public class InstructorSpecializationController {
         return ResponseEntity.ok(studentSpecValidationService.validateStudentSpec(instructorId, id, request));
     }
 
+    @GetMapping("/assigning/{instructorId}/{status}")
+    public List<AssignStudent> getAllStudents(@PathVariable Long instructorId,
+                                                      @PathVariable Status status,
+                                                      @RequestParam Instrument instrument) {
+        return assignStudentService.getAllAssignedStudent(status, instructorId, instrument);
+    }
+
     @GetMapping("/assigned/{instructorId}")
-    public List<AssignStudent> getAllAssignedStudent(@PathVariable Long instructorId,
+    public List<User> getAllAssignedStudent(@PathVariable Long instructorId,
                                                      @RequestParam Instrument instrument) {
-        return assignStudentService.getAllAssignedStudent(Status.PENDING, instructorId, instrument);
+        return assignStudentService.getAssignedStudents(Status.APPROVED, instructorId, instrument);
     }
 
     @GetMapping("/instruments/{instructorId}")
     public List<String> getIntrIntruments(@PathVariable Long instructorId) {
         return instructorSpecializationService.getInstrInstruments(instructorId);
     }
+
+    // This finds instructor specialization to validate student course assign
+    @GetMapping("/spec/{instructorId}/{instrument}")
+    public ResponseEntity<InstructorSpecialization> getInstructorSpec(@PathVariable Long instructorId,
+                                                                      @PathVariable Instrument instrument) {
+        return ResponseEntity.ok(instructorSpecializationService.getInstructorSpec(instructorId, instrument));
+    }
+
 }

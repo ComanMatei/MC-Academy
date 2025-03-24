@@ -13,6 +13,8 @@ public interface InstructorSpecializationRepository extends JpaRepository<Instru
     boolean existsByInstructorAndInstrument(User instructor, Instrument instrument);
     List<InstructorSpecialization> findAllByInstructorId(Long intructorid);
 
+    InstructorSpecialization findByInstructorIdAndInstrument(Long instructorId, Instrument instrument);
+
     @Query("SELECT i.instrument FROM InstructorSpecialization i WHERE i.instructor.id = :instructorId")
     List<String> findAllInstrumentByInstructorId(@Param("instructorId") Long instructorId);
 }
