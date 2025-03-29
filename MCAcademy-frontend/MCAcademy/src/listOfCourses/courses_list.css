@@ -11,6 +11,32 @@
     font-size: 16px;
 }
 
+.create-btn {
+    position: absolute;
+    top: 0;
+    right: 10%;
+    padding: 10px 20px;
+    background-color: #2cc78e;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.exit-btn {
+    position: absolute;
+    top: 0;
+    right: 19%;
+    padding: 10px 20px;
+    background-color: #2cc78e;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
 .share-btn:hover {
     background-color: #88c31b;
 }
@@ -31,4 +57,8 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     overflow: auto;
+}
+
+.seach-container {
+    width: 25%;
 }

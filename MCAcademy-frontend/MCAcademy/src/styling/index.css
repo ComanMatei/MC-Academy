@@ -48,6 +48,7 @@ textarea {
   font-size: 22px;
   padding: 0.25rem;
   border-radius: 0.5rem;
+  background-color: white;
 }
 
 label,
@@ -114,7 +115,7 @@ button {
     padding: 2rem;
     border-radius: 1rem;
     max-width: 90%;
-    width: 400px; /* Poți ajusta lățimea după preferințe */
+    width: 400px;
     z-index: 1000;
   }
 

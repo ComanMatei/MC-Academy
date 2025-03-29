@@ -24,7 +24,7 @@ const HomeComponent = () => {
             <br />
             <Link to="/admin">Go to the Admin page</Link>
             <br />
-            <Link to="/linkpage">Go to the link page</Link>
+            <Link to="/student">Go to the Student page</Link>
             <div className="flexGrow">
                 <button onClick={logout}>Sign Out</button>
             </div>

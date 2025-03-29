@@ -1,20 +1,13 @@
 import DataTable from "react-data-table-component";
 import { useState, useEffect } from 'react';
 
-const instruments = ["Drums", "Guitar", "Piano", "Violin"];
-
 const InstrumentSpecComponent = () => {
   const [selectedInstrument, setSelectedInstrument] = useState("");
   const [instructorId, setInstructorId] = useState('');
   const [specializations, setSpecializations] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const INSTRUMENTS = {
-    'Drums': 'DRUMS',
-    'Guitar': 'GUITAR',
-    'Piano': 'PIANO',
-    'Violin': 'VIOLIN'
-  }
+  const [instruments, setInstruments] = useState([]);
 
   useEffect(() => {
     const authData = localStorage.getItem("auth");
@@ -33,6 +26,10 @@ const InstrumentSpecComponent = () => {
       findAllSpec(instructorId);
     }
   }, [instructorId]);
+
+  useEffect(() => {
+    getAllInstruments();
+  }, []);
 
 
   const findInstructor = async (email) => {
@@ -62,6 +59,27 @@ const InstrumentSpecComponent = () => {
   const handleSelectChange = (event) => {
     setSelectedInstrument(event.target.value);
   };
+
+  const getAllInstruments = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/v1/instructor/instruments', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+      })
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+
+        setInstruments(data);
+      }
+    } catch (err) {
+      console.error("Error:", err);
+    }
+  }
 
   const findAllSpec = async (instructorId) => {
     try {
@@ -132,7 +150,7 @@ const InstrumentSpecComponent = () => {
       >
         <option value="" disabled>Select an instrument</option>
         {instruments.map((instrument) => (
-          <option key={instrument} value={INSTRUMENTS[instrument]}>
+          <option key={instrument} value={instrument}>
             {instrument}
           </option>
         ))}

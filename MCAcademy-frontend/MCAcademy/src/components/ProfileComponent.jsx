@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { useInstrument } from "../context/InstrumentContext";
 
 import { createImages } from "../service/FileService";
+import { getUserById } from "../service/UserService";
+import { getUserByEmail } from "../service/UserService";
 
 const ProfileComponent = () => {
 
@@ -30,8 +32,20 @@ const ProfileComponent = () => {
         const parsedAuth = authData ? JSON.parse(authData) : null;
         const validatorEmail = parsedAuth?.email || null;
 
-        findValidator(validatorEmail);
-        getUser();
+        const fetchValidator = async () => {
+            const validator = await getUserByEmail(validatorEmail);
+            setValidator(validator);
+        };
+        fetchValidator();
+    }, []);
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            const user = await getUserById(id);
+            setUser(user);
+        };
+
+        fetchUser();
     }, []);
 
     useEffect(() => {
@@ -84,7 +98,9 @@ const ProfileComponent = () => {
 
             if (response.ok) {
                 console.log(await response.json());
-                getUser();
+
+                const updatedUser = await getUserById(id);
+                setUser(updatedUser);
             } else {
                 console.error("Eroare:", response.status);
             }
@@ -143,55 +159,6 @@ const ProfileComponent = () => {
         }
     }
 
-    const getUser = async () => {
-
-        console.log("user id:" + id)
-
-        try {
-            const response = await fetch(`http://localhost:8080/api/v1/user/id/${id}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                console.log(data);
-
-                setUser(data);
-            } else {
-                console.error('Error:', response.status);
-            }
-        } catch (err) {
-            console.error("Eroare:", err);
-        }
-    }
-
-    const findValidator = async (email) => {
-        try {
-            const response = await fetch(`http://localhost:8080/api/v1/user/email/${email}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            console.log("Validator Data:", data);
-            setValidator(data);
-
-        } catch (err) {
-            console.error("Eroare la fetch:", err);
-        }
-    };
-
     const updateUser = async () => {
         let updatedUser = { ...user };
 
@@ -207,7 +174,7 @@ const ProfileComponent = () => {
             } catch (error) {
                 console.error("Eroare la încărcarea imaginii:", error);
                 return;
-            }    
+            }
         }
 
         console.log("Utilizator actualizat:", updatedUser);
@@ -245,7 +212,7 @@ const ProfileComponent = () => {
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
-        console.log("file: "+ file)
+        console.log("file: " + file)
         if (file) {
             const newImageUrl = URL.createObjectURL(file);
 

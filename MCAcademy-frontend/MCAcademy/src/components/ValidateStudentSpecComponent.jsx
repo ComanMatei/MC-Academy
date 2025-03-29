@@ -1,15 +1,19 @@
 import DataTable from "react-data-table-component";
+import SearchBar from "../search-bar/SearchBar";
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 
 import { useInstrument } from "../context/InstrumentContext";
 
 const ValidateStudentSpecComponent = () => {
-    
+
     const navigate = useNavigate();
     const { setInstrument } = useInstrument();
 
     const [assignedStudents, setAssignedStudents] = useState([]);
+    const [filteredAssignedStudents, setFilteredAssignedStudents] = useState([]);
+
     const [loading, setLoading] = useState(false);
     const [instructorId, setInstructorId] = useState('');
     const [instruments, setInstruments] = useState([]);
@@ -29,6 +33,10 @@ const ValidateStudentSpecComponent = () => {
             getInstrInstruments(instructorId);
         }
     }, [instructorId]);
+
+    useEffect(() => {
+        setFilteredAssignedStudents(assignedStudents);
+    }, [assignedStudents]);
 
     useEffect(() => {
         if (instructorId && selectedInstrument) {
@@ -73,6 +81,7 @@ const ValidateStudentSpecComponent = () => {
                 }));
 
                 setAssignedStudents(transformedData);
+                setFilteredAssignedStudents(transformedData)
             } else {
                 console.error('Error:', response.status);
             }
@@ -155,12 +164,20 @@ const ValidateStudentSpecComponent = () => {
                 </select>
             </div>
 
-            {/* Tabelul cu studenții */}
+            <div className='seach-container'>
+                <SearchBar
+                    data={assignedStudents}
+                    setResults={setFilteredAssignedStudents}
+                    type = "users"
+                />
+            </div>
+
+            {/* Students table */}
             <div>
                 <DataTable
                     title="List of assigned students"
                     columns={columns}
-                    data={assignedStudents}
+                    data={filteredAssignedStudents}
                     progressPending={loading}
                 />
             </div>

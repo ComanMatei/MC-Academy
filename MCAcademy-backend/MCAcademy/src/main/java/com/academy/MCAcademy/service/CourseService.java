@@ -80,7 +80,11 @@ public class CourseService {
         List<User> students = userRepository.findAllById(request.getStudentIds());
 
         for (Course course : courses) {
-            course.getStudents().addAll(students);
+            for (User student : students) {
+                if (!course.getStudents().contains(student)) {
+                    course.getStudents().add(student);
+                }
+            }
         }
 
         courseRepository.saveAll(courses);
@@ -91,6 +95,15 @@ public class CourseService {
                 .orElseThrow(() -> new RuntimeException("The course with this id doesn't exist!"));
 
         return course;
+    }
+
+    public List<Course> getStudentCourses(Long studentId, Long instructorId, Instrument instrument) {
+        List<Course> courses = courseRepository.findAllByStudents_IdAndInstructor_IdAndInstrument(studentId,
+                instructorId, instrument);
+        for(Course curs : courses) {
+            System.out.println("Idul: " + curs.getId());
+        }
+        return courses;
     }
 
     public Course editCourse(Long id, CourseRequest request) {

@@ -186,16 +186,16 @@ const CourseComponent = () => {
         const updatedImagesPreview = imagesPreview.filter((_, i) => i !== index);
         const updatedImages = images.filter((_, i) => i !== index);
 
-        setImages(updatedImagesPreview);
-        setImagesPreview(updatedImages);
+        setImagesPreview(updatedImagesPreview);
+        setImages(updatedImages);
     };
 
     const handleDeleteVideo = (index) => {
         const updatedVideosPreview = videosPreview.filter((_, i) => i !== index);
         const updatedVideos = videos.filter((_, i) => i !== index);
 
-        setVideos(updatedVideosPreview);
-        setVideosPreview(updatedVideos);
+        setVideosPreview(updatedVideosPreview);
+        setVideos(updatedVideos);
     };
 
     return (

@@ -1,5 +1,6 @@
 package com.academy.MCAcademy.controller;
 
+import com.academy.MCAcademy.entity.InstructorSpecialization;
 import com.academy.MCAcademy.request.AssignStudentRequest;
 import com.academy.MCAcademy.entity.AssignStudent;
 import com.academy.MCAcademy.entity.Status;
@@ -43,5 +44,11 @@ public class AssignStudentController {
     public ResponseEntity<AssignStudent> getAssign(@PathVariable Long studentId,
                                                    @PathVariable Long instructorSpecId) {
         return ResponseEntity.ok(assignStudentService.getAssign(studentId, instructorSpecId));
+    }
+
+    // This functions finds all student specializations
+    @GetMapping("/specializations/{studentId}")
+    public ResponseEntity<List<InstructorSpecialization>> getStudentSpecializations(@PathVariable Long studentId) {
+        return ResponseEntity.ok(assignStudentService.getStudentSpecializations(studentId));
     }
 }

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -62,5 +63,9 @@ public class InstructorSpecializationService {
 
     public InstructorSpecialization getInstructorSpec(Long instructorId, Instrument instrument) {
         return instructorSpecializationRepository.findByInstructorIdAndInstrument(instructorId, instrument);
+    }
+
+    public List<Instrument> getAllInstruments() {
+        return Arrays.asList(Instrument.values());
     }
 }

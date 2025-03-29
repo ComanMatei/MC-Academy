@@ -28,6 +28,16 @@ const SeeCourseComponent = () => {
     const [videosPreview, setVideosPreview] = useState([]);
     const [videos, setVideos] = useState([]);
 
+    const [userRole, setUserRole] = useState("");
+
+    useEffect(() => {
+        const authData = localStorage.getItem("auth");
+        const parsedAuth = authData ? JSON.parse(authData) : null;
+        const role = parsedAuth?.roles || null;
+
+        setUserRole(role);
+    }, []);
+
     useEffect(() => {
         getCourse();
     }, [id])
@@ -463,9 +473,11 @@ const SeeCourseComponent = () => {
                 </button>
             )}
 
-            <button onClick={handleEditClick}>
-                {isEditing ? "Cancel" : "Edit"}
-            </button>
+            {userRole == 'INSTRUCTOR' && (
+                <button onClick={handleEditClick}>
+                    {isEditing ? "Cancel" : "Edit"}
+                </button>
+            )}
 
             {!isEditing && (
                 <button onClick={getBack}>

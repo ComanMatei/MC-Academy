@@ -72,4 +72,8 @@ public class InstructorSpecializationController {
         return ResponseEntity.ok(instructorSpecializationService.getInstructorSpec(instructorId, instrument));
     }
 
+    @GetMapping("/instruments")
+    public ResponseEntity<List<Instrument>> getAllInstruments() {
+        return ResponseEntity.ok(instructorSpecializationService.getAllInstruments());
+    }
 }

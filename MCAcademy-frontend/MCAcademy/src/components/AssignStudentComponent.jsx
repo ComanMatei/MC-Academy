@@ -1,3 +1,5 @@
+import SearchComponent from "../search-bar/SearchComponent";
+
 import { useState, useEffect } from "react";
 
 const AssignStudentComponent = () => {
@@ -17,9 +19,9 @@ const AssignStudentComponent = () => {
     }, []);
 
     useEffect(() => {
-        const authData = localStorage.getItem("auth");  
-        const parsedAuth = authData ? JSON.parse(authData) : null;  
-        const email = parsedAuth?.email || null; 
+        const authData = localStorage.getItem("auth");
+        const parsedAuth = authData ? JSON.parse(authData) : null;
+        const email = parsedAuth?.email || null;
 
         findStudent(email);
     })
@@ -49,15 +51,15 @@ const AssignStudentComponent = () => {
                 },
                 withCredentials: true
             });
-    
+
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-    
+
             const data = await response.json();
-            console.log("Student Data:", data); 
+            console.log("Student Data:", data);
             setStudentId(data.id);
-    
+
         } catch (err) {
             console.error("Erorr to fetch:", err);
         }
@@ -117,10 +119,10 @@ const AssignStudentComponent = () => {
         try {
             const assign = {
                 instructorSpec: {
-                  id: selectedInstrument.id,
+                    id: selectedInstrument.id,
                 },
                 status: "PENDING",
-              };
+            };
 
             const response = await fetch(`http://localhost:8080/api/v1/student/assign-spec/${studentId}`, {
                 method: 'POST',
@@ -131,8 +133,8 @@ const AssignStudentComponent = () => {
                 withCredentials: true
             })
 
-            if(response.ok) {
-                const data = response.json();
+            if (response.ok) {
+                const data = await response.json();
                 console.log(data);
             } else {
                 console.error('Error:', response.status);
@@ -147,19 +149,14 @@ const AssignStudentComponent = () => {
             <label htmlFor="instrument" className="block mb-2 text-lg font-semibold">
                 Select your instructor:
             </label>
-            <select
-                id="instructor"
-                value={selectedInstructor ? selectedInstructor.id : ""}
-                onChange={handleSelectInstructor}
-                className="border border-gray-300 p-2 rounded-lg w-full"
-            >
-                <option value="" disabled>Select your instructor</option>
-                {instructors.map((instructor) => (
-                    <option key={instructor.id} value={instructor.id}>
-                        {instructor.firstname} {instructor.lastname}
-                    </option>
-                ))}
-            </select>
+            
+            <SearchComponent
+                instructors={instructors}
+                onSelectInstructor={(instructor) => {
+                    setSelectedInstructor(instructor);
+                    findAllSpec(instructor.id);
+                }}
+            />
 
             {selectedInstructor && (
                 <p className="mt-4 text-green-600 font-medium">
@@ -180,7 +177,7 @@ const AssignStudentComponent = () => {
                 <option value="" disabled>Select instrument</option>
                 {instruments.map((instrument) => (
                     <option key={instrument.id} value={instrument.id}>
-                        {instrument.instrument} {instrument.timeAssigned} 
+                        {instrument.instrument} {instrument.timeAssigned}
                     </option>
                 ))}
             </select>
@@ -192,6 +189,7 @@ const AssignStudentComponent = () => {
                     You selected: {selectedInstrument.instrument}
                 </p>
             )}
+
         </div>
 
 

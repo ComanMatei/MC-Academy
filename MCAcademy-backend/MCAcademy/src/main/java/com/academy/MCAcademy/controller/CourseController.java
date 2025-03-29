@@ -57,6 +57,13 @@ public class CourseController {
         return ResponseEntity.ok(courseService.getCourse(id));
     }
 
+    @GetMapping("/studentcourses/{studentId}/{instructorId}/{instrument}")
+    public ResponseEntity<List<Course>> getStudentCourses(@PathVariable Long studentId,
+                                                          @PathVariable Long instructorId,
+                                                          @PathVariable Instrument instrument) {
+        return ResponseEntity.ok(courseService.getStudentCourses(studentId, instructorId, instrument));
+    }
+
     @PutMapping("/update/{id}")
     public ResponseEntity<Course> editCourse(@PathVariable Long id,
                                                @RequestBody CourseRequest request) {

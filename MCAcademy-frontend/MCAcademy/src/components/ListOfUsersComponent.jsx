@@ -1,4 +1,6 @@
 import DataTable from "react-data-table-component";
+import SearchBar from "../search-bar/SearchBar";
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 
@@ -7,6 +9,8 @@ const ListOfUsersComponent = () => {
     const navigate = useNavigate();
 
     const [users, setUsers] = useState([]);
+    const [filteredUsers, setFilteredUsers] = useState([]);
+
     const [loading, setLoading] = useState(false);
     const [role, setRole] = useState("ADMIN");
 
@@ -15,6 +19,10 @@ const ListOfUsersComponent = () => {
     useEffect(() => {
         fetchTableData(role, selectedStatus);
     }, [role, selectedStatus]);
+
+    useEffect(() => {
+        setFilteredUsers(users);
+    }, [users]);
 
     const fetchTableData = async (userRole, selectedStatus) => {
         setLoading(true);
@@ -36,6 +44,7 @@ const ListOfUsersComponent = () => {
                 console.log(data);
 
                 setUsers(data);
+                setFilteredUsers(data);
             } else {
                 console.error('Error:', response.status);
             }
@@ -105,10 +114,18 @@ const ListOfUsersComponent = () => {
                 </select>
             </div>
 
+            <div className='seach-container'>
+                <SearchBar
+                    data={users}
+                    setResults={setFilteredUsers}
+                    type = "users"
+                />
+            </div>
+
             <DataTable
                 title="List of locked instructors"
                 columns={columns}
-                data={users}
+                data={filteredUsers}
                 progressPending={loading}
             />
             <button onClick={goBack}>

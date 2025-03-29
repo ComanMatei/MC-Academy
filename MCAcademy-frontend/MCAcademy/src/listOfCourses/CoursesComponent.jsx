@@ -1,9 +1,13 @@
 import './courses_list.css';
 
+import SearchBar from '../search-bar/SearchBar';
 import DataTable from "react-data-table-component";
+
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from "react-router-dom";
 
+import { getInstructor } from '../service/UserService';
+import { getStudent } from '../service/UserService';
 
 const CoursesComponent = () => {
     const navigate = useNavigate();
@@ -12,37 +16,88 @@ const CoursesComponent = () => {
     const [loading, setLoading] = useState(false);
     const [perPage, setPerPage] = useState(10);
 
+    const [filteredCourses, setFilteredCourses] = useState([]);
     const [courses, setCourses] = useState([]);
     const [courseId, setCourseId] = useState('');
 
-    const [instructorId, setInstructorId] = useState('');
+    const [instructor, setInstructor] = useState('');
+    const [userRole, setUserRole] = useState("");
 
     const [instruments, setInstruments] = useState([]);
     const [selectedInstrument, setSelectedInstrument] = useState("");
 
     const [students, setStudents] = useState([]);
     const [studentIds, setStudentIds] = useState([]);
+    const [student, setStudent] = useState('');
+
     const [selectedCourses, setSelectedCourses] = useState([]);
+
+    // Student initializations
+    const [studentSpec, setStudentSpec] = useState([]);
+    const [selectedInstructor, setSelectedInstructor] = useState('');
+
+    const uniqueInstructors = [...new Map(studentSpec.map(spec => [spec.instructor.id, spec.instructor])).values()];
+
+    useEffect(() => {
+        if (studentSpec.length > 0) {
+            setSelectedInstructor(studentSpec[0].instructor.id);
+        }
+    }, [studentSpec]);
+
+    useEffect(() => {
+        if (studentSpec.length > 0) {
+            setSelectedInstrument(studentSpec[0].instrument);
+        }
+    }, [studentSpec]);
 
     useEffect(() => {
         const authData = localStorage.getItem("auth");
         const parsedAuth = authData ? JSON.parse(authData) : null;
         const email = parsedAuth?.email || null;
+        const role = parsedAuth?.roles || null;
 
-        findInstructor(email);
+        setUserRole(role);
+
+        const fetchUserData = async () => {
+            if (role == 'INSTRUCTOR') {
+                const instructor = await getInstructor(email);
+                setInstructor(instructor);
+            }
+            else {
+                const student = await getStudent(email);
+                setStudent(student);
+            }
+        };
+
+        fetchUserData();
     }, []);
 
     useEffect(() => {
-        if (instructorId && selectedInstrument) {
-            fetchTableData(instructorId, selectedInstrument);
+        if (student && student.id) {
+            getStudentSpecializations();
         }
-    }, [instructorId, selectedInstrument]);
+    }, [student]);
 
     useEffect(() => {
-        if (instructorId) {
-            getInstrInstruments(instructorId);
+        if (instructor && selectedInstrument) {
+            fetchTableData(instructor.id, selectedInstrument);
         }
-    }, [instructorId]);
+    }, [instructor, selectedInstrument]);
+
+    useEffect(() => {
+        if (instructor && instructor.id) {
+            getInstrInstruments(instructor.id);
+        }
+    }, [instructor]);
+
+    useEffect(() => {
+        if (selectedInstrument) {
+            if (userRole == 'STUDENT') {
+                console.log("selec: " + selectedInstrument)
+                getStudentCourses(selectedInstrument);
+            }
+        }
+    }, [selectedInstrument]);
 
     useEffect(() => {
         if (instruments.length > 0 && !selectedInstrument) {
@@ -52,37 +107,15 @@ const CoursesComponent = () => {
     }, [instruments, selectedInstrument]);
 
     useEffect(() => {
-        if (selectedInstrument && instructorId) {
-            getAssignedStudents(instructorId, selectedInstrument);
+        if (selectedInstrument && instructor) {
+            getAssignedStudents(instructor.id, selectedInstrument);
         }
-    }, [selectedInstrument, instructorId]);
+    }, [selectedInstrument, instructor]);
 
     useEffect(() => {
-        console.log("State-ul instrumentelor actualizat:", instruments);
-    }, [instruments]);
-
-    const findInstructor = async (email) => {
-        try {
-            const response = await fetch(`http://localhost:8080/api/v1/instructor/${email}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            console.log("Instructor Data:", data);
-            setInstructorId(data.id);
-
-        } catch (err) {
-            console.error("Eroare la fetch:", err);
-        }
-    }
+        // Dacă se modifică searchQuery, filtrăm cursurile
+        setFilteredCourses(courses);
+    }, [courses]);
 
     const getInstrInstruments = async (instructorId) => {
         try {
@@ -105,7 +138,6 @@ const CoursesComponent = () => {
     }
 
     const deleteCourse = async (courseId) => {
-
         try {
             const response = await fetch(`http://localhost:8080/api/v1/course/delete/${courseId}`, {
                 method: 'DELETE',
@@ -152,6 +184,7 @@ const CoursesComponent = () => {
                 }));
 
                 setCourses(transformedData);
+                setFilteredCourses(transformedData);
             } else {
                 console.error('Error:', response.status);
             }
@@ -164,7 +197,6 @@ const CoursesComponent = () => {
 
     const getAssignedStudents = async (instructorId, selectedInstrument) => {
         console.log("Instrumentul ales: " + selectedInstrument + " instructor: " + instructorId);
-
         try {
             const response = await fetch(`http://localhost:8080/api/v1/instructor/assigned/${instructorId}?instrument=${selectedInstrument}`, {
                 method: 'GET',
@@ -183,10 +215,6 @@ const CoursesComponent = () => {
             console.error("Erorr", err);
         }
     }
-
-    const handleCourseClick = (courseId) => {
-        navigate(`/course/${courseId}`);
-    };
 
     const handleCheckboxCourses = (courseId) => {
         setSelectedCourses(prev => prev.includes(courseId)
@@ -221,24 +249,79 @@ const CoursesComponent = () => {
             });
 
             if (response.ok) {
-                const data = await response;
-                console.log(data);
+                console.log("Sanded!");
 
                 setSelectedCourses([]);
                 setStudentIds([]);
             }
         } catch (err) {
-            console.error("Eroare:", err);
+            console.error("Error: ", err);
         }
     };
 
+    const getStudentSpecializations = async () => {
+        const studentId = student.id;
+        try {
+            const response = await fetch(`http://localhost:8080/api/v1/student/specializations/${studentId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                withCredentials: true
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log("Received data:", data);
+
+                setStudentSpec(data);
+            }
+        } catch (err) {
+            console.error("Error: ", err);
+        }
+    }
+
+    const getStudentCourses = async (instrument) => {
+        const studentId = student.id;
+        console.log("studentId: " + studentId);
+        console.log("selectedInstructor: " + selectedInstructor);
+        console.log("selectedInstrument: " + instrument);
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/v1/course/studentcourses/${studentId}/${selectedInstructor}/${instrument}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                withCredentials: true
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setCourses(data);
+
+                console.log(data);
+            }
+        } catch (err) {
+            console.error("Error: ", err);
+        }
+    };
+
+    const getInstrumentsForInstructor = (instructorId) => {
+        const instruments = studentSpec
+            .filter(assign => assign.instructor.id == instructorId)
+            .map(assign => assign.instrument)
+            .filter((value, index, self) => self.indexOf(value) === index);
+        return instruments;
+    };
+
     const handleOpenDialog = async () => {
-        await getAssignedStudents(instructorId, selectedInstrument);
+        await getAssignedStudents(instructor.id, selectedInstrument);
         console.log("Open dialog");
         if (dialogRef.current) {
             dialogRef.current.showModal();
         } else {
-            console.log("Dialogul doesn't exist");
+            console.log("Dialog doesn't exist");
         }
     };
 
@@ -249,6 +332,25 @@ const CoursesComponent = () => {
             console.error("Dialogue not found");
         }
     };
+
+    const handleCourseClick = (courseId) => {
+        navigate(`/course/${courseId}`);
+    };
+
+    const handleCrateCourse = () => {
+        navigate('/course');
+    };
+
+    const goBack = () => {
+        if (userRole == 'INSTRUCTOR') {
+            navigate('/instructor');
+        }
+        else {
+            navigate(-1);
+        }
+    };
+
+
 
     const studentColumns = [
         {
@@ -319,30 +421,79 @@ const CoursesComponent = () => {
         <div style={{ position: "relative" }}>
             <h2>List of courses</h2>
 
-            <button className="share-btn" onClick={handleOpenDialog}>Share</button>
-            {
-                instruments.length > 0 ? (
-                    instruments.map((instrument, index) => (
+            <div style={{ display: "flex" }}>
+                {userRole == 'INSTRUCTOR' && (
+                    <>
+                        <button className="share-btn" onClick={handleOpenDialog}>Share</button>
+                        <button className="create-btn" onClick={handleCrateCourse}>Create course</button>
+                    </>
+                )}
+                <button className="exit-btn" onClick={goBack}>Back</button>
+            </div>
+
+            {userRole == 'STUDENT' && studentSpec.length > 0 && (
+                <div>
+                    <label htmlFor="instructorSelect">Selectează un instructor: </label>
+                    <select
+                        id="instructorSelect"
+                        value={selectedInstructor}
+                        onChange={(e) => setSelectedInstructor(e.target.value)}
+                    >
+                        <option value="">-- Alege un instructor --</option>
+                        {uniqueInstructors.map((instructor) => (
+                            <option key={instructor.id} value={instructor.id}>
+                                {instructor.firstname} {instructor.lastname}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            )}
+
+            {userRole == 'INSTRUCTOR' && instruments.length > 0 && (
+                <div>
+                    <label>Alege un instrument: </label>
+                    <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                        {instruments.map((instrument, index) => (
+                            <button
+                                key={index}
+                                onClick={() => setSelectedInstrument(instrument)}
+                            >
+                                {instrument}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {userRole == 'STUDENT' && selectedInstructor && (
+                <div>
+                    {getInstrumentsForInstructor(selectedInstructor).map((instrument, index) => (
                         <button
                             key={index}
                             onClick={() => {
                                 setSelectedInstrument(instrument);
-                                fetchTableData(instructorId, instrument);
+
+                                getStudentCourses(instrument);
                             }}
                         >
                             {instrument}
                         </button>
-                    ))
-                ) : (
-                    <p>There are no assigned instruments.</p>
-                )
-            }
+                    ))}
+                </div>
+            )}
+            <div className='seach-container'>
+                <SearchBar
+                    data={courses}  
+                    setResults={setFilteredCourses} 
+                    type = "courses"
+                />
+            </div>
 
             <div>
                 <DataTable
                     title="List of locked instructors"
                     columns={columns}
-                    data={courses}
+                    data={filteredCourses}
                     progressPending={loading}
                 />
             </div>

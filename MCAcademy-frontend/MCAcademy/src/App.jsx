@@ -9,7 +9,6 @@ import RequireAuth from "./components/RequireAuth";
 import AdminComponent from './components/AdminComponent'
 import InstructorComponent from './components/InstructorComponent'
 import StudentComponent from './components/StudentComponent'
-import LinkPage from './components/LinkPage'
 import Unauthorized from './components/Unauthorized'
 
 import MailInformationComponent from './components/MailInformationComponent'
@@ -29,6 +28,9 @@ import SeeCourseComponent from './course/SeeCourseComponent'
 import ProfileComponent from './components/ProfileComponent'
 import ListOfUsersComponent from './components/ListOfUsersComponent'
 
+import SearchComponent from './search-bar/SearchComponent'
+
+
 import { InstrumentProvider } from "./context/InstrumentContext";
 
 const ROLES = {
@@ -47,12 +49,13 @@ export default function App() {
           <Route path="register" element={<RegisterComponent />} />
           <Route path="login" element={<LoginComponent />} />
           <Route path="verify-email" element={<VerifyEmailComponent />} />
-          <Route path="linkpage" element={<LinkPage />} />
           <Route path="unauthorized" element={<Unauthorized />} />
           <Route path="mail-info" element={<MailInformationComponent />} />
           <Route path="/forgotpassword/reset" element={<ChangePasswordComponent />} />
           <Route path="/search" element={<SpotifySearch />} />
           <Route path="/course/:id" element={<SeeCourseComponent />} />
+
+          <Route path='/searchbar' element={<SearchComponent />} />
 
           <Route path="/profile/:id" element={<ProfileComponent />} />
 
@@ -68,16 +71,20 @@ export default function App() {
             <Route path="/assign-instrument" element={<InstrumentSpecComponent />} />
             <Route path="/validate-student" element={<ValidateStudentSpecComponent />} />
             <Route path="/course" element={<CourseComponent />} />
-            <Route path="/courses" element={<CoursesComponent />} />
           </Route>
 
           {/* STUDENT routes */}
           <Route element={<RequireAuth allowedRoles={[ROLES.Student]} />}>
             <Route path='/assign-spec' element={<AssignStudentComponent />} />
+            <Route path='/student' element={<StudentComponent />} />
           </Route>
 
           <Route element={<RequireAuth allowedRoles={[ROLES.Admin, ROLES.Instructor, ROLES.Student]} />}>
             <Route path="/" element={<HomeComponent />} />
+          </Route>
+
+          <Route element={<RequireAuth allowedRoles={[ROLES.Instructor, ROLES.Student]} />}>
+            <Route path="/courses" element={<CoursesComponent />} />
           </Route>
 
         </Route>

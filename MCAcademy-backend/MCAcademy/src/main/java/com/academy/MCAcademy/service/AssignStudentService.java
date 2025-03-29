@@ -64,9 +64,14 @@ public class AssignStudentService {
     }
 
     public AssignStudent getAssign(Long studentId, Long instructorSpecId) {
-        System.out.println("Service - studentId: " + studentId);
-        System.out.println("Service - instructorSpecId: " + instructorSpecId);
-
         return assignStudentRepository.findByStudent_IdAndInstructorSpec_Id(studentId, instructorSpecId);
+    }
+
+    public List<InstructorSpecialization> getStudentSpecializations(Long studentId) {
+        List<AssignStudent> studentAssignments = assignStudentRepository.findAllByStudent_IdAndStatus(studentId, Status.APPROVED);
+
+        return studentAssignments.stream()
+                .map(AssignStudent::getInstructorSpec)
+                .collect(Collectors.toList());
     }
 }
