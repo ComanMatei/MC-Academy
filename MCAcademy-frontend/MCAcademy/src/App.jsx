@@ -29,7 +29,7 @@ import ProfileComponent from './components/ProfileComponent'
 import ListOfUsersComponent from './components/ListOfUsersComponent'
 
 import SearchComponent from './search-bar/SearchComponent'
-
+import Metronome from './metronome/Metronome'
 
 import { InstrumentProvider } from "./context/InstrumentContext";
 
@@ -56,6 +56,7 @@ export default function App() {
           <Route path="/course/:id" element={<SeeCourseComponent />} />
 
           <Route path='/searchbar' element={<SearchComponent />} />
+          <Route path='/metronome' element={<Metronome />} />
 
           <Route path="/profile/:id" element={<ProfileComponent />} />
 

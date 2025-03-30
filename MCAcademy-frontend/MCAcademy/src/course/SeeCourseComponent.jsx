@@ -7,6 +7,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { createImages } from "../service/FileService";
 import { createVideos } from "../service/FileService";
 import { saveTrack } from '../service/SpotifyTrackService';
+import Metronome from '../metronome/Metronome';
 
 const SeeCourseComponent = () => {
 
@@ -484,6 +485,8 @@ const SeeCourseComponent = () => {
                     Exit
                 </button>
             )}
+
+            <Metronome />
         </div>
     );
 }
