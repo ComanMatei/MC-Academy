@@ -154,10 +154,6 @@ const CoursesComponent = () => {
         setLoading(true);
 
         let transformedData = [];
-        console.log("Selected userId:", userId);
-        console.log("Selected instrument:", instrument);
-        console.log("Selected viewMode:", viewMode);
-        console.log("Selected selectedInstructor:", selectedInstructor);
 
         if (userRole == 'INSTRUCTOR') {
             const data = await getAllCourses(userId, instrument, viewMode, token);
@@ -374,7 +370,7 @@ const CoursesComponent = () => {
                         <button
                             key={index}
                             onClick={() => {
-                                setSelectedInstrument(instrument); // Doar setezi instrumentul
+                                setSelectedInstrument(instrument);
                             }}
                         >
                             {instrument}

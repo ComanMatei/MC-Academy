@@ -2,20 +2,28 @@ import SearchBar from "./SearchBar"
 import SearchResults from "./SearchResults"
 import "./searchcomponent.css"
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-const SearchComponent = ({ instructors = [], onSelectInstructor }) => {
+const SearchComponent = ({ instructors, onSelectInstructor }) => {
+    const [filteredInstructors, setFilteredInstructors] = useState(instructors);
 
-    const [results, setResults] = useState([]);
+    useEffect(() => {
+        setFilteredInstructors(instructors);
+    }, [instructors]);
 
     return (
-        <div className="container">
-            <div className="search-bar-container">
-                <SearchBar data={instructors} setResults={setResults} type="instructors"/>
-                <SearchResults results={results.length > 0 ? results : instructors} onSelectInstructor={onSelectInstructor} />
-            </div>
+        <div className="search-container">
+                <SearchBar
+                    data={instructors}
+                    setResults={setFilteredInstructors}
+                    type="users"
+                />
+                <SearchResults
+                    results={filteredInstructors}
+                    onSelectInstructor={onSelectInstructor}
+                />
         </div>
-    )
-}
+    );
+};
 
-export default SearchComponent
+export default SearchComponent;

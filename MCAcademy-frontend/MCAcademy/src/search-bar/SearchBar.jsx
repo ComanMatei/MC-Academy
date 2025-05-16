@@ -5,36 +5,40 @@ import { useState, useEffect } from "react";
 const SearchBar = ({ data, setResults, type, viewMode }) => {
   const [input, setInput] = useState('');
 
-  // Reset text input when refresh
   useEffect(() => {
     setInput('');
-    setResults(data); // Reset results when data changes
+    setResults(data);
   }, [data, setResults]);
 
   const handleChange = (value) => {
     setInput(value);
     let filteredData;
 
-    // Verifică dacă input-ul este gol
-    if (value === '') {
-      // Dacă input-ul este gol, setează cursurile active sau din istoric
-      filteredData = viewMode === 'active'
-        ? data.filter(course => new Date(course.endDate) >= new Date())
-        : data.filter(course => new Date(course.endDate) < new Date());
+    if (value == '') {
+      if (type == 'courses') {
+        if (viewMode == 'active') {
+          filteredData = data.filter(course => new Date(course.endDate) >= new Date());
+        } else if (viewMode == true) {
+          filteredData = data.filter(course => new Date(course.endDate) < new Date());
+        } else {
+          filteredData = data;
+        }
+      } else {
+        filteredData = data;
+      }
 
       setResults(filteredData);
       return;
     }
 
-    // Filtrare pentru tipurile de date "courses" sau "instructors"
-    if (type === "courses" || type === "instructors") {
+    if (type == "courses" || type == "instructors") {
       filteredData = data.filter((data) => {
         const fullName = `${data.name}`.toLowerCase();
         return fullName.includes(value.toLowerCase());
       });
     }
 
-    if (type === "users") {
+    if (type == "users") {
       filteredData = data.filter((item) => {
         const name = `${item.firstname} ${item.lastname}`.toLowerCase();
         return name.includes(value.toLowerCase());
@@ -43,6 +47,7 @@ const SearchBar = ({ data, setResults, type, viewMode }) => {
 
     setResults(filteredData);
   };
+
 
   return (
     <div className="input-wrapper">
