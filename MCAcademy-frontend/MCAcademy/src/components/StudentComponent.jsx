@@ -1,34 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
-import AuthContext from "../context/AuthProvider";
 
-import { getUserByEmail } from "../service/UserService";
+import AuthContext from "../context/AuthProvider";
 
 const StudentComponent = () => {
 
-    const { setAuth } = useContext(AuthContext);
+    const { auth, setAuth } = useContext(AuthContext);
+    const userId = auth?.userId;
+
     const navigate = useNavigate();
-    
-    const [userId, setUserId] = useState('');
-
-    useEffect(() => {
-        const fetchUser = async () => {
-            const authData = localStorage.getItem("auth");
-            const parsedAuth = authData ? JSON.parse(authData) : null;
-            const email = parsedAuth?.email || null;
-
-            if (email) {
-                try {
-                    const user = await getUserByEmail(email);
-                    setUserId(user.id);
-                } catch (error) {
-                    console.error("Failed to fetch user:", error);
-                }
-            }
-        };
-
-        fetchUser();
-    }, []);
 
     const myCourses = () => {
         navigate('/courses')

@@ -1,43 +1,54 @@
 package com.academy.MCAcademy.service;
 
+import com.academy.MCAcademy.dto.CourseDto;
+import com.academy.MCAcademy.dto.UserDto;
+import com.academy.MCAcademy.dto.UserSummaryDto;
+import com.academy.MCAcademy.dto.ValidatorDto;
+import com.academy.MCAcademy.entity.Course;
 import com.academy.MCAcademy.entity.Role;
 import com.academy.MCAcademy.entity.Status;
 import com.academy.MCAcademy.entity.User;
+import com.academy.MCAcademy.repository.CourseRepository;
 import com.academy.MCAcademy.repository.UserRepository;
 import com.academy.MCAcademy.request.RegisterRequest;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
+    private final ModelMapper modelMapper;
+
     private final UserRepository userRepository;
 
-    public User getUserById(Long userId) {
+    private final CourseRepository courseRepository;
+
+    // Returns users info based on given ID
+    public UserDto getUserById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("The user with this id doesn't exist!"));
 
-        return user;
+        return convertUserEntityToDto(user);
     }
 
-    public User getUserByEmail(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("This user doesn't exist"));
+    // Returns users validator info based on given ID
+    public ValidatorDto getUsersValidatorById(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("This validator with this email doesn't exist!"));
 
-        return user;
+        return convertValidatorEntityToDto(user);
     }
 
-    public List<User> getAllPendingInstructors(Status status, Boolean enable) {
-        List<User> users = userRepository.findAllByRoleAndStatusAndEnabled(Role.INSTRUCTOR, status, enable);
-        users.forEach(user -> System.out.println("Instructor Email: " + user.getEmail()));
-        return userRepository.findAllByRoleAndStatusAndEnabled(Role.INSTRUCTOR, status, enable);
-    }
-
-    public List<User> getUsersByRole(Role role, Status status, Boolean enable) {
-        return userRepository.findAllByRoleAndStatusAndEnabled(role, status, enable);
+    public List<UserSummaryDto> getUsersByRoleAndStatus(Role role, Status status, Boolean enable) {
+        List<User> users = userRepository.findAllByRoleAndStatusAndEnabled(role, status, enable);
+        return users.stream()
+                .map(this::convertUserSummaryEntityToDto)
+                .collect(Collectors.toList());
     }
 
     public User updateUser(Long userId, RegisterRequest request) {
@@ -62,5 +73,37 @@ public class UserService {
         }
 
         return userRepository.save(user);
+    }
+
+    public CourseDto getCourse(Long id) {
+        Course course = courseRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("The course with this id doesn't exist!"));
+
+        return convertCourseEntityToDto(course);
+    }
+
+
+    // Private functions for converting Entity class to DTO class
+    private ValidatorDto convertValidatorEntityToDto(User user) {
+        ValidatorDto validatorDto = modelMapper.map(user, ValidatorDto.class);
+
+        return validatorDto;
+    }
+
+    private CourseDto convertCourseEntityToDto(Course course) {
+        return modelMapper.map(course, CourseDto.class);
+    }
+
+
+    private UserDto convertUserEntityToDto(User user) {
+        UserDto userDto = modelMapper.map(user, UserDto.class);
+
+        return userDto;
+    }
+
+    private UserSummaryDto convertUserSummaryEntityToDto(User user) {
+        UserSummaryDto userSummaryDto = modelMapper.map(user, UserSummaryDto.class);
+
+        return userSummaryDto;
     }
 }

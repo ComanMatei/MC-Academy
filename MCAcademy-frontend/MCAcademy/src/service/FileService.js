@@ -1,6 +1,6 @@
 
 // Create images for components
-export const createImages = async (files) => {
+export const createImages = async (files, token) => {
     if (!files) {
         console.log("No file has been selected!");
         return;
@@ -15,6 +15,9 @@ export const createImages = async (files) => {
         const response = await fetch('http://localhost:8080/api/v1/file/create-image', {
             method: 'POST',
             body: formData,
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
             withCredentials: true
         });
 
@@ -35,7 +38,7 @@ export const createImages = async (files) => {
 };
 
 // Create videos for components
-export const createVideos = async (files) => {
+export const createVideos = async (files, token) => {
     if (!files) {
         console.log("No file has been selected!");
         return;
@@ -48,6 +51,45 @@ export const createVideos = async (files) => {
 
     try {
         const response = await fetch('http://localhost:8080/api/v1/file/create-video', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            withCredentials: true
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+
+            if (Array.isArray(data) && data.length > 0) {
+
+                return data;
+            } else {
+                console.error("Unexpected response structure:", data);
+            }
+        } else {
+            console.error('Request failed with status:', response.status);
+        }
+    } catch (error) {
+        console.error('Failed to upload files:', error);
+    }
+};
+
+// Create profile picture
+export const createprofilePicture = async (files) => {
+    if (!files) {
+        console.log("No file has been selected!");
+        return;
+    }
+
+    const formData = new FormData();
+    files.forEach((file) => {
+        formData.append('file', file);
+    });
+
+    try {
+        const response = await fetch('http://localhost:8080/api/v1/file/profile-pic', {
             method: 'POST',
             body: formData,
             withCredentials: true

@@ -47,14 +47,16 @@ const LoginComponent = () => {
                 const data = await response.json();
                 console.log(data);
 
+                const userId = data.userId;
                 const accessToken = data.token;
+                const refreshToken = data.refreshToken;
                 const roles = Array.isArray(data.role) ? data.role : [data.role];
-                setAuth({ email, password, roles, accessToken });     
+                setAuth({ userId, roles, accessToken, refreshToken });     
 
                 setEmail('');
                 setPassword('');
                 console.log("Navigating to:", from);
-                navigate(from, { replace: true });
+                navigate("/", { replace: true });
             } else {
                 console.error('Error:', response.status);
             }

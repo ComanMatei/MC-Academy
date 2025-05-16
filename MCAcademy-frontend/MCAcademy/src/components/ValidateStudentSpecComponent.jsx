@@ -1,37 +1,40 @@
 import DataTable from "react-data-table-component";
 import SearchBar from "../search-bar/SearchBar";
 
-import { useState, useEffect } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 
-import { useInstrument } from "../context/InstrumentContext";
+import { getInstrInstruments } from "../service/InstructorService";
+import { getAssignedStudents } from "../service/InstructorService";
+import { validateStudentSpec } from "../service/InstructorService";
+
+import AuthContext from "../context/AuthProvider";
 
 const ValidateStudentSpecComponent = () => {
 
+    const { auth } = useContext(AuthContext);
+    const token = auth?.accessToken;
+    const instructorId = auth?.userId;
+
     const navigate = useNavigate();
-    const { setInstrument } = useInstrument();
 
     const [assignedStudents, setAssignedStudents] = useState([]);
     const [filteredAssignedStudents, setFilteredAssignedStudents] = useState([]);
 
     const [loading, setLoading] = useState(false);
-    const [instructorId, setInstructorId] = useState('');
     const [instruments, setInstruments] = useState([]);
     const [selectedInstrument, setSelectedInstrument] = useState("");
     const [selectedStatus, setSelectedStatus] = useState("PENDING");
 
     useEffect(() => {
-        const authData = localStorage.getItem("auth");
-        const parsedAuth = authData ? JSON.parse(authData) : null;
-        const email = parsedAuth?.email || null;
-
-        findInstructor(email);
-    }, []);
-
-    useEffect(() => {
-        if (instructorId) {
-            getInstrInstruments(instructorId);
+        const fetchInstruments = async (token) => {
+            if (instructorId) {
+                const instruments = await getInstrInstruments(instructorId, token);
+                setInstruments(instruments);
+                setSelectedInstrument(instruments[0] || "");
+            }
         }
+        fetchInstruments(token);
     }, [instructorId]);
 
     useEffect(() => {
@@ -44,85 +47,49 @@ const ValidateStudentSpecComponent = () => {
         }
     }, [instructorId, selectedInstrument, selectedStatus]);
 
-    const findInstructor = async (email) => {
-        try {
-            const response = await fetch(`http://localhost:8080/api/v1/instructor/${email}`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-                withCredentials: true
-            });
-
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-
-            const data = await response.json();
-            setInstructorId(data.id);
-        } catch (err) {
-            console.error("Eroare la fetch:", err);
-        }
-    };
-
     const fetchTableData = async (instructorId, selectedInstrument, status) => {
         setLoading(true);
 
-        try {
-            const response = await fetch(`http://localhost:8080/api/v1/instructor/assigning/${instructorId}/${status}?instrument=${selectedInstrument}`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-                withCredentials: true
-            });
+        const data = await getAssignedStudents(instructorId, status, selectedInstrument, token);
 
-            if (response.ok) {
-                const data = await response.json();
-                const transformedData = data.map(item => ({
-                    id: item.student.id,
-                    firstname: item.student.firstname,
-                    lastname: item.student.lastname,
-                    assignStudentId: item.id
-                }));
+        console.log("Assigned students data:", data);
+        const transformedData = data.map(item => ({
+            id: item.id,
+            firstname: item.firstname,
+            lastname: item.lastname,
+            assignStudentId: item.id
+        }));
 
-                setAssignedStudents(transformedData);
-                setFilteredAssignedStudents(transformedData)
-            } else {
-                console.error('Error:', response.status);
-            }
-        } catch (err) {
-            console.error("Eroare:", err);
-        } finally {
-            setLoading(false);
-        }
+        setAssignedStudents(transformedData);
+        setFilteredAssignedStudents(transformedData)
+
+        setLoading(false);
     };
 
-    const getInstrInstruments = async (instructorId) => {
-        try {
-            const response = await fetch(`http://localhost:8080/api/v1/instructor/instruments/${instructorId}`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-                withCredentials: true
-            });
+    const FetchValidation = async (instructorId, assignStudentId, answer) => {
 
-            if (response.ok) {
-                const data = await response.json();
-                setInstruments(data);
-                setSelectedInstrument(data[0] || "");
-            }
-        } catch (err) {
-            console.error("Eroare la fetch:", err);
-        }
+        console.log("answer", answer);
+        await validateStudentSpec(instructorId, assignStudentId, answer, token);
+
+        await fetchTableData(instructorId, selectedInstrument, selectedStatus);
     };
-
-    const handleUserProfile = (userId, selectedInstrument) => {
-        setInstrument(selectedInstrument);
-        navigate(`/profile/${userId}`);
-    }
 
     const columns = [
         { name: "Firstname", selector: (row) => row.firstname },
         { name: "Lastname", selector: (row) => row.lastname },
         {
-            name: "Profile",
+            name: "Approve",
             cell: (row) => (
-                <button onClick={() => handleUserProfile(row.id, selectedInstrument)}>
-                    See Profile
+                <button onClick={() => FetchValidation(instructorId, row.assignStudentId, true)}>
+                    Approve
+                </button>
+            ),
+        },
+        {
+            name: "Decline",
+            cell: (row) => (
+                <button onClick={() => FetchValidation(instructorId, row.assignStudentId, false)}>
+                    Decline
                 </button>
             ),
         },
@@ -168,7 +135,7 @@ const ValidateStudentSpecComponent = () => {
                 <SearchBar
                     data={assignedStudents}
                     setResults={setFilteredAssignedStudents}
-                    type = "users"
+                    type="users"
                 />
             </div>
 

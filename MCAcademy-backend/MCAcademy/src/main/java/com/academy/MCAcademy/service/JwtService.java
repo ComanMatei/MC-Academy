@@ -5,20 +5,21 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class JwtService{
 
-    private static final String SECRET_KEY = "2b7e151628aed2a6abf7158809cf4f3c8e04c3a3a0b5e1f1b5fe5e9b1a3b5f4a";
+    private static final String SECRET_KEY = Base64.getEncoder().encodeToString("a-string-secret-at-least-256-bits-long".getBytes(StandardCharsets.UTF_8));
+
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -31,7 +32,19 @@ public class JwtService{
     }
 
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+        Map<String, Object> extraClaims = new HashMap<>();
+
+        if (userDetails instanceof com.academy.MCAcademy.entity.User user) {
+            extraClaims.put("userId", user.getId());
+
+            List<String> authorities = user.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .map(role -> "ROLE_" + role)
+                    .collect(Collectors.toList());
+            extraClaims.put("authorities", authorities);
+        }
+
+        return generateToken(extraClaims, userDetails);
     }
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
@@ -40,7 +53,17 @@ public class JwtService{
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 15))
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String generateRefreshToken(UserDetails userDetails) {
+        return Jwts
+                .builder()
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -59,13 +82,27 @@ public class JwtService{
         return extractClaim(token, Claims::getExpiration);
     }
 
-    private Claims extractAllClaims(String token) {
+    public Claims extractAllClaims(String token) {
         return Jwts
                 .parserBuilder()
                 .setSigningKey(getSignInKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    public List<String> extractAuthorities(String token) {
+        Claims claims = extractAllClaims(token);
+        Object authorities = claims.get("authorities");
+
+        if (authorities instanceof List<?>) {
+            return ((List<?>) authorities).stream()
+                    .filter(String.class::isInstance)
+                    .map(String.class::cast)
+                    .collect(Collectors.toList());
+        }
+
+        return Collections.emptyList(); // fallback safe
     }
 
     private Key getSignInKey() {

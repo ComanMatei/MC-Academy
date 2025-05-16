@@ -4,7 +4,7 @@ import { faCheck, faTimes, faInfoCircle } from "@fortawesome/free-solid-svg-icon
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import '../registerState/register.css'
-import PictureUploadDialog from "./PictureUploadDialog";
+import { createprofilePicture } from "../service/FileService";
 
 const EMAIL_REGEX = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%_]).{8,24}$/;
@@ -37,8 +37,8 @@ const RegisterComponent = () => {
     const [validDescription, setValidDescription] = useState(false);
     const [descriptionFocus, setDescriptionFocus] = useState(false);
 
+    const [profilePicturePreview, setProfilePicturePreview] = useState('');
     const [profilePicture, setProfilePicture] = useState('');
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     const [password, setPassword] = useState('');
     const [validPassword, setValidPassword] = useState(false);
@@ -84,35 +84,6 @@ const RegisterComponent = () => {
         setRole(role)
     }
 
-    const createImages = async () => {
-        if (!profilePicture) {
-            console.log("No file has been selected!");
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('file', profilePicture);
-
-        try {
-            const response = await fetch('http://localhost:8080/api/v1/file/create-image', {
-                method: 'POST',
-                body: formData,
-                withCredentials: true
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                console.log("Profile picture:", data);
-
-                setProfilePicture(data);
-            } else {
-                console.error('Request failed with status:', response.status);
-            }
-        } catch (error) {
-            console.error('Failed to upload files:', error);
-        }
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -122,12 +93,20 @@ const RegisterComponent = () => {
         const v4 = EMAIL_REGEX.test(email);
         const v5 = PASSWORD_REGEX.test(password);
         const v6 = DESCRIPTION_REGEX.test(description)
+
+        if (!profilePicture) {
+            setErrMsg("Profile picture is required");
+            return;
+        }
+
         if (!v1 || !v2 || !v3 || !v4 || !v5 || !v6) {
             setErrMsg("Invalid Entry");
             return;
         }
 
-        const user = { firstname, lastname, dateOfBirth, email, password, role, description, profilePicture: profilePicture[0] }
+        const picture = await createprofilePicture([profilePicture]);
+
+        const user = { firstname, lastname, dateOfBirth, email, password, role, description, profilePicture: picture[0] }
         console.log(user);
         setSuccess(true);
 
@@ -135,7 +114,7 @@ const RegisterComponent = () => {
             const response = await fetch('http://localhost:8080/api/v1/auth/register', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(user),
                 withCredentials: true
@@ -173,16 +152,12 @@ const RegisterComponent = () => {
         }
     }
 
-    const handleProfilePictureChange = (event) => {
-        setProfilePicture(event.target.files[0]);
-    };
-
-    const handleOpenDialog = () => {
-        setIsDialogOpen(true);
-    };
-
-    const handleCloseDialog = () => {
-        setIsDialogOpen(false);
+    const handleFileChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            setProfilePicturePreview(URL.createObjectURL(file));
+            setProfilePicture(file);
+        }
     };
 
     return (
@@ -193,6 +168,27 @@ const RegisterComponent = () => {
             <button onClick={() => handleRoleSelect("INSTRUCTOR")}> Instructor </button>
             <button onClick={() => handleRoleSelect("STUDENT")}> Student </button>
             <form onSubmit={handleSubmit}>
+
+                <label>Profile picture:</label>
+                <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                />
+
+                {profilePicturePreview && (
+                    <img
+                        src={profilePicturePreview}
+                        alt="Profile Preview"
+                        style={{
+                            width: "150px",
+                            height: "150px",
+                            borderRadius: "50%",
+                            objectFit: "cover",
+                            marginTop: "10px",
+                        }}
+                    />
+                )}
 
                 <label htmlFor="firstname">
                     Firstname:
@@ -309,35 +305,6 @@ const RegisterComponent = () => {
                     <FontAwesomeIcon icon={faInfoCircle} />
                     Minimum 100 characters
                 </p>
-
-                <label htmlFor="profilePicture">Profile Picture:</label>
-                <input
-                    type="file"
-                    id="profilePicture"
-                    onChange={handleProfilePictureChange}
-                    accept="image/*"
-                    style={{ display: "none" }}
-                />
-                {profilePicture && <p>Profile picture uploaded successfully!</p>}
-
-                <button type="button" onClick={handleOpenDialog}>
-                    Open Dialog
-                </button>
-
-                {isDialogOpen && (
-                    <div className="dialog-overlay" onClick={handleCloseDialog}>
-                        <div className="dialog">
-                            <h2>Încarcă poza de profil</h2>
-                            <PictureUploadDialog
-                                isOpen={isDialogOpen}
-                                onClose={handleCloseDialog}
-                                createImages={createImages}
-                                profilePicture={profilePicture}
-                                setProfilePicture={setProfilePicture}
-                            />
-                        </div>
-                    </div>
-                )}
 
                 <label htmlFor="password">
                     Password:

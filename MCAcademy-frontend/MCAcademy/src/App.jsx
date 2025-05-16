@@ -9,7 +9,9 @@ import RequireAuth from "./components/RequireAuth";
 import AdminComponent from './components/AdminComponent'
 import InstructorComponent from './components/InstructorComponent'
 import StudentComponent from './components/StudentComponent'
+
 import Unauthorized from './components/Unauthorized'
+import UrlUnauthorized from './components/UrlUnauthorized'
 
 import MailInformationComponent from './components/MailInformationComponent'
 import VerifyEmailComponent from './components/VerifyEmailComponent'
@@ -31,8 +33,6 @@ import ListOfUsersComponent from './components/ListOfUsersComponent'
 import SearchComponent from './search-bar/SearchComponent'
 import Metronome from './metronome/Metronome'
 
-import { InstrumentProvider } from "./context/InstrumentContext";
-
 const ROLES = {
   'Admin': 'ADMIN',
   'Instructor': 'INSTRUCTOR',
@@ -42,7 +42,6 @@ const ROLES = {
 export default function App() {
 
   return (
-    <InstrumentProvider>
       <Routes>
         <Route path='/' element={<Layout />}>
           {/* public routes */}
@@ -50,6 +49,7 @@ export default function App() {
           <Route path="login" element={<LoginComponent />} />
           <Route path="verify-email" element={<VerifyEmailComponent />} />
           <Route path="unauthorized" element={<Unauthorized />} />
+          <Route path="url-unauthorized" element={<UrlUnauthorized />} />
           <Route path="mail-info" element={<MailInformationComponent />} />
           <Route path="/forgotpassword/reset" element={<ChangePasswordComponent />} />
           <Route path="/search" element={<SpotifySearch />} />
@@ -82,6 +82,7 @@ export default function App() {
 
           <Route element={<RequireAuth allowedRoles={[ROLES.Admin, ROLES.Instructor, ROLES.Student]} />}>
             <Route path="/" element={<HomeComponent />} />
+            <Route path="/profile/:id" element={<ProfileComponent />} />
           </Route>
 
           <Route element={<RequireAuth allowedRoles={[ROLES.Instructor, ROLES.Student]} />}>
@@ -90,7 +91,6 @@ export default function App() {
 
         </Route>
       </Routes>
-    </InstrumentProvider>
   )
 }
 

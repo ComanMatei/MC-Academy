@@ -41,7 +41,6 @@ const Metronome = () => {
                     <span className="tempo">{bpm}</span>
                     <span className="bpm">BPM</span>
                 </div>
-                <div className="tempo-text">Nice and steady</div>
                 <div className="tempo-settings">
                     <div className="adjust-tempo-btn decrease-tempo" onClick={() => setBpm(prev => Math.max(20, prev - 1))}>-</div>
                     <input 

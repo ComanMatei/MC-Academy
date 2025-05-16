@@ -1,14 +1,20 @@
-import { useState, useEffect } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
-import { useInstrument } from "../context/InstrumentContext";
-
+import { getUsersValidatorById } from "../service/UserService";
 import { createImages } from "../service/FileService";
 import { getUserById } from "../service/UserService";
-import { getUserByEmail } from "../service/UserService";
+import { usersValidation } from "../service/AdminService";
+
+import AuthContext from "../context/AuthProvider";
 
 const ProfileComponent = () => {
+
+    const { auth } = useContext(AuthContext);
+    const token = auth?.accessToken;
+    const validatorUserId = auth?.userId;
+    const role = auth?.roles;
 
     const navigate = useNavigate();
 
@@ -17,31 +23,28 @@ const ProfileComponent = () => {
     const [user, setUser] = useState({});
     const [validator, setValidator] = useState('');
 
-    const { instrument } = useInstrument();
-
-    const [instructorSpec, setInstructorSpec] = useState('');
-    const [assignStudent, setAssignedStudent] = useState('');
-
+    const [instructorSpecId, setInstructorSpecId] = useState('');
     const [isOwnProfile, setIsOwnProfile] = useState(false);
 
     const [imagePreview, setImagePreview] = useState('');
     const [profilePicture, setProfilePicture] = useState('');
 
     useEffect(() => {
-        const authData = localStorage.getItem("auth");
-        const parsedAuth = authData ? JSON.parse(authData) : null;
-        const validatorEmail = parsedAuth?.email || null;
-
         const fetchValidator = async () => {
-            const validator = await getUserByEmail(validatorEmail);
-            setValidator(validator);
+            if (!validatorUserId || !token) return;
+
+            if (role == "ADMIN") {
+                const validator = await getUsersValidatorById(validatorUserId, token);
+                setValidator(validator);
+            }
         };
+
         fetchValidator();
-    }, []);
+    }, [id, token]);
 
     useEffect(() => {
         const fetchUser = async () => {
-            const user = await getUserById(id);
+            const user = await getUserById(id, token);
             setUser(user);
         };
 
@@ -49,122 +52,41 @@ const ProfileComponent = () => {
     }, []);
 
     useEffect(() => {
-        if (validator && id) {
-            if (validator.id == id) {
-                setIsOwnProfile(true);
+        if (role == "INSTRUCTOR" || role == "STUDENT") {
+            if (id != validatorUserId) {
+                navigate("/url-unauthorized");
+                return;
             }
         }
+    }, [id, validatorUserId, navigate]);
+
+    useEffect(() => {
+        if (!validator) {
+            setIsOwnProfile(true);
+        } else if (validator.id === id) {
+            setIsOwnProfile(true);
+        } else {
+            setIsOwnProfile(false);
+        }
     }, [validator, id]);
-
-    useEffect(() => {
-        if (validator && instrument) {
-            getInstructorSpec(validator.id, instrument);
-        }
-    }, [validator, instrument]);
-
-    useEffect(() => {
-        if (user && instructorSpec) {
-            getAssignStudent(user, instructorSpec);
-        }
-    }, [user, instructorSpec]);
 
     const handleValidation = async (answer) => {
         if (!validator.role) return;
 
-        let endpoint = "";
-        let bodyData = {};
         const validatorId = validator.id;
-        const assignStudentId = assignStudent.id;
 
-        // If validator is instructor, he can only validate instructors account
-        if (validator.role === "ADMIN") {
-            endpoint = `http://localhost:8080/api/v1/admin/validation/${validatorId}/${id}`;
-            bodyData = { validatorId, id, answer };
-        }
+        await usersValidation(validatorId, id, answer, token);
 
-        // If validator is instructor, he can only validate assigning students instruments
-        if (validator.role === "INSTRUCTOR") {
-            endpoint = `http://localhost:8080/api/v1/instructor/validation/${validatorId}/${assignStudentId}`;
-            bodyData = { answer };
-        }
-
-        try {
-            const response = await fetch(endpoint, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(bodyData),
-                withCredentials: true
-            });
-
-            if (response.ok) {
-                console.log(await response.json());
-
-                const updatedUser = await getUserById(id);
-                setUser(updatedUser);
-            } else {
-                console.error("Eroare:", response.status);
-            }
-        } catch (err) {
-            console.error("Eroare la fetch:", err);
-        }
+        const updatedUser = await getUserById(id, token);
+        setUser(updatedUser);
     };
-
-    const getInstructorSpec = async (validatorId, instrument) => {
-        console.log("Inainte de validate: " + validatorId + "   " + instrument);
-        try {
-            const response = await fetch(`http://localhost:8080/api/v1/instructor/spec/${validatorId}/${instrument}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                console.log("Spec: " + data.id);
-
-                setInstructorSpec(data);
-            } else {
-                console.error('Error:', response.status);
-            }
-        } catch (err) {
-            console.error("Eroare:", err);
-        }
-    }
-
-    const getAssignStudent = async (user, instructorSpec) => {
-        const userId = user.id;
-        const instructorSpecId = instructorSpec.id;
-        console.log("Inainte de validate: " + userId + "   " + instructorSpecId);
-        try {
-            const response = await fetch(`http://localhost:8080/api/v1/student/assign/${userId}/${instructorSpecId}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                console.log("assign: " + data.id);
-
-                setAssignedStudent(data);
-            } else {
-                console.error('Error:', response.status);
-            }
-        } catch (err) {
-            console.error("Eroare:", err);
-        }
-    }
 
     const updateUser = async () => {
         let updatedUser = { ...user };
 
         if (profilePicture) {
             try {
-                const uploadedImages = await createImages([profilePicture]);
+                const uploadedImages = await createImages([profilePicture], token);
                 if (uploadedImages) {
                     updatedUser.profilePicture = uploadedImages[0];
                 } else {
@@ -177,13 +99,12 @@ const ProfileComponent = () => {
             }
         }
 
-        console.log("Utilizator actualizat:", updatedUser);
-
         try {
             const response = await fetch(`http://localhost:8080/api/v1/user/edit/${id}`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(updatedUser),
                 withCredentials: true
@@ -198,7 +119,7 @@ const ProfileComponent = () => {
                 console.error('Error:', response.status);
             }
         } catch (err) {
-            console.error("Eroare:", err);
+            console.error("Erorr:", err);
         }
     }
 
@@ -227,7 +148,7 @@ const ProfileComponent = () => {
 
     return (
         <div>
-            <h2>Profil utilizator</h2>
+            <h2>User profile</h2>
             <form>
                 <div>
                     {imagePreview ? (
@@ -319,7 +240,7 @@ const ProfileComponent = () => {
                     />
                 </div>
                 <div>
-                    <label htmlFor="role"><strong>Rol:</strong></label>
+                    <label htmlFor="role"><strong>Role:</strong></label>
                     <input
                         type="text"
                         id="role"
@@ -343,7 +264,7 @@ const ProfileComponent = () => {
             </form>
             {/*<p><strong>Assign</strong> {instrument} <strong>course status :</strong> {assignStudent.status}</p>*/}
 
-            {(validator.role === "ADMIN" || validator.role === "INSTRUCTOR") && !isOwnProfile && (
+            {(validator.role == "ADMIN") && !isOwnProfile && (
                 <>
                     <button onClick={() => handleValidation(false)}>
                         Lock

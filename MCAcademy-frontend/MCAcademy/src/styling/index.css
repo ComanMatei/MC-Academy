@@ -9,7 +9,6 @@
 html {
     font-family: 'Nunito', sans-serif;
     font-size: 22px;
-    color: #fff;
 }
 
 body {
@@ -50,6 +49,7 @@ textarea {
   padding: 0.25rem;
   border-radius: 0.5rem;
   background-color: white;
+  color: black;
 }
 
 label,

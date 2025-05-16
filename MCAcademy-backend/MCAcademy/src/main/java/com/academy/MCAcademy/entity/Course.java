@@ -29,6 +29,8 @@ public class Course {
 
     private LocalDate endDate;
 
+    private Boolean isHistory;
+
     @Enumerated(EnumType.STRING)
     private Instrument instrument;
 

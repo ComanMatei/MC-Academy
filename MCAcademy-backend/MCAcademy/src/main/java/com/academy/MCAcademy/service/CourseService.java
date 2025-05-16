@@ -1,5 +1,9 @@
 package com.academy.MCAcademy.service;
 
+import com.academy.MCAcademy.dto.CourseDto;
+import com.academy.MCAcademy.dto.CourseSummaryDto;
+import com.academy.MCAcademy.dto.InstructorSpecDto;
+import com.academy.MCAcademy.dto.ValidatorDto;
 import com.academy.MCAcademy.entity.*;
 import com.academy.MCAcademy.repository.CourseRepository;
 import com.academy.MCAcademy.repository.FileRepository;
@@ -8,16 +12,21 @@ import com.academy.MCAcademy.repository.UserRepository;
 import com.academy.MCAcademy.request.AssignCoursesRequest;
 import com.academy.MCAcademy.request.CourseRequest;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class CourseService {
+
+    private final ModelMapper modelMapper;
 
     private final CourseRepository courseRepository;
 
@@ -27,9 +36,10 @@ public class CourseService {
 
     private final FileRepository fileRepository;
 
-    public Course createCourse(CourseRequest request) {
+    // Create course
+    public CourseDto createCourse(CourseDto dto) {
 
-        User instructor = userRepository.findById(request.getInstructorId())
+        User instructor = userRepository.findById(dto.getInstructorId())
                 .orElseThrow(() -> new RuntimeException("This instructor doesn't exist"));
 
         if (instructor.getRole() != Role.INSTRUCTOR) {
@@ -37,31 +47,24 @@ public class CourseService {
         }
 
         Set<File> images = new HashSet<>();
-        if (request.getImages() != null && !request.getImages().isEmpty()) {
-            images = request.getImages();
+        if (dto.getImages() != null && !dto.getImages().isEmpty()) {
+            images = dto.getImages();
         }
 
         Set<File> videos = new HashSet<>();
-        if (request.getVideos() != null && !request.getVideos().isEmpty()) {
-            videos = request.getVideos();
+        if (dto.getVideos() != null && !dto.getVideos().isEmpty()) {
+            videos = dto.getVideos();
         }
 
-        Course newCourse = Course
-                .builder()
-                .name(request.getName())
-                .startDate(request.getStartDate())
-                .endDate(request.getEndDate())
-                .instrument(request.getInstrument())
-                .instructor(instructor)
-                .spotifyTrack(request.getSpotifyTrack())
-                .images(images)
-                .videos(videos)
-                .build();
+        Course course = convertCourseDtoToEntity(dto, instructor, images, videos);
 
-        return courseRepository.save(newCourse);
+        Course savedCourse = courseRepository.save(course);
+
+        return convertCourseEntityToDto(savedCourse);
     }
 
-    public List<Course> getAllCourses(Long instructorId, Instrument instrument) {
+    // Return all the instructor courses based on instruments and isHistory
+    public List<CourseSummaryDto> getAllCourses(Long instructorId, Instrument instrument, Boolean isHistory) {
 
         User instructor = userRepository.findById(instructorId)
                 .orElseThrow(() -> new RuntimeException("This instructor doesn't exist"));
@@ -70,9 +73,15 @@ public class CourseService {
             throw new RuntimeException("This user is not an instructor!");
         }
 
-        return courseRepository.findAllCoursesByInstructorIdAndInstrument(instructorId, instrument);
+        List<Course> courses = courseRepository.findAllCoursesByInstructorIdAndInstrumentAndIsHistory(instructorId,
+                instrument, isHistory);
+
+        return courses.stream()
+                .map(this::convertCourseSummaryEntityToDto)
+                .collect(Collectors.toList());
     }
 
+    // Assign courses to students
     @Transactional
     public void assignCoursesStudents(AssignCoursesRequest request) {
 
@@ -90,20 +99,17 @@ public class CourseService {
         courseRepository.saveAll(courses);
     }
 
-    public Course getCourse(Long id) {
-        Course course = courseRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("The course with this id doesn't exist!"));
+    // Marks a course as history if its end date has passed
+    public CourseSummaryDto markCourseAsHistory(Long courseId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Course not found"));
 
-        return course;
-    }
+        if (LocalDate.now().isAfter(course.getEndDate()))
+            course.setIsHistory(true);
 
-    public List<Course> getStudentCourses(Long studentId, Long instructorId, Instrument instrument) {
-        List<Course> courses = courseRepository.findAllByStudents_IdAndInstructor_IdAndInstrument(studentId,
-                instructorId, instrument);
-        for(Course curs : courses) {
-            System.out.println("Idul: " + curs.getId());
-        }
-        return courses;
+        courseRepository.save(course);
+
+        return convertCourseSummaryEntityToDto(course);
     }
 
     public Course editCourse(Long id, CourseRequest request) {
@@ -149,6 +155,7 @@ public class CourseService {
         return courseRepository.save(course);
     }
 
+    // Delete course based on its ID
     public void deleteCourse(Long id) {
         Course course = courseRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("The course with this id doesn't exist!"));
@@ -177,5 +184,31 @@ public class CourseService {
         }
 
         courseRepository.deleteById(id);
+    }
+
+
+    // Private functions for converting Entity class to DTO class
+    private CourseDto convertCourseEntityToDto(Course course) {
+        return modelMapper.map(course, CourseDto.class);
+    }
+
+    private CourseSummaryDto convertCourseSummaryEntityToDto(Course course) {
+        return modelMapper.map(course, CourseSummaryDto.class);
+    }
+
+    // Private functions for converting DTO class to Entity class
+    private Course convertCourseDtoToEntity(CourseDto dto, User instructor, Set<File> images, Set<File> videos) {
+        return Course
+                .builder()
+                .name(dto.getName())
+                .startDate(dto.getStartDate())
+                .endDate(dto.getEndDate())
+                .isHistory(dto.getIsHistory())
+                .instrument(dto.getInstrument())
+                .instructor(instructor)
+                .spotifyTrack(dto.getSpotifyTrack())
+                .images(images)
+                .videos(videos)
+                .build();
     }
 }

@@ -1,10 +1,16 @@
 import DataTable from "react-data-table-component";
 import SearchBar from "../search-bar/SearchBar";
 
-import { useState, useEffect } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 
+import AuthContext from "../context/AuthProvider";
+import { listOfUsers } from "../service/UserService";
+
 const ListOfUsersComponent = () => {
+
+    const { auth } = useContext(AuthContext);
+    const token = auth?.accessToken;
 
     const navigate = useNavigate();
 
@@ -17,49 +23,24 @@ const ListOfUsersComponent = () => {
     const [selectedStatus, setSelectedStatus] = useState("PENDING");
 
     useEffect(() => {
-        fetchTableData(role, selectedStatus);
+        const fetchTableData = async () => {
+            setLoading(true);
+
+            const users = await listOfUsers(role, selectedStatus, token);
+            setUsers(users);
+            setFilteredUsers(users);
+
+            setLoading(false);
+        }
+
+        fetchTableData();
     }, [role, selectedStatus]);
 
     useEffect(() => {
         setFilteredUsers(users);
     }, [users]);
 
-    const fetchTableData = async (userRole, selectedStatus) => {
-        setLoading(true);
-
-        console.log("role: " + userRole);
-        console.log("status: " + selectedStatus);
-
-        try {
-            const response = await fetch(`http://localhost:8080/api/v1/user/${userRole}/${selectedStatus}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                console.log(data);
-
-                setUsers(data);
-                setFilteredUsers(data);
-            } else {
-                console.error('Error:', response.status);
-            }
-        } catch (err) {
-            console.error("Eroare:", err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     const columns = [
-        {
-            name: "ID",
-            selector: (row) => row.id,
-        },
         {
             name: "Firstname",
             selector: (row) => row.firstname,
@@ -79,7 +60,7 @@ const ListOfUsersComponent = () => {
         {
             name: "Profile",
             cell: (row) => (
-                <button onClick={() => handleUserProfile(row.id)}>
+                <button onClick={() => handleUserProfile(row.userId)}>
                     See Profile
                 </button>
             ),

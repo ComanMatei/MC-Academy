@@ -1,5 +1,7 @@
 package com.academy.MCAcademy.repository;
 
+import com.academy.MCAcademy.dto.UserDto;
+import com.academy.MCAcademy.dto.ValidatorDto;
 import com.academy.MCAcademy.entity.Role;
 import com.academy.MCAcademy.entity.Status;
 import com.academy.MCAcademy.entity.User;
@@ -18,7 +20,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByEmail(String email);
 
-    List<User> findAllByRoleAndStatusAndEnabled(Role role, Status status, Boolean enable);
+    List<User> findAllByRoleAndStatusAndEnabled(Role role, Status status, Boolean enabled);
 
     @Transactional
     @Modifying

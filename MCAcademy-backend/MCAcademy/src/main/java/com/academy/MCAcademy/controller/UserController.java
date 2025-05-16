@@ -1,5 +1,10 @@
 package com.academy.MCAcademy.controller;
 
+import com.academy.MCAcademy.dto.CourseDto;
+import com.academy.MCAcademy.dto.UserDto;
+import com.academy.MCAcademy.dto.UserSummaryDto;
+import com.academy.MCAcademy.dto.ValidatorDto;
+import com.academy.MCAcademy.entity.Course;
 import com.academy.MCAcademy.entity.Role;
 import com.academy.MCAcademy.entity.Status;
 import com.academy.MCAcademy.entity.User;
@@ -19,25 +24,34 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/id/{userId}")
-    public ResponseEntity<User> getUserById(@PathVariable Long userId) {
+    // Return user info based on given id
+    @GetMapping("/info/{userId}")
+    public ResponseEntity<UserDto> getUserById(@PathVariable Long userId) {
         return ResponseEntity.ok(userService.getUserById(userId));
     }
 
-    @GetMapping("/email/{email}")
-    public ResponseEntity<User> getUserByEmail(@PathVariable String email){
-        return ResponseEntity.ok(userService.getUserByEmail(email));
+    // Returns validator info based on given email
+    @GetMapping("/validator/{userId}")
+    public ResponseEntity<ValidatorDto> getUsersValidatorById(@PathVariable Long userId){
+        return ResponseEntity.ok(userService.getUsersValidatorById(userId));
     }
 
+    // Returns a list of users filtered by role, status, and if activation is true
     @GetMapping("/{role}/{status}")
-    public List<User> getUserByEmail(@PathVariable Role role,
-                                     @PathVariable Status status){
-        return userService.getUsersByRole(role, status, true);
+    public List<UserSummaryDto> getUsersByRoleAndStatus(@PathVariable Role role,
+                                                        @PathVariable Status status){
+        return userService.getUsersByRoleAndStatus(role, status, true);
     }
 
+    // Update user account
     @PutMapping("/edit/{userId}")
     public ResponseEntity<User> updateUser(@PathVariable Long userId,
                                            @RequestBody RegisterRequest request) {
         return ResponseEntity.ok(userService.updateUser(userId, request));
+    }
+
+    @GetMapping("/{userId}/only/{id}")
+    public ResponseEntity<CourseDto> getCourse(@PathVariable Long userId, @PathVariable Long id) {
+        return ResponseEntity.ok(userService.getCourse(id));
     }
 }

@@ -17,25 +17,33 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfiguration {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
+
     private final AuthenticationProvider authenticationProvider;
+
+    private final UserRequestAuthorizationManager userRequestAuthorizationManager;
+
+    private final InstructorRequestAuthorizationManager instructorRequestAuthorizationManager;
+
+    private final StudentRequestAuthorizationManager studentRequestAuthorizationManager;
+
+    private final AdminRequestAuthorizationManager adminRequestAuthorizationManager;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/api/v1/forgotpassword/**").permitAll()
-                        .requestMatchers("/api/v1/user/**").permitAll()
-                        .requestMatchers("/api/v1/admin/**").permitAll()
-                        .requestMatchers("/api/v1/instructor/**").permitAll()
-                        .requestMatchers("/api/v1/student/**").permitAll()
-                        .requestMatchers("/api/v1/course/**").permitAll()
-                        .requestMatchers("/api/v1/file/**").permitAll()
-                        .anyRequest().authenticated()
-                )
+                        .requestMatchers("/api/v1/auth/**", "/api/v1/forgotpassword/**", "/api/v1/file/profile-pic").permitAll()
+                        .requestMatchers("/api/v1/user/edit/{userId}", "/api/v1/user/{role}/{status}", "/api/v1/instructor/specs/{instructorId}").authenticated()
+                        .requestMatchers("/api/v1/user/**").access(this.userRequestAuthorizationManager)
+                        .requestMatchers("/api/v1/admin/**").access(this.adminRequestAuthorizationManager)
+                        .requestMatchers("/api/v1/course/**").access(this.instructorRequestAuthorizationManager)
+                        .requestMatchers("/api/v1/instructor/**").access(this.instructorRequestAuthorizationManager)
+                        .requestMatchers("/api/v1/student/**").access(this.studentRequestAuthorizationManager)
+                        .requestMatchers("/api/v1/file/**").authenticated()
+                        .anyRequest().authenticated())
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 

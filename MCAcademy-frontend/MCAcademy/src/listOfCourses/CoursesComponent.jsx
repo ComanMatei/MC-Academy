@@ -3,25 +3,35 @@ import './courses_list.css';
 import SearchBar from '../search-bar/SearchBar';
 import DataTable from "react-data-table-component";
 
-import { useState, useEffect, useRef } from 'react';
+import { useContext, useState, useEffect, useRef } from 'react';
 import { useNavigate } from "react-router-dom";
 
-import { getInstructor } from '../service/UserService';
-import { getStudent } from '../service/UserService';
+import AuthContext from "../context/AuthProvider";
+import { getStudentSpecializations } from '../service/StudentService';
+import { findAllSpec } from '../service/InstructorService';
+import { getAllCourses } from '../service/CourseService';
+import { getAssignedStudents } from '../service/InstructorService';
+import { shareCourses } from '../service/CourseService';
+import { deleteCourse } from '../service/CourseService';
+import { markCourseAsHistory } from '../service/CourseService';
+import { getStudentCourses } from '../service/StudentService';
 
 const CoursesComponent = () => {
+    const { auth } = useContext(AuthContext);
+    const token = auth?.accessToken;
+    const userId = auth?.userId;
+    const userRole = auth?.roles;
+
     const navigate = useNavigate();
     const dialogRef = useRef(null);
 
     const [loading, setLoading] = useState(false);
     const [perPage, setPerPage] = useState(10);
+    const [viewMode, setViewMode] = useState(false);
 
     const [filteredCourses, setFilteredCourses] = useState([]);
     const [courses, setCourses] = useState([]);
     const [courseId, setCourseId] = useState('');
-
-    const [instructor, setInstructor] = useState('');
-    const [userRole, setUserRole] = useState("");
 
     const [instruments, setInstruments] = useState([]);
     const [selectedInstrument, setSelectedInstrument] = useState("");
@@ -31,16 +41,34 @@ const CoursesComponent = () => {
     const [student, setStudent] = useState('');
 
     const [selectedCourses, setSelectedCourses] = useState([]);
+    const [searchResults, setSearchResults] = useState([]);
 
     // Student initializations
     const [studentSpec, setStudentSpec] = useState([]);
     const [selectedInstructor, setSelectedInstructor] = useState('');
 
-    const uniqueInstructors = [...new Map(studentSpec.map(spec => [spec.instructor.id, spec.instructor])).values()];
+    const uniqueInstructors = [
+        ...new Map(
+            studentSpec.map(spec => [
+                spec.instructorId,
+                {
+                    id: spec.instructorId,
+                    firstname: spec.firstname,
+                    lastname: spec.lastname,
+                }
+            ])
+        ).values()
+    ];
+
+    useEffect(() => {
+        if (selectedInstructor) {
+            console.log("Selected instructor: " + selectedInstructor);
+        }
+    }, [selectedInstructor]);
 
     useEffect(() => {
         if (studentSpec.length > 0) {
-            setSelectedInstructor(studentSpec[0].instructor.id);
+            setSelectedInstructor(studentSpec[0].instructorId);
         }
     }, [studentSpec]);
 
@@ -51,53 +79,29 @@ const CoursesComponent = () => {
     }, [studentSpec]);
 
     useEffect(() => {
-        const authData = localStorage.getItem("auth");
-        const parsedAuth = authData ? JSON.parse(authData) : null;
-        const email = parsedAuth?.email || null;
-        const role = parsedAuth?.roles || null;
+        if (userRole == 'STUDENT') {
+            const fetchStudent = async () => {
+                const studentsSpec = await getStudentSpecializations(userId, token);
+                setStudentSpec(studentsSpec);
+                console.log("Student specializations:", studentsSpec);
+            };
 
-        setUserRole(role);
-
-        const fetchUserData = async () => {
-            if (role == 'INSTRUCTOR') {
-                const instructor = await getInstructor(email);
-                setInstructor(instructor);
-            }
-            else {
-                const student = await getStudent(email);
-                setStudent(student);
-            }
-        };
-
-        fetchUserData();
-    }, []);
-
-    useEffect(() => {
-        if (student && student.id) {
-            getStudentSpecializations();
+            fetchStudent();
         }
-    }, [student]);
-
+    }, [userRole]);
+    //const fetchTableData = async (userId, selectedInstructor, viewMode, instrument, token)
     useEffect(() => {
-        if (instructor && selectedInstrument) {
-            fetchTableData(instructor.id, selectedInstrument);
+        if (userId && selectedInstrument) {
+            console.log("Selected instrument:", selectedInstructor);
+            fetchTableData(
+                userId,
+                selectedInstructor,
+                viewMode,
+                selectedInstrument.instrument || selectedInstrument,
+                token
+            );
         }
-    }, [instructor, selectedInstrument]);
-
-    useEffect(() => {
-        if (instructor && instructor.id) {
-            getInstrInstruments(instructor.id);
-        }
-    }, [instructor]);
-
-    useEffect(() => {
-        if (selectedInstrument) {
-            if (userRole == 'STUDENT') {
-                console.log("selec: " + selectedInstrument)
-                getStudentCourses(selectedInstrument);
-            }
-        }
-    }, [selectedInstrument]);
+    }, [userId, selectedInstrument, selectedInstructor, viewMode]);
 
     useEffect(() => {
         if (instruments.length > 0 && !selectedInstrument) {
@@ -107,113 +111,76 @@ const CoursesComponent = () => {
     }, [instruments, selectedInstrument]);
 
     useEffect(() => {
-        if (selectedInstrument && instructor) {
-            getAssignedStudents(instructor.id, selectedInstrument);
-        }
-    }, [selectedInstrument, instructor]);
-
-    useEffect(() => {
-        // Dacă se modifică searchQuery, filtrăm cursurile
         setFilteredCourses(courses);
     }, [courses]);
 
-    const getInstrInstruments = async (instructorId) => {
-        try {
-            const response = await fetch(`http://localhost:8080/api/v1/instructor/instruments/${instructorId}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true
-            })
-
-            if (response.ok) {
-                const data = await response.json();
-                setInstruments(data);
-                console.log("Instrumentele instructorului:", data);
+    useEffect(() => {
+        const fetchInstruments = async () => {
+            if (userId) {
+                const instruments = await findAllSpec(userId, token);
+                setInstruments(instruments);
+                console.log("Instruments:", instruments);
             }
-        } catch (err) {
-            console.error("Eroare la fetch:", err);
+        };
+        fetchInstruments();
+    }, [userId]);
+
+    useEffect(() => {
+        const markCourses = async () => {
+            for (const course of courses) {
+                const endDate = new Date(course.endDate).getTime();
+
+                if (Date.now() > endDate && course.isHistory == false) {
+                    await markCourseAsHistory(course.id, token);
+                    console.log("Course marked as history:", course.id);
+                }
+            }
+        };
+
+        if (courses.length > 0 && token) {
+            markCourses();
         }
+    }, [courses, token]);
+
+    const handleDeleteCourse = async (courseId, token) => {
+
+        await deleteCourse(userId, courseId, token)
+
+        setCourses(courses.filter(course => course.id !== courseId));
+        setCourseId('');
     }
 
-    const deleteCourse = async (courseId) => {
-        try {
-            const response = await fetch(`http://localhost:8080/api/v1/course/delete/${courseId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true
-            })
-
-            if (response.ok) {
-                const data = await response;
-                setCourses(courses.filter(course => course.id !== courseId));
-                setCourseId('');
-            }
-        } catch (err) {
-            console.error("Error to fetch:", err);
-        }
-    }
-
-    const fetchTableData = async (instructorId, selectedInstrument) => {
+    const fetchTableData = async (userId, selectedInstructor, viewMode, instrument, token) => {
         setLoading(true);
 
-        console.log("Calling for the selected tool:", selectedInstrument);
-        console.log("Calling for id:", instructorId);
+        let transformedData = [];
+        console.log("Selected userId:", userId);
+        console.log("Selected instrument:", instrument);
+        console.log("Selected viewMode:", viewMode);
+        console.log("Selected selectedInstructor:", selectedInstructor);
 
-        try {
-            const response = await fetch(`http://localhost:8080/api/v1/course/${instructorId}?instrument=${selectedInstrument}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                console.log(data);
-
-                const transformedData = data.map(item => ({
-                    id: item.id,
-                    name: item.name,
-                    startDate: item.startDate,
-                    endDate: item.endDate
-                }));
-
-                setCourses(transformedData);
-                setFilteredCourses(transformedData);
-            } else {
-                console.error('Error:', response.status);
-            }
-        } catch (err) {
-            console.error("Eroare:", err);
-        } finally {
-            setLoading(false);
+        if (userRole == 'INSTRUCTOR') {
+            const data = await getAllCourses(userId, instrument, viewMode, token);
+            transformedData = data.map(item => ({
+                id: item.id,
+                name: item.name,
+                startDate: item.startDate,
+                endDate: item.endDate
+            }));
         }
-    }
 
-    const getAssignedStudents = async (instructorId, selectedInstrument) => {
-        console.log("Instrumentul ales: " + selectedInstrument + " instructor: " + instructorId);
-        try {
-            const response = await fetch(`http://localhost:8080/api/v1/instructor/assigned/${instructorId}?instrument=${selectedInstrument}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                console.log("Incoming students:", data);
-                setStudents(data);
-            }
-        } catch (err) {
-            console.error("Erorr", err);
+        if (userRole == 'STUDENT' && instrument) {
+            const data = await getStudentCourses(userId, selectedInstructor, viewMode, instrument, token);
+            transformedData = data.map(item => ({
+                id: item.id,
+                name: item.name,
+                startDate: item.startDate,
+                endDate: item.endDate
+            }));
         }
+
+        setCourses(transformedData);
+        setLoading(false);
     }
 
     const handleCheckboxCourses = (courseId) => {
@@ -232,91 +199,30 @@ const CoursesComponent = () => {
         console.log(studentId)
     };
 
-    const shareCourses = async () => {
+    const shareStudentsCourses = async () => {
         console.log("Courses selected:", selectedCourses);
         console.log("Students selected:", studentIds);
 
         const assignCourses = { courseIds: selectedCourses, studentIds }
 
-        try {
-            const response = await fetch('http://localhost:8080/api/v1/course/assign-students', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(assignCourses),
-                withCredentials: true
-            });
+        await shareCourses(userId, assignCourses, token);
 
-            if (response.ok) {
-                console.log("Sanded!");
-
-                setSelectedCourses([]);
-                setStudentIds([]);
-            }
-        } catch (err) {
-            console.error("Error: ", err);
-        }
-    };
-
-    const getStudentSpecializations = async () => {
-        const studentId = student.id;
-        try {
-            const response = await fetch(`http://localhost:8080/api/v1/student/specializations/${studentId}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                console.log("Received data:", data);
-
-                setStudentSpec(data);
-            }
-        } catch (err) {
-            console.error("Error: ", err);
-        }
+        setSelectedCourses([]);
+        setStudentIds([]);
     }
-
-    const getStudentCourses = async (instrument) => {
-        const studentId = student.id;
-        console.log("studentId: " + studentId);
-        console.log("selectedInstructor: " + selectedInstructor);
-        console.log("selectedInstrument: " + instrument);
-
-        try {
-            const response = await fetch(`http://localhost:8080/api/v1/course/studentcourses/${studentId}/${selectedInstructor}/${instrument}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                setCourses(data);
-
-                console.log(data);
-            }
-        } catch (err) {
-            console.error("Error: ", err);
-        }
-    };
 
     const getInstrumentsForInstructor = (instructorId) => {
         const instruments = studentSpec
-            .filter(assign => assign.instructor.id == instructorId)
+            .filter(assign => assign.instructorId == instructorId)
             .map(assign => assign.instrument)
             .filter((value, index, self) => self.indexOf(value) === index);
         return instruments;
     };
 
     const handleOpenDialog = async () => {
-        await getAssignedStudents(instructor.id, selectedInstrument);
+        const students = await getAssignedStudents(userId, "APPROVED", selectedInstrument.instrument, token);
+        setStudents(students);
+        console.log("Students:", students);
         console.log("Open dialog");
         if (dialogRef.current) {
             dialogRef.current.showModal();
@@ -350,23 +256,20 @@ const CoursesComponent = () => {
         }
     };
 
-
-
     const studentColumns = [
         {
             name: "",
             cell: (row) => (
                 <input
                     type="checkbox"
-                    checked={studentIds.includes(row.id)}
-                    onChange={() => handleCheckboxStudents(row.id)}
+                    checked={studentIds.includes(row.userId)}
+                    onChange={() => handleCheckboxStudents(row.userId)}
                 />
             ),
             width: "50px"
         },
         { name: "First name", selector: (row) => row.firstname },
         { name: "Last name", selector: (row) => row.lastname },
-        { name: "Email", selector: (row) => row.email },
     ];
 
     const columns = [
@@ -410,7 +313,7 @@ const CoursesComponent = () => {
         {
             name: "Delete",
             cell: (row) => (
-                <button onClick={() => deleteCourse(row.id)}>
+                <button onClick={() => handleDeleteCourse(row.id, token)}>
                     Delete
                 </button>
             ),
@@ -458,7 +361,7 @@ const CoursesComponent = () => {
                                 key={index}
                                 onClick={() => setSelectedInstrument(instrument)}
                             >
-                                {instrument}
+                                {instrument.instrument}
                             </button>
                         ))}
                     </div>
@@ -471,9 +374,7 @@ const CoursesComponent = () => {
                         <button
                             key={index}
                             onClick={() => {
-                                setSelectedInstrument(instrument);
-
-                                getStudentCourses(instrument);
+                                setSelectedInstrument(instrument); // Doar setezi instrumentul
                             }}
                         >
                             {instrument}
@@ -481,22 +382,41 @@ const CoursesComponent = () => {
                     ))}
                 </div>
             )}
-            <div className='seach-container'>
-                <SearchBar
-                    data={courses}  
-                    setResults={setFilteredCourses} 
-                    type = "courses"
-                />
+            <div className='inline-container'>
+                <div className='seach-container'>
+                    <SearchBar
+                        data={courses}
+                        setResults={setFilteredCourses}
+                        type="courses"
+                    />
+                </div>
+
+                <div className='course-activity'>
+                    <button
+                        className={viewMode == false ? "selected" : ""}
+                        onClick={() => {
+                            setViewMode(false);
+                        }}
+                    >
+                        Activ
+                    </button>
+                    <button
+                        className={viewMode == true ? "selected" : ""}
+                        onClick={() => {
+                            setViewMode(true);
+                        }}
+                    >
+                        History
+                    </button>
+                </div>
             </div>
 
-            <div>
-                <DataTable
-                    title="List of locked instructors"
-                    columns={columns}
-                    data={filteredCourses}
-                    progressPending={loading}
-                />
-            </div>
+            <DataTable
+                title="List of courses"
+                columns={columns}
+                data={searchResults.length > 0 ? searchResults : filteredCourses}
+                progressPending={loading}
+            />
 
             <dialog ref={dialogRef} className="custom-dialog">
                 <h2>Students list</h2>
@@ -505,7 +425,7 @@ const CoursesComponent = () => {
                 <button className="close-btn" onClick={handleCloseDialog}>
                     Close
                 </button>
-                <button className="close-btn" onClick={shareCourses}>
+                <button className="close-btn" onClick={shareStudentsCourses}>
                     Assign
                 </button>
             </dialog>

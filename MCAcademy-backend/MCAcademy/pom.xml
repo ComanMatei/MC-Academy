@@ -77,6 +77,10 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
@@ -86,9 +90,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.thymeleaf</groupId>
-			<artifactId>thymeleaf-spring6</artifactId>
-			<version>3.1.2.RELEASE</version>
+			<groupId>org.modelmapper</groupId>
+			<artifactId>modelmapper</artifactId>
+			<version>2.4.5</version>
 		</dependency>
 		<dependency>
 			<groupId>se.michaelthelin.spotify</groupId>

@@ -27,6 +27,11 @@ public class FileController {
         return ResponseEntity.ok(fileService.createImages(multipartFiles));
     }
 
+    @PostMapping("/profile-pic")
+    public ResponseEntity<?> createProfilePicture(@RequestParam("file") List<MultipartFile> multipartFiles) throws IOException {
+        return ResponseEntity.ok(fileService.createImages(multipartFiles));
+    }
+
     @PostMapping("/create-video")
     public ResponseEntity<?> createVideos(@RequestParam("file") List<MultipartFile> multipartFiles) throws IOException {
         return ResponseEntity.ok(fileService.createVideos(multipartFiles));

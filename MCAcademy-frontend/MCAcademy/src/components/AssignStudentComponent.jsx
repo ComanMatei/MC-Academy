@@ -1,8 +1,18 @@
 import SearchComponent from "../search-bar/SearchComponent";
 
-import { useState, useEffect } from "react";
+import { useContext, useState, useEffect } from "react";
+
+import AuthContext from "../context/AuthProvider";
+
+import { listOfUsers } from "../service/UserService";
+import { findAllSpec } from "../service/InstructorService";
+import { assignStudent } from "../service/StudentService";
 
 const AssignStudentComponent = () => {
+
+    const { auth } = useContext(AuthContext);
+    const token = auth?.accessToken;
+    const studentId = auth?.userId;
 
     const [instructors, setInstructors] = useState([]);
     const [selectedInstructor, setSelectedInstructor] = useState("");
@@ -11,30 +21,19 @@ const AssignStudentComponent = () => {
     const [selectedInstrument, setSelectedInstrument] = useState("");
 
     const [loading, setLoading] = useState(false);
-    const [studentId, setStudentId] = useState('');
-    const [instructorId, setInstructorId] = useState('')
 
     useEffect(() => {
-        listOfInstructors();
+        const fetchListOfInstructors = async () => {
+            setLoading(true);
+
+            const instructors = await listOfUsers("INSTRUCTOR", "APPROVED", token);
+            setInstructors(instructors);
+
+            setLoading(false);
+        };
+
+        fetchListOfInstructors();
     }, []);
-
-    useEffect(() => {
-        const authData = localStorage.getItem("auth");
-        const parsedAuth = authData ? JSON.parse(authData) : null;
-        const email = parsedAuth?.email || null;
-
-        findStudent(email);
-    })
-
-    const handleSelectInstructor = (event) => {
-        const instructorId = event.target.value;
-        const instructor = instructors.find(inst => inst.id === parseInt(instructorId));
-        setSelectedInstructor(instructor);
-
-        if (instructor) {
-            findAllSpec(instructorId);
-        }
-    }
 
     const handleSelectInstrument = (event) => {
         const instrumentId = event.target.value;
@@ -42,106 +41,13 @@ const AssignStudentComponent = () => {
         setSelectedInstrument(selectedInst);
     };
 
-    const findStudent = async (email) => {
-        try {
-            const response = await fetch(`http://localhost:8080/api/v1/student/${email}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true
-            });
+    const fetchAssignStudent = async () => {
+        const assign = {
+            instructorSpecId: selectedInstrument.id,
+            status: "PENDING",
+        };
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            console.log("Student Data:", data);
-            setStudentId(data.id);
-
-        } catch (err) {
-            console.error("Erorr to fetch:", err);
-        }
-    };
-
-    const listOfInstructors = async () => {
-        setLoading(true);
-
-        try {
-            const response = await fetch('http://localhost:8080/api/v1/student/approved-instructors', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                console.log(data);
-
-                setInstructors(data);
-            } else {
-                console.error('Error:', response.status);
-            }
-        } catch (err) {
-            console.error("Erorr:", err);
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    const findAllSpec = async (instructorId) => {
-        try {
-            const response = await fetch(`http://localhost:8080/api/v1/instructor/instr-assign/${instructorId}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true
-            })
-
-            if (response.ok) {
-                const data = await response.json();
-                console.log(data);
-                console.log("aici sefule")
-                setInstruments(data);
-            } else {
-                console.error('Error:', response.status);
-            }
-        } catch (err) {
-            console.error("Erorr:", err);
-        }
-    }
-
-    const assignStudent = async () => {
-        try {
-            const assign = {
-                instructorSpec: {
-                    id: selectedInstrument.id,
-                },
-                status: "PENDING",
-            };
-
-            const response = await fetch(`http://localhost:8080/api/v1/student/assign-spec/${studentId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(assign),
-                withCredentials: true
-            })
-
-            if (response.ok) {
-                const data = await response.json();
-                console.log(data);
-            } else {
-                console.error('Error:', response.status);
-            }
-        } catch (err) {
-            console.error("Erorr:", err);
-        }
+        await assignStudent(studentId, assign, token);
     }
 
     return (
@@ -149,12 +55,21 @@ const AssignStudentComponent = () => {
             <label htmlFor="instrument" className="block mb-2 text-lg font-semibold">
                 Select your instructor:
             </label>
-            
+
             <SearchComponent
                 instructors={instructors}
-                onSelectInstructor={(instructor) => {
+                onSelectInstructor={async (instructor) => {
+                    console.log("Instructor selected:", instructor);
                     setSelectedInstructor(instructor);
-                    findAllSpec(instructor.id);
+                    if (instructor?.userId) {
+                        try {
+                            const instrumentList = await findAllSpec(instructor.userId, token);
+                            console.log("Received instruments:", instrumentList);
+                            setInstruments(instrumentList);
+                        } catch (err) {
+                            console.error("Error fetching instruments:", err);
+                        }
+                    }
                 }}
             />
 
@@ -167,22 +82,26 @@ const AssignStudentComponent = () => {
             <label htmlFor="instrument" className="block mb-2 text-lg font-semibold">
                 Select instrument:
             </label>
+
             <select
                 id="instrument"
-                value={selectedInstrument ? selectedInstrument.id : ""}
+                value={selectedInstrument?.id || ""}
                 onChange={handleSelectInstrument}
-                className="border border-gray-300 p-2 rounded-lg w-full"
+                className="border border-gray-300 p-2 rounded-lg w-full disabled:bg-gray-100"
                 disabled={instruments.length === 0}
             >
-                <option value="" disabled>Select instrument</option>
-                {instruments.map((instrument) => (
-                    <option key={instrument.id} value={instrument.id}>
-                        {instrument.instrument} {instrument.timeAssigned}
+                <option value="" disabled>
+                    {instruments.length === 0 ? "No instruments available" : "Select instrument"}
+                </option>
+
+                {instruments.map(({ id, instrument, timeAssigned }) => (
+                    <option key={id} value={id}>
+                        {instrument} {timeAssigned}
                     </option>
                 ))}
             </select>
 
-            <button onClick={assignStudent}>Save</button>
+            <button onClick={fetchAssignStudent}>Save</button>
 
             {selectedInstrument && (
                 <p className="mt-4 text-green-600 font-medium">
@@ -191,8 +110,6 @@ const AssignStudentComponent = () => {
             )}
 
         </div>
-
-
     );
 }
 

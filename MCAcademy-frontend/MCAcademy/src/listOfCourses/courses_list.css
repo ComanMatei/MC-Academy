@@ -62,3 +62,22 @@
 .seach-container {
     width: 25%;
 }
+
+.inline-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.course-activity {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 10px;
+    width: 100%; 
+}
+
+.course-activity button.selected {
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+}

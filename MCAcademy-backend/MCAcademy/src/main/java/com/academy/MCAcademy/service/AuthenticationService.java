@@ -1,6 +1,7 @@
 package com.academy.MCAcademy.service;
 
 import com.academy.MCAcademy.request.AuthenticationRequest;
+import com.academy.MCAcademy.request.RefreshTokenRequest;
 import com.academy.MCAcademy.response.AuthenticationResponse;
 import com.academy.MCAcademy.request.RegisterRequest;
 import com.academy.MCAcademy.entity.ConfirmationToken;
@@ -131,9 +132,12 @@ public class AuthenticationService {
         }
 
         var jwtToken = jwtService.generateToken(user);
+        var refreshToken = jwtService.generateRefreshToken(user);
 
         return AuthenticationResponse.builder()
+                .userId(user.getId())
                 .token(jwtToken)
+                .refreshToken(refreshToken)
                 .role(user.getRole())
                 .build();
     }
@@ -157,6 +161,24 @@ public class AuthenticationService {
         userRepository.enableUser(confirmationToken.getUser().getEmail());
 
         return "confirmed";
+    }
+
+    public AuthenticationResponse refreshToken(RefreshTokenRequest request) {
+        String username = jwtService.extractUsername(request.getRefreshToken());
+        User user = userRepository.findByEmail(username)
+                .orElseThrow(() -> new IllegalStateException("User not found"));
+
+        if (!jwtService.isTokenValid(request.getRefreshToken(), user)) {
+            throw new IllegalStateException("Refresh token expired. Please log in again.");
+        }
+
+        String newAccessToken = jwtService.generateToken(user);
+
+        return AuthenticationResponse.builder()
+                .token(newAccessToken)
+                .refreshToken(request.getRefreshToken())
+                .role(user.getRole())
+                .build();
     }
 
 }

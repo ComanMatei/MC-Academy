@@ -1,5 +1,7 @@
 package com.academy.MCAcademy.controller;
 
+import com.academy.MCAcademy.dto.CourseDto;
+import com.academy.MCAcademy.dto.CourseSummaryDto;
 import com.academy.MCAcademy.entity.Course;
 import com.academy.MCAcademy.entity.Instrument;
 import com.academy.MCAcademy.entity.SpotifyTrack;
@@ -27,50 +29,51 @@ public class CourseController {
 
     private final CourseService courseService;
 
+    // Create course
     @PostMapping("/create-course")
-    public ResponseEntity<Course> createCourse(@RequestBody CourseRequest request) {
-        Course course = courseService.createCourse(request);
+    public ResponseEntity<CourseDto> createCourse(@RequestBody CourseDto dto) {
+        CourseDto courseDto = courseService.createCourse(dto);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(course);
+        return ResponseEntity.status(HttpStatus.CREATED).body(courseDto);
     }
 
+    // Create spotify track for courses
     @PostMapping("/create-track")
     public ResponseEntity<SpotifyTrack> createTrack(@RequestBody SpotifyTrack track) {
         return ResponseEntity.ok(spotifyTrackService.createTrack(track));
     }
 
-    @GetMapping("/{instructorId}")
-    public List<Course> getAllCourses(@PathVariable Long instructorId,
-                                      @RequestParam Instrument instrument) {
-        return courseService.getAllCourses(instructorId, instrument);
+    // Return all the instructor courses based on instruments and isHistory
+    @GetMapping("/{instructorId}/{isHistory}")
+    public List<CourseSummaryDto> getAllCourses(@PathVariable Long instructorId,
+                                                @PathVariable Boolean isHistory,
+                                                @RequestParam Instrument instrument) {
+        return courseService.getAllCourses(instructorId, instrument, isHistory);
     }
 
-    @PostMapping("/assign-students")
-    public ResponseEntity<String> assignCoursesStudents(@RequestBody AssignCoursesRequest request) {
+    // Assign courses to students
+    @PostMapping("{instructorId}/assign-students")
+    public ResponseEntity<String> assignCoursesStudents(@PathVariable Long instructorId,
+                                                        @RequestBody AssignCoursesRequest request) {
         courseService.assignCoursesStudents(request);
 
         return ResponseEntity.ok("The courses has been assigned!");
     }
 
-    @GetMapping("/only/{id}")
-    public ResponseEntity<Course> getCourse(@PathVariable Long id) {
-        return ResponseEntity.ok(courseService.getCourse(id));
+    // Marks a course as history if its end date has passed
+    @PatchMapping("/mark-history/{courseId}")
+    public ResponseEntity<CourseSummaryDto> markCourseAsHistory(@PathVariable Long instructorId,
+                                                                @PathVariable Long courseId) {
+        return ResponseEntity.ok(courseService.markCourseAsHistory(courseId));
     }
 
-    @GetMapping("/studentcourses/{studentId}/{instructorId}/{instrument}")
-    public ResponseEntity<List<Course>> getStudentCourses(@PathVariable Long studentId,
-                                                          @PathVariable Long instructorId,
-                                                          @PathVariable Instrument instrument) {
-        return ResponseEntity.ok(courseService.getStudentCourses(studentId, instructorId, instrument));
-    }
-
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Course> editCourse(@PathVariable Long id,
-                                               @RequestBody CourseRequest request) {
+    @PutMapping("/{instructorId}/update/{id}")
+    public ResponseEntity<Course> editCourse(@PathVariable Long instructorId, @PathVariable Long id,
+                                             @RequestBody CourseRequest request) {
         return ResponseEntity.ok(courseService.editCourse(id, request));
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{instructorId}/delete/{id}")
     public ResponseEntity<String> deleteCourse(@PathVariable Long id) {
         try {
             courseService.deleteCourse(id);

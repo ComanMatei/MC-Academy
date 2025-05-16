@@ -1,15 +1,23 @@
 import './see_course.css';
 import SpotifySearch from '../components/SpotifySearch';
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 import { createImages } from "../service/FileService";
 import { createVideos } from "../service/FileService";
 import { saveTrack } from '../service/SpotifyTrackService';
+import { getCourse } from '../service/UserService';
 import Metronome from '../metronome/Metronome';
 
+import AuthContext from "../context/AuthProvider";
+
 const SeeCourseComponent = () => {
+
+    const { auth } = useContext(AuthContext);
+    const token = auth?.accessToken;
+    const userRole = auth?.roles;
+    const userId = auth?.userId;
 
     const { id } = useParams();
     const navigate = useNavigate();
@@ -29,18 +37,14 @@ const SeeCourseComponent = () => {
     const [videosPreview, setVideosPreview] = useState([]);
     const [videos, setVideos] = useState([]);
 
-    const [userRole, setUserRole] = useState("");
-
     useEffect(() => {
-        const authData = localStorage.getItem("auth");
-        const parsedAuth = authData ? JSON.parse(authData) : null;
-        const role = parsedAuth?.roles || null;
+        const fetchCourse = async () => {
+            const data = await getCourse(userId, id, token);
 
-        setUserRole(role);
-    }, []);
+            setCourse(data);
+        }
 
-    useEffect(() => {
-        getCourse();
+        fetchCourse();
     }, [id])
 
     const getSpotifyId = (url) => {
@@ -48,27 +52,6 @@ const SeeCourseComponent = () => {
         const match = url.match(/track\/([a-zA-Z0-9]+)/);
         return match ? match[1] : null;
     };
-
-    const getCourse = async () => {
-
-        try {
-            const response = await fetch(`http://localhost:8080/api/v1/course/only/${id}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true
-            })
-
-            if (response.ok) {
-                const data = await response.json();
-                console.log(data);
-                setCourse(data);
-            }
-        } catch (err) {
-            console.error("Error:", err);
-        }
-    }
 
     const updateCourse = async () => {
         try {
@@ -79,7 +62,7 @@ const SeeCourseComponent = () => {
                 console.log("imagesPreview: ", imagesPreview);
 
                 const validImages = images.filter(img => img !== undefined);
-                const uploadedImages = await createImages(validImages);
+                const uploadedImages = await createImages(validImages, token);
 
                 updatedCourse = {
                     ...updatedCourse,
@@ -94,7 +77,7 @@ const SeeCourseComponent = () => {
                 console.log("imagesPreview: ", videosPreview);
 
                 const validVideos = videos.filter(video => video !== undefined);
-                const uploadedVideos = await createVideos(validVideos);
+                const uploadedVideos = await createVideos(validVideos, token);
 
                 updatedCourse = {
                     ...updatedCourse,
@@ -111,10 +94,11 @@ const SeeCourseComponent = () => {
 
             console.log("Updated data:", updatedCourse);
 
-            const response = await fetch(`http://localhost:8080/api/v1/course/update/${id}`, {
+            const response = await fetch(`http://localhost:8080/api/v1/course/${userId}/update/${id}`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(updatedCourse),
                 withCredentials: true
@@ -213,7 +197,8 @@ const SeeCourseComponent = () => {
             const response = await fetch(`http://localhost:8080/api/v1/file/delete/${fileId}/${id}`, {
                 method: 'DELETE',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 withCredentials: true
             });
@@ -380,48 +365,60 @@ const SeeCourseComponent = () => {
                 />
             )}
 
-            {course?.images?.length > 0 && (
+            {course?.images?.length >= 0 && (
                 <div className="mt-4">
                     <h3 className="font-semibold">Images:</h3>
+
                     {isEditing && (
                         <div className="mt-4">
-                            <input type="file" multiple accept="image/*" onChange={(e) => handleFileChange(e, "image")} />
+                            <input
+                                type="file"
+                                multiple
+                                accept="image/*"
+                                onChange={(e) => handleFileChange(e, "image")}
+                            />
                         </div>
                     )}
-                    <div className="img-container flex flex-wrap gap-4">
-                        {course.images.map((img, index) => (
-                            <div key={index} className="relative flex justify-center items-center">
-                                {isEditing && (
-                                    <button onClick={() => handleDeleteImage(index, false)} className="delete-button">
-                                        X
-                                    </button>
-                                )}
-                                {img?.fileData ? (
-                                    <img src={`data:image/jpeg;base64,${img.fileData}`} alt={img.name} className="img-small" />
-                                ) : (
-                                    <div className="no-image-available">
-                                        <p>Image not available</p>
-                                    </div>
-                                )}
-                            </div>
-                        ))}
 
-                        {/* Show preview images */}
-                        {imagesPreview.map((preview, index) => (
-                            <div key={`preview-${index}`} className="relative flex justify-center items-center">
-                                {isEditing && (
-                                    <button onClick={() => handleDeleteImage(index, true)} className="delete-button">
-                                        X
-                                    </button>
-                                )}
-                                <img src={preview.fileData} alt="Preview" className="img-small" />
-                            </div>
-                        ))}
+                    <div className="img-container flex flex-wrap gap-4 mt-4">
+                        {Array.isArray(course?.images) &&
+                            course.images.map((img, index) => (
+                                <div key={index} className="relative flex justify-center items-center">
+                                    {isEditing && (
+                                        <button onClick={() => handleDeleteImage(index, false)} className="delete-button">
+                                            X
+                                        </button>
+                                    )}
+                                    {img?.fileData ? (
+                                        <img
+                                            src={`data:image/jpeg;base64,${img.fileData}`}
+                                            alt={img.name}
+                                            className="img-small"
+                                        />
+                                    ) : (
+                                        <div className="no-image-available">
+                                            <p>Image not available</p>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+
+                        {imagesPreview.length > 0 &&
+                            imagesPreview.map((preview, index) => (
+                                <div key={`preview-${index}`} className="relative flex justify-center items-center">
+                                    {isEditing && (
+                                        <button onClick={() => handleDeleteImage(index, true)} className="delete-button">
+                                            X
+                                        </button>
+                                    )}
+                                    <img src={preview.fileData} alt="Preview" className="img-small" />
+                                </div>
+                            ))}
                     </div>
                 </div>
             )}
 
-            {course?.videos?.length > 0 && (
+            {course?.videos?.length >= 0 && (
                 <div className="mt-4">
                     <h3 className="font-semibold">Videos:</h3>
                     {isEditing && (

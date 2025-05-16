@@ -1,130 +1,46 @@
 import DataTable from "react-data-table-component";
-import { useState, useEffect } from 'react';
+import { useContext, useState, useEffect } from 'react';
+
+import { getAllInstruments } from "../service/InstructorService";
+import { findAllSpec } from "../service/InstructorService";
+import { saveSelectedInstrument } from "../service/InstructorService";
+
+import AuthContext from "../context/AuthProvider";
 
 const InstrumentSpecComponent = () => {
+  const { auth } = useContext(AuthContext);
+  const token = auth?.accessToken;
+  const userId = auth?.userId;
+
   const [selectedInstrument, setSelectedInstrument] = useState("");
-  const [instructorId, setInstructorId] = useState('');
   const [specializations, setSpecializations] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const [instruments, setInstruments] = useState([]);
 
   useEffect(() => {
-    const authData = localStorage.getItem("auth");
-    const parsedAuth = authData ? JSON.parse(authData) : null;
-    const email = parsedAuth?.email || null;
+    const fetchInstruments = async () => {
+      if (userId) {
+        const instrumentsData = await getAllInstruments(token);
+        setInstruments(instrumentsData);
 
-    if (email) {
-      findInstructor(email);
-    } else {
-      console.error("Email is undefined in localStorage!");
-    }
-  }, []);
-
-  useEffect(() => {
-    if (instructorId) {
-      findAllSpec(instructorId);
-    }
-  }, [instructorId]);
-
-  useEffect(() => {
-    getAllInstruments();
-  }, []);
-
-
-  const findInstructor = async (email) => {
-    try {
-      const response = await fetch(`http://localhost:8080/api/v1/instructor/${email}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        withCredentials: true
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        const specializations = await findAllSpec(userId, token);
+        setSpecializations(specializations);
       }
-
-      const data = await response.json();
-      console.log("Instructor Data:", data);
-      setInstructorId(data.id);
-
-    } catch (err) {
-      console.error("Eroare la fetch:", err);
-    }
-  };
-
+    };
+    fetchInstruments();
+  }, [userId]);
 
   const handleSelectChange = (event) => {
     setSelectedInstrument(event.target.value);
   };
 
-  const getAllInstruments = async () => {
-    try {
-      const response = await fetch('http://localhost:8080/api/v1/instructor/instruments', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        withCredentials: true
-      })
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data);
-
-        setInstruments(data);
-      }
-    } catch (err) {
-      console.error("Error:", err);
-    }
-  }
-
-  const findAllSpec = async (instructorId) => {
-    try {
-      const response = await fetch(`http://localhost:8080/api/v1/instructor/instr-assign/${instructorId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        withCredentials: true
-      })
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data);
-
-        setSpecializations(data);
-      }
-    } catch (err) {
-      console.error("Eroare:", err);
-    }
-  }
-
-  const saveSelectedInstrument = async () => {
-    try {
-      const response = await fetch(`http://localhost:8080/api/v1/instructor/assign/${instructorId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ instrument: selectedInstrument }),
-        withCredentials: true
-      })
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data);
-
-        if (instructorId) {
-          findAllSpec(instructorId);
-        }
-      }
-    } catch (err) {
-      console.error("Eroare:", err);
-    }
-  }
+  const createSpecialization = async (selectedInstrument) => {
+    await saveSelectedInstrument(selectedInstrument, userId, token);
+    
+    const updatedSpecializations = await findAllSpec(userId, token);
+    setSpecializations(updatedSpecializations);
+  };
 
   const columns = [
     {
@@ -156,7 +72,7 @@ const InstrumentSpecComponent = () => {
         ))}
       </select>
 
-      <button onClick={saveSelectedInstrument}>Save</button>
+      <button onClick={() => createSpecialization(selectedInstrument)}>Save</button>
 
       <div>
         <DataTable

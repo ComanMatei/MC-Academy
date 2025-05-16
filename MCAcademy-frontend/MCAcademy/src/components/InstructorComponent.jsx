@@ -1,28 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
-import AuthContext from "../context/AuthProvider";
 
-import { getUserByEmail } from "../service/UserService";
+import AuthContext from "../context/AuthProvider";
 
 const InstructorComponent = () => {
 
-    const { setAuth } = useContext(AuthContext);
+    const { auth, setAuth } = useContext(AuthContext);
+    const userId = auth?.userId;
+
     const navigate = useNavigate();
-
-    const [userId, setUserId] = useState('');
-
-    useEffect(() => {
-        const authData = localStorage.getItem("auth");
-        const parsedAuth = authData ? JSON.parse(authData) : null;
-        const email = parsedAuth?.email || null;
-
-        const fetchUser = async () => {
-            const user = await getUserByEmail(email);
-            setUserId(user.id);
-        }
-
-        fetchUser();
-    }, []);
 
     const toAssignPage = () => {
         navigate('/assign-instrument')
@@ -36,11 +22,11 @@ const InstructorComponent = () => {
         navigate('/courses')
     }
 
-    const logout = async () => {
-        setAuth({});
+    const handleLogout = () => {
+        setAuth({ userId: '', roles: [], accessToken: '', refreshToken: '' });
         localStorage.removeItem("auth");
-        navigate('/linkpage');
-    }
+        navigate("/", { replace: true, state: null });
+    };
 
     const handleUserProfile = (userId) => {
         navigate(`/profile/${userId}`);
@@ -53,7 +39,7 @@ const InstructorComponent = () => {
             <button onClick={validateStudentsPage}>Validate students</button>
             <button onClick={myCourses}>My courses</button>
             <button onClick={() => handleUserProfile(userId)}>My profile</button>
-            <button onClick={logout}>Log Out</button>
+            <button onClick={handleLogout}>Log Out</button>
         </div>
     )
 }

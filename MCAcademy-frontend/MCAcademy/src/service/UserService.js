@@ -1,11 +1,13 @@
+const url = 'http://localhost:8080/api/v1/user';
 
-export const getUserByEmail = async (email) => {
+export const getUserById = async (id, token) => {
 
     try {
-        const response = await fetch(`http://localhost:8080/api/v1/user/email/${email}`, {
+        const response = await fetch(`${url}/info/${id}`, {
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             withCredentials: true
         });
@@ -23,13 +25,14 @@ export const getUserByEmail = async (email) => {
     }
 }
 
-export const getUserById = async (id) => {
+export const getUsersValidatorById = async (userId, token) => {
 
     try {
-        const response = await fetch(`http://localhost:8080/api/v1/user/id/${id}`, {
+        const response = await fetch(`${url}/validator/${userId}`, {
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             withCredentials: true
         });
@@ -47,22 +50,24 @@ export const getUserById = async (id) => {
     }
 }
 
-export const getInstructor = async (email) => {
+export const listOfUsers = async (role, status, token) => {
+
     try {
-        const response = await fetch(`http://localhost:8080/api/v1/instructor/${email}`, {
+        const response = await fetch(`${url}/${role}/${status}`, {
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             withCredentials: true
         });
 
         if (response.ok) {
             const data = await response.json();
+            console.log(data);
 
             return data;
-        }
-        else {
+        } else {
             console.error('Error:', response.status);
         }
     } catch (err) {
@@ -70,23 +75,22 @@ export const getInstructor = async (email) => {
     }
 }
 
-export const getStudent = async (email) => {
+export const getCourse = async (userId, id, token) => {
+
     try {
-        const response = await fetch(`http://localhost:8080/api/v1/student/${email}`, {
+        const response = await fetch(`${url}/${userId}/only/${id}`, {
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             withCredentials: true
-        });
+        })
 
         if (response.ok) {
             const data = await response.json();
 
             return data;
-        }
-        else {
-            console.error('Error:', response.status);
         }
     } catch (err) {
         console.error("Error:", err);

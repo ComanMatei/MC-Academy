@@ -1,21 +1,27 @@
 import './see_course.css';
 import SpotifySearch from "../components/SpotifySearch";
 
-import { useState, useEffect } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 
 import { createImages } from "../service/FileService";
 import { createVideos } from "../service/FileService";
 import { saveTrack } from '../service/SpotifyTrackService';
+import { findAllSpec } from "../service/InstructorService";
+
+import AuthContext from "../context/AuthProvider";
 
 const CourseComponent = () => {
+
+    const { auth } = useContext(AuthContext);
+    const token = auth?.accessToken;
+    const userId = auth?.userId;
 
     const navigate = useNavigate();
 
     const [name, setName] = useState('');
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
-    const [instructorId, setInstructorId] = useState('');
     const [spotifyTrack, setSpotifyTrack] = useState(null);
 
     const [imagesPreview, setImagesPreview] = useState([]);
@@ -30,67 +36,17 @@ const CourseComponent = () => {
     const [openDialog, setOpenDialog] = useState(false);
 
     useEffect(() => {
-        const authData = localStorage.getItem("auth");
-        const parsedAuth = authData ? JSON.parse(authData) : null;
-        const email = parsedAuth?.email || null;
-
-        findInstructor(email);
-    }, []);
-
-    useEffect(() => {
-        if (instructorId) {
-            findAllSpec(instructorId);
-        }
-    }, [instructorId]);
-
-    const findInstructor = async (email) => {
-        try {
-            const response = await fetch(`http://localhost:8080/api/v1/instructor/${email}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+        const fetchSpec = async () => {
+            if (userId) {
+                const specializations = await findAllSpec(userId, token);
+                setInstruments(specializations);
             }
-
-            const data = await response.json();
-            console.log("Instructor Data:", data);
-            setInstructorId(data.id);
-
-        } catch (err) {
-            console.error("Erorr to fetch:", err);
-        }
-    };
-
-    const findAllSpec = async (instructorId) => {
-        try {
-            const response = await fetch(`http://localhost:8080/api/v1/instructor/instr-assign/${instructorId}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true
-            })
-
-            if (response.ok) {
-                const data = await response.json();
-                console.log(data);
-                setInstruments(data);
-            } else {
-                console.error('Error:', response.status);
-            }
-        } catch (err) {
-            console.error("Erorr:", err);
-        }
-    }
+        };
+        fetchSpec();
+    }, [userId]);
 
     const handleFileChange = (event, type) => {
         const selectedFiles = Array.from(event.target.files);
-        console.log("selectedFiles:", selectedFiles);
 
         if (selectedFiles.length === 0) {
             console.log("No file has been selected!");
@@ -122,8 +78,8 @@ const CourseComponent = () => {
 
     const createCourse = async () => {
 
-        const uploadedImages = await createImages(images);
-        const uploadedVideos = await createVideos(videos);
+        const uploadedImages = await createImages(images, token);
+        const uploadedVideos = await createVideos(videos, token);
 
         if (uploadedImages) {
             console.log("Images successfully uploaded:", uploadedImages);
@@ -137,14 +93,22 @@ const CourseComponent = () => {
             console.log("No videos were uploaded.");
         }
 
-        const savedTrack = await saveTrack(spotifyTrack);
+        const savedTrack = await saveTrack(spotifyTrack, token);
         console.log("The song that is coming into play:", savedTrack);
+
+        var isHistory;
+        if (Date.now() > new Date(endDate).getTime()) {
+            isHistory = true; 
+        } else {
+            isHistory = false;
+        }
 
         const course = {
             name,
             startDate,
             endDate,
-            instructorId,
+            isHistory: isHistory,
+            instructorId: userId,
             instrument: selectedInstrument.instrument,
             spotifyTrack: savedTrack,
             images: uploadedImages,
@@ -155,7 +119,8 @@ const CourseComponent = () => {
             const response = await fetch('http://localhost:8080/api/v1/course/create-course', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(course),
                 withCredentials: true
@@ -174,8 +139,11 @@ const CourseComponent = () => {
 
     const handleSelectInstrument = (event) => {
         const instrumentId = event.target.value;
-        const selectedInst = instruments.find(inst => inst.id === parseInt(instrumentId));
-        setSelectedInstrument(selectedInst);
+        const selectedInst = instruments.find(inst => inst.id == parseInt(instrumentId));
+
+        if (selectedInst) {
+            setSelectedInstrument(selectedInst);
+        }
     };
 
     const handleOpenDialog = () => {
@@ -244,6 +212,7 @@ const CourseComponent = () => {
                 type="file"
                 name="images"
                 multiple
+                accept="image/*"
                 onChange={(e) => handleFileChange(e, "image")}
             />
 
@@ -253,7 +222,7 @@ const CourseComponent = () => {
                     <div>
                         <h3>Selected Images:</h3>
                         {imagesPreview.map((imagePreview, index) => (
-                            <div key={index} className="image-wrapper">
+                            <div key={imagePreview.file.name} className="image-wrapper">
                                 {imagePreview?.fileData ? (
                                     <div className="relative">
                                         <img
@@ -281,6 +250,7 @@ const CourseComponent = () => {
                 type="file"
                 name="videos"
                 multiple
+                accept="video/*"
                 onChange={(e) => handleFileChange(e, "video")}
             />
 
@@ -290,7 +260,7 @@ const CourseComponent = () => {
                     <div>
                         <h3>Selected Videos:</h3>
                         {videosPreview.map((videoPreview, index) => (
-                            <div key={index} className="video-wrapper">
+                            <div key={videoPreview.file.name} className="video-wrapper">
                                 {videoPreview?.fileData ? (
                                     <div className="relative">
                                         <video
@@ -320,7 +290,7 @@ const CourseComponent = () => {
                 value={selectedInstrument ? selectedInstrument.id : ""}
                 onChange={handleSelectInstrument}
                 className="border border-gray-300 p-2 rounded-lg w-full"
-                disabled={instruments.length === 0}
+                disabled={instruments.length == 0}
             >
                 <option value="" disabled>Select instrument</option>
                 {instruments.map((instrument) => (
@@ -328,7 +298,7 @@ const CourseComponent = () => {
                         {instrument.instrument}
                     </option>
                 ))}
-            </select> <br /> <br />
+            </select>
 
             <input
                 type="date"

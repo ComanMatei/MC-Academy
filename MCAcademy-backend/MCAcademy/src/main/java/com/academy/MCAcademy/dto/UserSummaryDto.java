@@ -1,0 +1,23 @@
+package com.academy.MCAcademy.dto;
+
+import com.academy.MCAcademy.entity.Status;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserSummaryDto {
+    private Long userId;
+
+    private String firstname;
+
+    private String lastname;
+
+    private String email;
+
+    private Status status;
+}

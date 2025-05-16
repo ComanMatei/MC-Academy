@@ -1,6 +1,7 @@
 package com.academy.MCAcademy.controller;
 
 import com.academy.MCAcademy.request.AuthenticationRequest;
+import com.academy.MCAcademy.request.RefreshTokenRequest;
 import com.academy.MCAcademy.response.AuthenticationResponse;
 import com.academy.MCAcademy.request.RegisterRequest;
 import com.academy.MCAcademy.service.AuthenticationService;
@@ -15,7 +16,6 @@ import java.net.URI;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/v1/auth")
-@CrossOrigin(origins = "http://localhost:5173")
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
@@ -28,6 +28,11 @@ public class AuthenticationController {
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate (@RequestBody AuthenticationRequest request) {
         return ResponseEntity.ok(authenticationService.authenticate(request));
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<AuthenticationResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
+        return ResponseEntity.ok(authenticationService.refreshToken(request));
     }
 
     @GetMapping(path = "confirm")
