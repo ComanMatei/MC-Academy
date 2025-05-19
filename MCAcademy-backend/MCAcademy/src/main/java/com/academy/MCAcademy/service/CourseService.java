@@ -2,15 +2,12 @@ package com.academy.MCAcademy.service;
 
 import com.academy.MCAcademy.dto.CourseDto;
 import com.academy.MCAcademy.dto.CourseSummaryDto;
-import com.academy.MCAcademy.dto.InstructorSpecDto;
-import com.academy.MCAcademy.dto.ValidatorDto;
 import com.academy.MCAcademy.entity.*;
 import com.academy.MCAcademy.repository.CourseRepository;
 import com.academy.MCAcademy.repository.FileRepository;
 import com.academy.MCAcademy.repository.SpotifyTrackRepository;
 import com.academy.MCAcademy.repository.UserRepository;
 import com.academy.MCAcademy.request.AssignCoursesRequest;
-import com.academy.MCAcademy.request.CourseRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -112,12 +109,12 @@ public class CourseService {
         return convertCourseSummaryEntityToDto(course);
     }
 
-    public Course editCourse(Long id, CourseRequest request) {
+    public CourseDto editCourse(Long id, CourseDto dto) {
         Course course = courseRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("The course with this id doesn't exist!"));
 
-        if (request.getImages() != null && !request.getImages().isEmpty()) {
-            Set<File> newImages = request.getImages();
+        if (dto.getImages() != null && !dto.getImages().isEmpty()) {
+            Set<File> newImages = dto.getImages();
 
             if (course.getImages() == null) {
                 course.setImages(newImages);
@@ -126,8 +123,8 @@ public class CourseService {
             }
         }
 
-        if (request.getVideos() != null && !request.getVideos().isEmpty()) {
-            Set<File> newVideos = request.getVideos();
+        if (dto.getVideos() != null && !dto.getVideos().isEmpty()) {
+            Set<File> newVideos = dto.getVideos();
 
             if (course.getVideos() == null) {
                 course.setVideos(newVideos);
@@ -136,23 +133,25 @@ public class CourseService {
             }
         }
 
-        if (request.getName() != null) {
-            course.setName(request.getName());
+        if (dto.getName() != null) {
+            course.setName(dto.getName());
         }
-        if (request.getStartDate() != null) {
-            course.setStartDate(request.getStartDate());
+        if (dto.getStartDate() != null) {
+            course.setStartDate(dto.getStartDate());
         }
-        if (request.getEndDate() != null) {
-            course.setEndDate(request.getEndDate());
+        if (dto.getEndDate() != null) {
+            course.setEndDate(dto.getEndDate());
         }
-        if (request.getInstrument() != null) {
-            course.setInstrument(request.getInstrument());
+        if (dto.getInstrument() != null) {
+            course.setInstrument(dto.getInstrument());
         }
-        if (request.getSpotifyTrack() != null) {
-            course.setSpotifyTrack(request.getSpotifyTrack());
+        if (dto.getSpotifyTrack() != null) {
+            course.setSpotifyTrack(dto.getSpotifyTrack());
         }
 
-        return courseRepository.save(course);
+        Course savedCourse = courseRepository.save(course);
+
+        return convertCourseEntityToDto(savedCourse);
     }
 
     // Delete course based on its ID

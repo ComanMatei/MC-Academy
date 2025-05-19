@@ -19,10 +19,6 @@ public class StudentSpecValidation {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "instructor_id", nullable = false)
-    private User instructor;
-
-    @ManyToOne
     @JoinColumn(name = "assign_student_id", nullable = false)
     private AssignStudent assignStudent;
 

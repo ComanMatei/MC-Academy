@@ -40,7 +40,7 @@ public class StudentSpecValidationService {
         AssignStudent assignStudent = assignStudentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Student assign was not found with this id!"));
 
-        StudentSpecValidation studentSpecValidation = convertStudentSpecValidationDtoToEntity(instructor, assignStudent, dto);
+        StudentSpecValidation studentSpecValidation = convertStudentSpecValidationDtoToEntity(assignStudent, dto);
 
         String subject = "Status instrument assign!";
         String name = assignStudent.getStudent().getFirstname() + " " + assignStudent.getStudent().getLastname();
@@ -91,11 +91,10 @@ public class StudentSpecValidationService {
 
 
     // Private functions for converting DTO class to Entity class
-    private StudentSpecValidation convertStudentSpecValidationDtoToEntity(User instructor, AssignStudent assignStudent,
+    private StudentSpecValidation convertStudentSpecValidationDtoToEntity(AssignStudent assignStudent,
                                                                           StudentSpecValidationDto dto) {
         return StudentSpecValidation
                 .builder()
-                .instructor(instructor)
                 .assignStudent(assignStudent)
                 .answer(dto.getAnswer())
                 .build();

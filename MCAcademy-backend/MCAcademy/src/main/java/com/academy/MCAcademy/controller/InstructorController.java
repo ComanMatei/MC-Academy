@@ -4,7 +4,6 @@ import com.academy.MCAcademy.dto.AssignStudentDto;
 import com.academy.MCAcademy.dto.InstructorSpecDto;
 import com.academy.MCAcademy.dto.StudentSpecValidationDto;
 import com.academy.MCAcademy.dto.ValidatorDto;
-import com.academy.MCAcademy.request.ValidationRequest;
 import com.academy.MCAcademy.entity.*;
 import com.academy.MCAcademy.service.AssignStudentService;
 import com.academy.MCAcademy.service.InstructorSpecializationService;

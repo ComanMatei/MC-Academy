@@ -2,11 +2,9 @@ package com.academy.MCAcademy.controller;
 
 import com.academy.MCAcademy.dto.CourseDto;
 import com.academy.MCAcademy.dto.CourseSummaryDto;
-import com.academy.MCAcademy.entity.Course;
 import com.academy.MCAcademy.entity.Instrument;
 import com.academy.MCAcademy.entity.SpotifyTrack;
 import com.academy.MCAcademy.request.AssignCoursesRequest;
-import com.academy.MCAcademy.request.CourseRequest;
 import com.academy.MCAcademy.service.CourseService;
 import com.academy.MCAcademy.service.SpotifyTrackService;
 import lombok.AllArgsConstructor;
@@ -68,9 +66,9 @@ public class CourseController {
     }
 
     @PutMapping("/{instructorId}/update/{id}")
-    public ResponseEntity<Course> editCourse(@PathVariable Long instructorId, @PathVariable Long id,
-                                             @RequestBody CourseRequest request) {
-        return ResponseEntity.ok(courseService.editCourse(id, request));
+    public ResponseEntity<CourseDto> editCourse(@PathVariable Long instructorId, @PathVariable Long id,
+                                                @RequestBody CourseDto dto) {
+        return ResponseEntity.ok(courseService.editCourse(id, dto));
     }
 
     @DeleteMapping("/{instructorId}/delete/{id}")

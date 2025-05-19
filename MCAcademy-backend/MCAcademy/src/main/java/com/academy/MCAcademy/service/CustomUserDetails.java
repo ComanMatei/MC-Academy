@@ -1,14 +1,11 @@
 package com.academy.MCAcademy.service;
 
-import com.academy.MCAcademy.entity.User;
-import com.academy.MCAcademy.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Collection;
 

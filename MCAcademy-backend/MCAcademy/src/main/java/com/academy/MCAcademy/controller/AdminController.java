@@ -2,7 +2,6 @@ package com.academy.MCAcademy.controller;
 
 import com.academy.MCAcademy.request.ValidationRequest;
 import com.academy.MCAcademy.entity.UserValidation;
-import com.academy.MCAcademy.entity.User;
 import com.academy.MCAcademy.service.UserValidationService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
