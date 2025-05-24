@@ -31,19 +31,31 @@ export const assignStudent = async (studentId, assign, token) => {
                 'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(assign),
-            withCredentials: true
-        })
+            credentials: 'include'
+        });
+
+        const contentType = response.headers.get('Content-Type');
 
         if (response.ok) {
             const data = await response.json();
             console.log(data);
+            return { success: true, data };
+        } else {
+            let error = {};
+            if (contentType && contentType.includes('application/json')) {
+                error = await response.json();
+            } else {
+                error.message = await response.text();
+            }
 
-            return data;
+            console.error("Backend error:", error);
+            return { success: false, error };
         }
     } catch (err) {
-        console.error("Erorr:", err);
+        console.error("Network/client error:", err);
+        return { success: false, error: { message: err.message } };
     }
-}
+};
 
 export const getStudentCourses = async (studentId, instructorId, isHistory, instrument, token) => {
     try {

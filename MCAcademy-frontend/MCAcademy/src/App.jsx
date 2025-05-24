@@ -1,8 +1,8 @@
 import { Routes, Route } from 'react-router-dom'
 
 import HomeComponent from './components/HomeComponent'
-import RegisterComponent from './registerState/RegisterComponent'
-import LoginComponent from './components/LoginComponent'
+import RegisterComponent from './Register/RegisterComponent'
+import LoginComponent from './LogIn/LoginComponent'
 import Layout from './context/Layout'
 
 import RequireAuth from "./components/RequireAuth";

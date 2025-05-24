@@ -1,5 +1,6 @@
 package com.academy.MCAcademy.service;
 
+import com.academy.MCAcademy.exception.AuthForbiddenException;
 import com.academy.MCAcademy.request.AuthenticationRequest;
 import com.academy.MCAcademy.request.RefreshTokenRequest;
 import com.academy.MCAcademy.response.AuthenticationResponse;
@@ -12,12 +13,15 @@ import com.academy.MCAcademy.mailing.EmailSender;
 import com.academy.MCAcademy.mailing.EmailValidator;
 import com.academy.MCAcademy.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.mail.MailSendException;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.ConnectException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -41,10 +45,11 @@ public class AuthenticationService {
 
     private final BuildEmailService buildEmailService;
 
+    @Transactional
     public AuthenticationResponse register(RegisterRequest request) {
         boolean isValidEmail = emailValidator.test(request.getEmail());
         if (!isValidEmail) {
-            throw new IllegalStateException("Email not valid");
+            throw new IllegalStateException("Email already taken!");
         }
 
 //        if (request.getProfilePicture() == null) {
@@ -83,8 +88,13 @@ public class AuthenticationService {
         String notice = "Link will expire in 15 minutes.";
         String signiture = "MC Academy Team!";
 
-        emailSender.send(request.getEmail(),
-                buildEmailService.buildEmail(subject, name, body, link, linkName, notice, signiture));
+        try {
+            emailSender.send(request.getEmail(),
+                    buildEmailService.buildEmail(subject, name, body, link, linkName, notice, signiture));
+        } catch (MailSendException e) {
+            userRepository.delete(user);
+            throw new MailSendException("Failed to connect to mail server");
+        }
 
         var jwtToken = jwtService.generateToken(user);
 
@@ -117,18 +127,23 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+            );
+        } catch (BadCredentialsException ex) {
+            throw new BadCredentialsException("Invalid email or password");
+        }
+
         var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new IllegalStateException("User not found"));
+                .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
 
         if (user.getEnabled() != true) {
             throw new IllegalStateException("Email not confirmed. Please activate your account.");
         }
 
         if (user.getStatus() == Status.PENDING || user.getStatus() == Status.DECLINED) {
-            throw new IllegalStateException("You don't have permission to authenticate!");
+            throw new IllegalStateException("Your account is pending approval. You will be notified once access is granted.");
         }
 
         var jwtToken = jwtService.generateToken(user);

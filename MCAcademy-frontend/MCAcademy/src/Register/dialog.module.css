@@ -1,0 +1,26 @@
+.dialogNative {
+  padding: 2rem 3rem;
+  border: none;
+  border-radius: 12px;
+  background-color: white;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+}
+
+::backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.closeButton {
+  margin-top: 1.5rem;
+  padding: 0.7rem 1.5rem;
+  background-color: #0b1b77;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+}

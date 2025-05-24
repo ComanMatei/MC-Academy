@@ -1,0 +1,362 @@
+.wrapper {
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(to right top, #6dd5fa, #2980b9);
+  font-family: 'Poppins', sans-serif;
+  padding: 1rem;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.section {
+  background: rgba(255, 255, 255, 0.12);
+  padding: 2rem;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #0b1b77;
+}
+
+.title {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.profilePreview {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  border: 4px solid #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.fileLabel {
+  margin-bottom: 1.2rem;
+  text-align: center;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.fileInput {
+  display: block;
+  margin: 0.5rem auto;
+  cursor: pointer;
+  display: none; /* ascunde inputul nativ */
+}
+
+.customFileButton {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+.roleButtons {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.instructor,
+.student {
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: linear-gradient(45deg, #43e97b, #38f9d7);
+  color: white;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.instructor:hover,
+.student:hover {
+  background: #0b1b77;
+  color: white;
+}
+
+.active {
+  background: #0b1b77 !important;
+}
+
+.form {
+  width: 100%;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  max-height: none;
+  overflow: hidden;
+}
+
+.formGroup {
+  position: relative;
+  margin: 15px 0;
+  padding: 10px 0 0;
+  font-size: 20px;
+}
+
+.formField {
+  box-sizing: border-box;
+  font-family: inherit;
+  width: 100%;
+  border: 0;
+  border-bottom: 3px solid var(--gray);
+  outline: 0;
+  font-size: 1.1rem;
+  color: var(--white);
+  padding: 20px 0 4px 0;
+  background: transparent;
+  transition: border-color 0.2s;
+  max-height: 2.5rem;
+  font-size: 20px;
+}
+
+.formField::placeholder {
+  color: transparent;
+}
+
+.formField:placeholder-shown~.formLabel {
+  font-size: 1.3rem;
+  cursor: text;
+  top: 20px;
+}
+
+.formLabel {
+  position: absolute;
+  top: 0;
+  display: block;
+  transition: 0.2s;
+  font-size: 1rem;
+  color: var(--gray);
+  font-size: 20px;
+}
+
+.formField:focus {
+  padding-bottom: 6px;
+  border-bottom: 3px solid transparent;
+  font-weight: 700;
+  border-width: 3px;
+  border-image: linear-gradient(to right, var(--primary), var(--secondary));
+  border-image-slice: 1;
+}
+
+.formField:focus~.formLabel {
+  position: absolute;
+  top: 0;
+  display: block;
+  transition: 0.2s;
+  font-size: 1rem;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.formField:required,
+.formField:invalid {
+  box-shadow: none;
+}
+
+.submitButton {
+  margin-top: 1rem;
+  background-color: #1db954;
+  color: white;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 0.6rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: center;
+  transition: background 0.3s ease;
+}
+
+.submitButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.submitButton:hover:enabled {
+  background-color: #0b1b77;
+}
+
+.loginPrompt {
+  margin-top: 1rem;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.link {
+  color: #0b1b77;
+  text-decoration: underline;
+}
+
+.errmsg {
+  background: #ff4d4d;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  color: white;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-align: center;
+  width: 100%;
+}
+
+.inputError {
+  color: #e74c3c;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  position: absolute;
+}
+
+.inputtError {
+  color: #e74c3c;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  position: absolute;
+  bottom: -2.4em;
+}
+
+.inputtError {
+  color: #e74c3c;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  position: absolute;
+  bottom: -2.4em;
+}
+
+.inputttError {
+  color: #e74c3c;
+  position:static;
+}
+
+.inputRoleError {
+  color: #e74c3c;
+  font-size: 0.875rem;
+  margin-top: 2.5rem;
+  position: absolute;
+}
+
+.offscreen {
+  position: absolute;
+  left: -9999px;
+}
+
+.twoColumn {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.leftColumn {
+  flex: 1;
+  min-width: 45%;
+  display: flex;
+  flex-direction: column;
+}
+
+.rightColumn {
+  flex: 1;
+  min-width: 45%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.descriptionArea {
+  resize: none;
+  height: 200px;
+  font-size: 18px;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-family: 'Poppins', sans-serif;
+  display: block;  
+}
+
+.descriptionLabel {
+  margin-top: 20px;
+  font-size: 20px;
+  display: block;  
+}
+
+.nameDobRow {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.nameDobRow>div {
+  flex: 1;
+  min-width: 150px;
+  display: flex;
+  flex-direction: column;
+}
+
+.formDate {
+  box-sizing: border-box;
+  font-family: inherit;
+  width: 75%;
+  border: 0;
+  border-bottom: 3px solid var(--gray);
+  outline: 0;
+  font-size: 1.1rem;
+  color: var(--white);
+  padding: 20px 0 13px 0;
+  background: transparent;
+  transition: border-color 0.2s;
+  max-height: 2.5rem;
+  font-size: 20px;
+}
+
+.formDate:focus {
+  border-bottom: 3px solid var(--primary);
+}
+
+.formDate::placeholder {
+  color: transparent;
+}
+
+.formDate:focus::placeholder {
+  color: transparent;
+}
+
+.formDate:focus + label,
+.formDate:not(:placeholder-shown) + label {
+  top: 0;
+  font-size: 14px;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.roleButtons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.roleButtons p {
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.buttonGroup {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}

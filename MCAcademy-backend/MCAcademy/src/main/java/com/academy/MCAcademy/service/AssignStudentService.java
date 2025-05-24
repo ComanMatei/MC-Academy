@@ -1,6 +1,7 @@
 package com.academy.MCAcademy.service;
 
 import com.academy.MCAcademy.dto.*;
+import com.academy.MCAcademy.exception.AlreadyAssignedException;
 import com.academy.MCAcademy.repository.CourseRepository;
 import com.academy.MCAcademy.repository.InstructorSpecializationRepository;
 import com.academy.MCAcademy.request.AssignStudentRequest;
@@ -37,7 +38,7 @@ public class AssignStudentService {
         }
 
         if (assignStudentRepository.existsByStudentAndInstructorSpec_Id(student, request.getInstructorSpecId())) {
-            throw new RuntimeException("You have already assigned to this instructor for this instrument!");
+            throw new AlreadyAssignedException("You have already assigned to this instructor for this instrument!");
         }
 
         InstructorSpecialization instructorSpecialization = instructorSpecializationRepository.findById(request.getInstructorSpecId())
