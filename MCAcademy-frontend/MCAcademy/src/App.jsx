@@ -13,9 +13,7 @@ import StudentComponent from './components/StudentComponent'
 import Unauthorized from './components/Unauthorized'
 import UrlUnauthorized from './components/UrlUnauthorized'
 
-import MailInformationComponent from './components/MailInformationComponent'
-import VerifyEmailComponent from './components/VerifyEmailComponent'
-import ChangePasswordComponent from './components/ChangePasswordComponent'
+import ChangePasswordComponent from './ForgetPassword/ChangePasswordComponent'
 
 import InstrumentSpecComponent from './components/InstrumentSpecComponent'
 import ValidateStudentSpecComponent from './components/ValidateStudentSpecComponent'
@@ -47,10 +45,8 @@ export default function App() {
           {/* public routes */}
           <Route path="register" element={<RegisterComponent />} />
           <Route path="login" element={<LoginComponent />} />
-          <Route path="verify-email" element={<VerifyEmailComponent />} />
           <Route path="unauthorized" element={<Unauthorized />} />
           <Route path="url-unauthorized" element={<UrlUnauthorized />} />
-          <Route path="mail-info" element={<MailInformationComponent />} />
           <Route path="/forgotpassword/reset" element={<ChangePasswordComponent />} />
           <Route path="/search" element={<SpotifySearch />} />
           <Route path="/course/:id" element={<SeeCourseComponent />} />

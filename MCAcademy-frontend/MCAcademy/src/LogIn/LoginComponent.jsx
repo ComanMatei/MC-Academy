@@ -4,6 +4,7 @@ import useAuth from '../hooks/useAuth';
 
 import loginCSS from './logIn.module.css';
 import logo from '../assets/MCAcademy_logo.png';
+import VerifyEmailDialog from '../ForgetPassword/VerifyEmailDialog';
 
 const LoginComponent = () => {
 
@@ -19,6 +20,8 @@ const LoginComponent = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errMsg, setErrMsg] = useState('');
+
+    const [showVerifyEmailDialog, setShowVerifyEmailDialog] = useState(false);
 
     useEffect(() => {
         userRef.current.focus();
@@ -62,7 +65,7 @@ const LoginComponent = () => {
                 try {
                     errorData = await response.json();
                 } catch (e) {
-
+                    console.log('Something is wrong', e);
                 }
 
                 if (response.status == 400) {
@@ -82,6 +85,10 @@ const LoginComponent = () => {
             errRef.current?.focus();
         }
     };
+
+    const toRegister = () => {
+        navigate('/register');
+    }
 
     return (
         <div className={loginCSS.wrapper}>
@@ -134,12 +141,27 @@ const LoginComponent = () => {
                 </form>
 
                 <p className={loginCSS.line}>
-                    <Link to="/register" className={loginCSS.link}>Need an Account?</Link>
+                    <button className={loginCSS.link} type="button" onClick={toRegister}>
+                        Need an Account?
+                    </button>
                 </p>
                 <p className={loginCSS.line}>
-                    <Link to="/verify-email" className={loginCSS.link}>Forgot your password?</Link>
+                    <button
+                        className={loginCSS.link}
+                        onClick={() => setShowVerifyEmailDialog(true)}
+                        type="button"
+                    >
+                        Forgot your password?
+                    </button>
                 </p>
             </section>
+
+            {showVerifyEmailDialog && (
+                <VerifyEmailDialog
+                    isOpen={showVerifyEmailDialog}
+                    onClose={() => setShowVerifyEmailDialog(false)}
+                />
+            )}
         </div>
     );
 }

@@ -1,5 +1,6 @@
 package com.academy.MCAcademy.service;
 
+import com.academy.MCAcademy.exception.EmailNotFoundException;
 import com.academy.MCAcademy.request.EmailRequest;
 import com.academy.MCAcademy.response.EmailResponse;
 import com.academy.MCAcademy.request.ResetPasswordRequest;
@@ -55,7 +56,7 @@ public class ForgotPasswordService {
 
     public EmailResponse verifyEmail(EmailRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new IllegalStateException("Email not found"));
+                .orElseThrow(() -> new EmailNotFoundException("Email not found"));
 
         String token = generateResetToken(user);
 

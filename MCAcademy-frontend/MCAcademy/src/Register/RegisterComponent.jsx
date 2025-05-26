@@ -71,13 +71,6 @@ const RegisterComponent = () => {
         setValidDescription(DESCRIPTION_REGEX.test(description))
     }, [email, firstname, lastname, dateOfBirth, description])
 
-    useEffect(() => {F
-        const result = PASSWORD_REGEX.test(password);
-        setValidPassword(result);
-        const match = password === matchPwd;
-        setValidMatch(match);
-    }, [password, matchPwd])
-
     useEffect(() => {
         setErrMsg('');
     }, [firstname, lastname, dateOfBirth, email, password, matchPwd, description])

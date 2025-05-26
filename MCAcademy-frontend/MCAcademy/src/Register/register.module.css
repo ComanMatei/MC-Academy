@@ -49,17 +49,17 @@
   display: block;
   margin: 0.5rem auto;
   cursor: pointer;
-  display: none; /* ascunde inputul nativ */
+  display: none;
 }
 
 .customFileButton {
-    display: inline-block;
-    padding: 0.5rem 1rem;
-    background-color: #007bff;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-  }
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
 
 .roleButtons {
   display: flex;
@@ -237,7 +237,7 @@
 
 .inputttError {
   color: #e74c3c;
-  position:static;
+  position: static;
 }
 
 .inputRoleError {
@@ -283,13 +283,13 @@
   border-radius: 8px;
   border: 1px solid #ccc;
   font-family: 'Poppins', sans-serif;
-  display: block;  
+  display: block;
 }
 
 .descriptionLabel {
   margin-top: 20px;
   font-size: 20px;
-  display: block;  
+  display: block;
 }
 
 .nameDobRow {
@@ -334,8 +334,8 @@
   color: transparent;
 }
 
-.formDate:focus + label,
-.formDate:not(:placeholder-shown) + label {
+.formDate:focus+label,
+.formDate:not(:placeholder-shown)+label {
   top: 0;
   font-size: 14px;
   color: var(--primary);

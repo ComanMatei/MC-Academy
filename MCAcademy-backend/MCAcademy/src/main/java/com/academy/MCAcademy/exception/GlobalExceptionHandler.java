@@ -48,4 +48,14 @@ public class GlobalExceptionHandler {
         ErrorResponse error = new ErrorResponse(LocalDateTime.now(), ex.getMessage(), "Mail server unavailable");
         return new ResponseEntity<>(error, HttpStatus.SERVICE_UNAVAILABLE);
     }
+
+    @ExceptionHandler(EmailNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleEmailNotFound(EmailNotFoundException ex) {
+        ErrorResponse error = new ErrorResponse(
+                LocalDateTime.now(),
+                ex.getMessage(),
+                "Email Not Found"
+        );
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
 }
