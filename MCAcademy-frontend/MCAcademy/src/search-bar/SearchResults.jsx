@@ -1,13 +1,14 @@
-import "./searchResults.css";
+import SeachResultCSS from "./searchResults.module.css";
+import SearchBarCSS from "./searchBar.module.css";
 
 const SearchResults = ({ results = [], onSelectInstructor }) => {
     return (
-        <div className="results-list">
+        <div className={SearchBarCSS.resultsList}>
             {results.length > 0 ? (
                 results.map((result, index) => (
                     <div
                         key={result.id || `${result.firstname}-${result.lastname}-${index}`}
-                        className="result-item"
+                        className={SeachResultCSS.resultItem}
                         onClick={() => onSelectInstructor(result)}
                     >
                         {result.firstname} {result.lastname}

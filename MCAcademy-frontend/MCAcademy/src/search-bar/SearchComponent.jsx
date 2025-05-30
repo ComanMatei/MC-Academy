@@ -1,6 +1,7 @@
 import SearchBar from "./SearchBar"
 import SearchResults from "./SearchResults"
-import "./searchcomponent.css"
+
+import SearchBarCSS from "./searchBar.module.css";
 
 import { useEffect, useState } from "react";
 
@@ -12,7 +13,7 @@ const SearchComponent = ({ instructors, onSelectInstructor }) => {
     }, [instructors]);
 
     return (
-        <div className="search-container">
+        <div className={SearchBarCSS.searchContainer}>
                 <SearchBar
                     data={instructors}
                     setResults={setFilteredInstructors}

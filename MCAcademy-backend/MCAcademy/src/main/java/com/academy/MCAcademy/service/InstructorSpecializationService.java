@@ -27,14 +27,14 @@ public class InstructorSpecializationService {
     // Creates instructor instrument assign
     public InstructorSpecDto assignInstrument(Long instructorId, InstructorSpecDto dto) {
         User instructor = userRepository.findById(instructorId)
-                .orElseThrow(() -> new RuntimeException("This instructor doesn't exist"));
+                .orElseThrow(() -> new IllegalStateException("This instructor doesn't exist"));
 
         if (instructor.getRole() != Role.INSTRUCTOR) {
-            throw new RuntimeException("Only instructors can assign instruments for courses");
+            throw new IllegalStateException("Only instructors can assign instruments for courses!");
         }
 
         if (instructorSpecializationRepository.existsByInstructorAndInstrument(instructor, dto.getInstrument())) {
-            throw new RuntimeException("Instructor is already assigned to this instrument");
+            throw new IllegalStateException("You already assigned to this instrument!");
         }
 
         InstructorSpecialization instructorSpecialization = convertInstructorSpecializationDtoToEntity(dto, instructor);

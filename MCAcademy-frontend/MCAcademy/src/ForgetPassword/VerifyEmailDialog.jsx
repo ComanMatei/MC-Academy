@@ -49,6 +49,7 @@ const VerifyEmailDialog = ({ isOpen, onClose }) => {
                 setEmail('');
                 setErrMsg('');
             } else {
+                setSuccessMsg('');
                 let errorData = null;
                 try {
                     errorData = await response.json();

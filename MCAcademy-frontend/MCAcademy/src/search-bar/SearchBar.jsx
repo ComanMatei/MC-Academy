@@ -1,6 +1,7 @@
-import { FaSearch } from "react-icons/fa";
-import "./searchBar.css";
 import { useState, useEffect } from "react";
+
+import { FaSearch } from "react-icons/fa";
+import searchBarCSS from "./searchBar.module.css";
 
 const SearchBar = ({ data, setResults, type, viewMode }) => {
   const [input, setInput] = useState('');
@@ -50,8 +51,8 @@ const SearchBar = ({ data, setResults, type, viewMode }) => {
 
 
   return (
-    <div className="input-wrapper">
-      <FaSearch id="search-icon" />
+    <div className={searchBarCSS.inputWrapper}>
+      <FaSearch className={searchBarCSS.searchIcon} />
       <input
         placeholder="Type to search..."
         value={input}

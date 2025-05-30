@@ -45,7 +45,7 @@ public class UserController {
 
     // Update user account
     @PutMapping("/edit/{userId}")
-    public ResponseEntity<User> updateUser(@PathVariable Long userId,
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long userId,
                                            @RequestBody RegisterRequest request) {
         return ResponseEntity.ok(userService.updateUser(userId, request));
     }

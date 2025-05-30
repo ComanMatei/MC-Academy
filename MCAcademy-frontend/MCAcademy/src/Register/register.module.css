@@ -360,3 +360,43 @@
   justify-content: center;
   gap: 1rem;
 }
+
+.uploadWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #e0e0e0;
+  padding: 0.3rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  width: fit-content;
+}
+
+.uploadWrapper:hover {
+  background-color: #d5d5d5;
+}
+
+.iconBox {
+  width: 32px;
+  height: 32px;
+  background-color: #e0e0e0;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon {
+  font-size: 18px;
+  color: #333;
+}
+
+.uploadText {
+  font-weight: 500;
+  color: #333;
+}
+
+.fileInput {
+  display: none;
+}

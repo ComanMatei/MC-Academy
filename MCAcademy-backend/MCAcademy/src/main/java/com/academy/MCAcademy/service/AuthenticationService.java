@@ -52,13 +52,13 @@ public class AuthenticationService {
             throw new IllegalStateException("Email already taken!");
         }
 
-//        if (request.getProfilePicture() == null) {
-//            throw new IllegalStateException("Must have a profile picture!");
-//        }
+        if (request.getProfilePicture() == null) {
+            throw new IllegalStateException("Must have a profile picture!");
+        }
 
-//        if (request.getProfilePicture().getType() == "video") {
-//            throw new IllegalStateException("This file is not an image!");
-//        }
+        if (request.getProfilePicture().getType() == "video") {
+            throw new IllegalStateException("This file is not an image!");
+        }
 
         var user = User.builder()
                 .firstname(request.getFirstname())

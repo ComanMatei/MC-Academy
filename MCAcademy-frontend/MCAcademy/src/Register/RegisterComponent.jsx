@@ -2,6 +2,8 @@ import { useRef, useState, useEffect } from "react";
 
 import { createprofilePicture } from "../service/FileService";
 
+import { FiUpload } from "react-icons/fi";
+
 import registerCSS from './register.module.css'
 import RegisterDialog from "./RegisterDialog";
 
@@ -62,14 +64,6 @@ const RegisterComponent = () => {
     useEffect(() => {
         userRef.current.focus();
     }, [])
-
-    useEffect(() => {
-        setValidFirstname(NAME_REGEX.test(firstname));
-        setValidLastname(NAME_REGEX.test(lastname));
-        setValidDateOfBirth(DATE_REGEX.test(dateOfBirth));
-        setValidEmail(EMAIL_REGEX.test(email));
-        setValidDescription(DESCRIPTION_REGEX.test(description))
-    }, [email, firstname, lastname, dateOfBirth, description])
 
     useEffect(() => {
         setErrMsg('');
@@ -171,6 +165,7 @@ const RegisterComponent = () => {
 
         if (!profilePicture) {
             setProfilePictureError("Profile picture is required.");
+            return;
         } else {
             setProfilePictureError('');
         }
@@ -236,6 +231,7 @@ const RegisterComponent = () => {
         if (file) {
             setProfilePicturePreview(URL.createObjectURL(file));
             setProfilePicture(file);
+            setProfilePictureError('');
         }
     };
 
@@ -259,7 +255,12 @@ const RegisterComponent = () => {
                     />
                 )}
 
-                <label htmlFor="file" className={registerCSS.customFileButton}>Select picture</label>
+                <label htmlFor="file" className={registerCSS.uploadWrapper}>
+                    <div className={registerCSS.iconBox}>
+                        <FiUpload className={registerCSS.icon} />
+                    </div>
+                    <span className={registerCSS.uploadText}>Upload image</span>
+                </label>
                 <input
                     type="file"
                     id="file"

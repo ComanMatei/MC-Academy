@@ -4,8 +4,9 @@ import HomeComponent from './components/HomeComponent'
 import RegisterComponent from './Register/RegisterComponent'
 import LoginComponent from './LogIn/LoginComponent'
 import Layout from './context/Layout'
+import AuthLayout from './context/AuthLayout'
 
-import RequireAuth from "./components/RequireAuth";
+import RequireAuth from "./context/RequireAuth";
 import AdminComponent from './components/AdminComponent'
 import InstructorComponent from './components/InstructorComponent'
 import StudentComponent from './components/StudentComponent'
@@ -15,7 +16,6 @@ import UrlUnauthorized from './components/UrlUnauthorized'
 
 import ChangePasswordComponent from './ForgetPassword/ChangePasswordComponent'
 
-import InstrumentSpecComponent from './components/InstrumentSpecComponent'
 import ValidateStudentSpecComponent from './components/ValidateStudentSpecComponent'
 
 import AssignStudentComponent from './components/AssignStudentComponent'
@@ -25,8 +25,8 @@ import CourseComponent from './course/CourseComponent'
 import CoursesComponent from './listOfCourses/CoursesComponent'
 import SeeCourseComponent from './course/SeeCourseComponent'
 
-import ProfileComponent from './components/ProfileComponent'
-import ListOfUsersComponent from './components/ListOfUsersComponent'
+import ProfileComponent from './Profile/ProfileComponent'
+import ListOfUsersComponent from './Users-list/ListOfUsersComponent'
 
 import SearchComponent from './search-bar/SearchComponent'
 import Metronome from './metronome/Metronome'
@@ -40,32 +40,31 @@ const ROLES = {
 export default function App() {
 
   return (
-      <Routes>
-        <Route path='/' element={<Layout />}>
-          {/* public routes */}
-          <Route path="register" element={<RegisterComponent />} />
-          <Route path="login" element={<LoginComponent />} />
-          <Route path="unauthorized" element={<Unauthorized />} />
-          <Route path="url-unauthorized" element={<UrlUnauthorized />} />
-          <Route path="/forgotpassword/reset" element={<ChangePasswordComponent />} />
-          <Route path="/search" element={<SpotifySearch />} />
-          <Route path="/course/:id" element={<SeeCourseComponent />} />
+    <Routes>
+      <Route path='/' element={<Layout />}>
+        {/* public routes */}
+        <Route path="register" element={<RegisterComponent />} />
+        <Route path="login" element={<LoginComponent />} />
+        <Route path="unauthorized" element={<Unauthorized />} />
+        <Route path="url-unauthorized" element={<UrlUnauthorized />} />
+        <Route path="/forgotpassword/reset" element={<ChangePasswordComponent />} />
+        <Route path="/search" element={<SpotifySearch />} />
+        <Route path="/course/:id" element={<SeeCourseComponent />} />
 
-          <Route path='/searchbar' element={<SearchComponent />} />
-          <Route path='/metronome' element={<Metronome />} />
+        {/* <Route path='/searchbar' element={<SearchComponent />} />
+        <Route path='/metronome' element={<Metronome />} /> */}
 
-          <Route path="/profile/:id" element={<ProfileComponent />} />
+        <Route element={<AuthLayout />}>
 
           {/* ADMIN routes */}
           <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
-            <Route path="admin" element={<AdminComponent />} />
+            <Route path="/admin" element={<AdminComponent />} />
             <Route path="/users" element={<ListOfUsersComponent />} />
           </Route>
 
           {/* INSTRUCTOR routes */}
           <Route element={<RequireAuth allowedRoles={[ROLES.Instructor]} />}>
             <Route path="instructor" element={<InstructorComponent />} />
-            <Route path="/assign-instrument" element={<InstrumentSpecComponent />} />
             <Route path="/validate-student" element={<ValidateStudentSpecComponent />} />
             <Route path="/course" element={<CourseComponent />} />
           </Route>
@@ -86,7 +85,9 @@ export default function App() {
           </Route>
 
         </Route>
-      </Routes>
+
+      </Route>
+    </Routes>
   )
 }
 

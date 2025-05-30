@@ -1,29 +1,32 @@
-/* .search-container {
+.searchContainer {
   width: 100%;
   max-width: 400px; 
   margin-left: 0;
 }
 
-.input-wrapper {
+.inputWrapper {
   display: flex;
-  align-items:flex-start;
+  align-items: center; /* pentru aliniere verticală corectă */
+  gap: 10px;            /* spațiu între iconiță și input */
   background-color: #fff;
   border: 1px solid #ccc;
   border-radius: 8px;
   padding: 6px 10px;
   width: 100%;
   box-sizing: border-box;
+  position: relative;
 }
 
-.input-wrapper input {
-  border: none;
-  outline: none;
-  flex-grow: 1;
-  font-size: 16px;
-  padding: 5px;
+.inputWrapper input {
+  width: 100%;
+  padding: 8px 12px 8px 36px; /* padding stânga mărit pentru iconiță */
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  box-sizing: border-box;
 }
 
-.results-list {
+.resultsList {
   background-color: #f9f9f9;
   border: 1px solid #ddd;
   margin-top: 8px;
@@ -45,4 +48,10 @@
 
 .result-item:hover {
   background-color: #eaeaea;
-} */
+}
+
+.searchIcon {
+  margin-right: 5px;
+  font-size: 21px;
+  color: #6b7280;
+}

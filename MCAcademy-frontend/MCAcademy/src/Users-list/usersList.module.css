@@ -1,0 +1,96 @@
+.wrapper {
+  padding-top: 70px;
+  background: linear-gradient(to right top, #6dd5fa, #2980b9);
+  font-family: 'Poppins', sans-serif;
+  text-align: center;
+  min-height: calc(100vh - 70px);
+}
+
+.searchWrapper {
+  margin-bottom: -19px;
+  display: flex;
+  justify-content: flex-start; 
+  padding-left: 0%; 
+}
+
+.tableSection {
+  max-width: 80%;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.searchWrapper input {
+  width: 100%;
+  padding: 7px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.controlsWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  padding: 0 17%;
+  margin-bottom: 1px;
+}
+
+.controlsWrapper select {
+  padding: 13px 22px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-bottom: -25px;
+}
+
+.searchWrapper {
+  flex: 1;
+  max-width: 300px;
+}
+
+.leftControls {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+}
+
+.searchWrapper {
+  max-width: 500px;
+}
+
+.rightButtons {
+  display: flex;
+  gap: 5px;
+}
+
+.rightButtons button {
+  padding: 13px 22px;
+  font-size: 16px;
+  border-radius: 8px;
+  margin-bottom: -25px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border: 1px solid #ccc;
+}
+
+.active {
+  background-color: #0b1b77;
+  border: 1px solid #0b1b77 !important;
+  color: #ffffff;
+}
+
+.title {
+  font-size: 32px;         
+  text-align: center;      
+  margin-bottom: 20px;     
+  color: #0b1b77;          
+  font-weight: 600;   
+  margin: 0px 0 30px 60px; 
+}
+
+.dataTable {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}

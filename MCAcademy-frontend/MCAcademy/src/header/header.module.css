@@ -1,0 +1,28 @@
+.header {
+    height: 60px; /* sau cât vrei tu */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #0b1b77;
+    color: white;
+    position: fixed;
+    width: 100%;
+    z-index: 1000; /* să stea deasupra altor elemente */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.nav a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+    font-size: 16px;
+}
+
+.nav a:hover {
+    text-decoration: underline;
+}

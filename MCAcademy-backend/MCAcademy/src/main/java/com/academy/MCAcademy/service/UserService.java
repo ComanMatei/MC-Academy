@@ -51,28 +51,36 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public User updateUser(Long userId, RegisterRequest request) {
+    public UserDto updateUser(Long userId, RegisterRequest request) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("This user doesn't exist!"));
 
-        if (request.getFirstname() != null) {
+        Boolean updated = false;
+
+        if (request.getFirstname() != null && !request.getFirstname().equals(user.getFirstname())) {
             user.setFirstname(request.getFirstname());
+            updated = true;
         }
-        if (request.getLastname() != null) {
+        if (request.getLastname() != null && !request.getLastname().equals(user.getLastname())) {
             user.setLastname(request.getLastname());
+            updated = true;
         }
-        if (request.getDescription() != null) {
+        if (request.getDescription() != null && !request.getDescription().equals(user.getDescription())) {
             user.setDescription(request.getDescription());
+            updated = true;
         }
-        if (request.getDateOfBirth() != null) {
-            user.setDateOfBirth(request.getDateOfBirth());
-        }
-        if (request.getProfilePicture() != null) {
+        if (request.getProfilePicture() != null && !request.getProfilePicture().equals(user.getProfilePicture())) {
             user.setProfilePicture(request.getProfilePicture());
+            updated = true;
         }
 
-        return userRepository.save(user);
+        if (!updated) {
+            throw new IllegalStateException("No changes detected!");
+        }
+
+        User updatedUser = userRepository.save(user);
+        return convertUserEntityToDto(updatedUser);
     }
 
     public CourseDto getCourse(Long id) {

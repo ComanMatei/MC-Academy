@@ -7,8 +7,6 @@ import changePasswordCSS from './changePassword.module.css';
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%_]).{8,24}$/;
 
 const ChangePasswordComponent = () => {
-    const confirmToken = searchParams.get("token");
-
     const navigator = useNavigate();
 
     // State variables for form fields and validation
@@ -20,6 +18,8 @@ const ChangePasswordComponent = () => {
 
     const [errMsg, setErrMsg] = useState('');
     const [searchParams] = useSearchParams();
+
+    const confirmToken = searchParams.get("token");
 
     // Error messages for each field
     const [passwordError, setPasswordError] = useState('');
