@@ -1,5 +1,25 @@
 const url = 'http://localhost:8080/api/v1/course';
 
+export const assignFilesToCourse = async (courseFilesobj, token) => {
+    try {
+        const response = await fetch(`${url}/assign-files`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(courseFilesobj),
+            withCredentials: true
+        });
+
+        if (response.ok) {
+            console.log("Sanded!");
+        }
+    } catch (err) {
+        console.error("Error: ", err);
+    }
+};
+
 export const getAllCourses = async (instructorId, selectedInstrument, isHistory, token) => {
     try {
         const response = await fetch(`${url}/${instructorId}/${isHistory}?instrument=${selectedInstrument}`, {

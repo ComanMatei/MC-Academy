@@ -14,7 +14,7 @@ import { FiUpload } from "react-icons/fi";
 
 // Inputs validation
 const NAME_REGEX = /^[A-Z][a-z'-]+(?: [A-Z][a-z'-]+)*$/;
-const DESCRIPTION_REGEX = /^.{5,254}$/;
+const DESCRIPTION_REGEX = /^[\s\S]{5,254}$/;
 
 const ProfileComponent = () => {
 
@@ -28,7 +28,7 @@ const ProfileComponent = () => {
     // User id
     const { id } = useParams();
     const errRef = useRef();
-    
+
     const [user, setUser] = useState({});
     const [validator, setValidator] = useState('');
 
@@ -198,6 +198,7 @@ const ProfileComponent = () => {
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
+        console.log(file);
         if (file) {
             const newImageUrl = URL.createObjectURL(file);
 

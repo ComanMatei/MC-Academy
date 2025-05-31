@@ -1,6 +1,7 @@
 package com.academy.MCAcademy.service;
 
 import com.academy.MCAcademy.dto.CourseDto;
+import com.academy.MCAcademy.dto.CourseFilesDto;
 import com.academy.MCAcademy.dto.CourseSummaryDto;
 import com.academy.MCAcademy.entity.*;
 import com.academy.MCAcademy.repository.CourseRepository;
@@ -10,12 +11,14 @@ import com.academy.MCAcademy.repository.UserRepository;
 import com.academy.MCAcademy.request.AssignCoursesRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,7 +36,10 @@ public class CourseService {
 
     private final FileRepository fileRepository;
 
+    private final SpotifyTrackService spotifyTrackService;
+
     // Create course
+    @Transactional
     public CourseDto createCourse(CourseDto dto) {
 
         User instructor = userRepository.findById(dto.getInstructorId())
@@ -43,22 +49,64 @@ public class CourseService {
             throw new RuntimeException("This user is not an instructor!");
         }
 
-        Set<File> images = new HashSet<>();
-        if (dto.getImages() != null && !dto.getImages().isEmpty()) {
-            images = dto.getImages();
+        Optional<Course> existingCourse = courseRepository.findByNameAndInstrumentAndInstructorId(
+                dto.getName(),
+                dto.getInstrument(),
+                dto.getInstructorId()
+        );
+
+        if (existingCourse.isPresent()) {
+            throw new IllegalStateException("A course with this name already exists for this instrument!");
         }
 
-        Set<File> videos = new HashSet<>();
-        if (dto.getVideos() != null && !dto.getVideos().isEmpty()) {
-            videos = dto.getVideos();
+        SpotifyTrack spotifyTrack = null;
+        if (dto.getSpotifyTrack() != null) {
+            Long trackId = dto.getSpotifyTrack().getId();
+            String trackName = dto.getSpotifyTrack().getName();
+
+            if (trackId != null) {
+                spotifyTrack = spotifyTrackRepository.findById(trackId)
+                        .orElseThrow(() -> new RuntimeException("SpotifyTrack with id " + trackId + " not found"));
+            } else {
+                Optional<SpotifyTrack> existingTrack = spotifyTrackRepository.findByName(trackName);
+
+                if (existingTrack.isPresent()) {
+                    spotifyTrack = existingTrack.get();
+                } else {
+                    spotifyTrack = spotifyTrackService.createTrack(dto.getSpotifyTrack());
+                }
+            }
         }
 
-        Course course = convertCourseDtoToEntity(dto, instructor, images, videos);
+        Course convertedCourse = convertCourseDtoToEntity(dto, instructor);
 
-        Course savedCourse = courseRepository.save(course);
+        if (spotifyTrack != null) {
+            convertedCourse.setSpotifyTrack(spotifyTrack);
+        }
+
+        Course savedCourse = courseRepository.save(convertedCourse);
 
         return convertCourseEntityToDto(savedCourse);
     }
+
+    // Assign images and videos to a course
+    public CourseDto assignFilesToCourse(CourseFilesDto dto) {
+
+        Course course = courseRepository.findById(dto.getCourseId())
+                .orElseThrow(() -> new RuntimeException("This course doesn't exist"));
+
+        if (dto.getImages() != null) {
+            course.getImages().addAll(dto.getImages());
+        }
+
+        if (dto.getVideos() != null) {
+            course.getVideos().addAll(dto.getVideos());
+        }
+
+        Course savedCourse = courseRepository.save(course);
+        return convertCourseEntityToDto(savedCourse);
+    }
+
 
     // Return all the instructor courses based on instruments and isHistory
     public List<CourseSummaryDto> getAllCourses(Long instructorId, Instrument instrument, Boolean isHistory) {
@@ -192,11 +240,20 @@ public class CourseService {
     }
 
     private CourseSummaryDto convertCourseSummaryEntityToDto(Course course) {
-        return modelMapper.map(course, CourseSummaryDto.class);
-    }
+        CourseSummaryDto dto = new CourseSummaryDto();
+        dto.setId(course.getId());
+        dto.setName(course.getName());
+        dto.setStartDate(course.getStartDate());
+        dto.setEndDate(course.getEndDate());
 
+        dto.setImageCount(course.getImages() != null ? course.getImages().size() : 0);
+        dto.setVideoCount(course.getVideos() != null ? course.getVideos().size() : 0);
+        dto.setHasSpotifyTrack(course.getSpotifyTrack() != null);
+
+        return dto;
+    }
     // Private functions for converting DTO class to Entity class
-    private Course convertCourseDtoToEntity(CourseDto dto, User instructor, Set<File> images, Set<File> videos) {
+    private Course convertCourseDtoToEntity(CourseDto dto, User instructor) {
         return Course
                 .builder()
                 .name(dto.getName())
@@ -205,7 +262,12 @@ public class CourseService {
                 .isHistory(dto.getIsHistory())
                 .instrument(dto.getInstrument())
                 .instructor(instructor)
-                .spotifyTrack(dto.getSpotifyTrack())
+                .build();
+    }
+
+    private Course convertCourseFilesDtoToEntity(Set<File> images, Set<File> videos) {
+        return Course
+                .builder()
                 .images(images)
                 .videos(videos)
                 .build();

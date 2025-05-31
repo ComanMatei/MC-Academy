@@ -21,6 +21,7 @@ public class InstructorRequestAuthorizationManager implements AuthorizationManag
             "/api/v1/instructor/instruments",
             "/api/v1/instructor/{instructorId}/**",
             "/api/v1/course/create-course",
+            "/api/v1/course/assign-files",
             "/api/v1/course/create-track",
             "/api/v1/course/mark-history/{courseId}",
             "/api/v1/course/{instructorId}/**"

@@ -1,0 +1,240 @@
+.wrapper {
+    padding-top: 50px;
+    background: linear-gradient(to right top, #6dd5fa, #2980b9);
+    min-height: 100vh;
+}
+
+.instrumentButtons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 0 1rem;
+    gap: 3rem;
+}
+
+.instrumentButton {
+    font-size: 1.1rem;
+    font-weight: bold;
+    padding: 0.75rem 2rem;
+    border: 2px dashed #5866b8;
+    border-radius: 1rem;
+    background-color: white;
+    color: #5866b8;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    position: relative;
+}
+
+.instrumentButton:hover {
+    background-color: #5866b8;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.instrumentButton.selected {
+    background-color: #5866b8;
+    color: white;
+    border-style: solid;
+}
+
+.cardWrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.title {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0b1b77;
+    border-bottom: 2px solid #0b1b77;
+    padding-bottom: 0.5rem;
+    display: block;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.cardContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 350px);
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 0.3rem;
+    padding: 1rem;
+}
+
+.studentCard {
+    background: linear-gradient(145deg, #ffffff, #e6e6e6);
+    border-radius: 1rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    min-height: 370px;
+}
+
+.studentCard:hover {
+    transform: scale(1.03);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+}
+
+.cardHeader {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #0b1b77;
+    margin-bottom: 0.75rem;
+    text-align: center;
+    margin-top: 0;
+}
+
+.profileImage {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #0b1b77;
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.profileImage:hover {
+    transform: scale(1.05);
+}
+
+.description {
+    font-size: 0.95rem;
+    color: #333;
+    text-align: center;
+    margin-bottom: 1rem;
+    padding: 0 0.5rem;
+}
+
+.cardButtons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: auto;
+}
+
+.cardButtons button {
+    padding: 0.5rem 1.25rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.cardButtons button:first-of-type {
+    background-color: #28a745;
+}
+
+.cardButtons button:last-of-type {
+    background-color: #dc3545;
+}
+
+.cardButtons button:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+.searchWrapper {
+    max-width: 300px;
+    flex: 1;
+    margin-bottom: 10px;
+    margin-left: 14%;
+}
+
+.searchWrapper input {
+    width: 100%;
+    padding: 7px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+}
+
+.controlsWrapper {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    justify-content: flex-start;
+    margin-bottom: -1rem;
+}
+
+.statusDropdown {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.statusDropdown select {
+    margin-top: -8px;
+    padding: 13px 17px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 1rem;
+}
+
+.pagination button {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background: white;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.pagination button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.pagination button:hover:not(:disabled) {
+    background-color: #0b1b77;
+    color: white;
+    border-color: #0b1b77;
+}
+
+.noDataMessageWrapper {
+    display: flex;
+    justify-content: center; /* centrează pe orizontală */
+    width: 100%;
+    margin-top: 2rem; /* spațiu de sus */
+}
+
+.noDataMessageWrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 3rem;
+    padding: 1rem;
+}
+
+.noDataMessage {
+    max-width: 400px;
+    background-color: #f8f9fa;
+    padding: 1rem 2rem;
+    border-radius: 0.75rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #333;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    text-align: center;
+}

@@ -77,9 +77,6 @@ public class AssignStudentService {
                                                     Instrument instrument, Boolean isHistory) {
         List<Course> courses = courseRepository.findAllByStudents_IdAndInstructor_IdAndInstrumentAndIsHistory(studentId,
                 instructorId, instrument, isHistory);
-        for(Course curs : courses) {
-            System.out.println("Idul: " + curs.getId());
-        }
 
         return courses.stream()
                 .map(this::convertCourseSummaryEntityToDto)
@@ -93,6 +90,8 @@ public class AssignStudentService {
             mapper.map(src -> src.getStudent().getId(), AssignStudentDto::setUserId);
             mapper.map(src -> src.getStudent().getFirstname(), AssignStudentDto::setFirstname);
             mapper.map(src -> src.getStudent().getLastname(), AssignStudentDto::setLastname);
+            mapper.map(src -> src.getStudent().getDescription(), AssignStudentDto::setDescription);
+            mapper.map(src -> src.getStudent().getProfilePicture(), AssignStudentDto::setProfilePicture);
         });
 
         return modelMapper.map(assignStudent, AssignStudentDto.class);
@@ -109,7 +108,17 @@ public class AssignStudentService {
     }
 
     private CourseSummaryDto convertCourseSummaryEntityToDto(Course course) {
-        return modelMapper.map(course, CourseSummaryDto.class);
+        CourseSummaryDto dto = new CourseSummaryDto();
+        dto.setId(course.getId());
+        dto.setName(course.getName());
+        dto.setStartDate(course.getStartDate());
+        dto.setEndDate(course.getEndDate());
+
+        dto.setImageCount(course.getImages() != null ? course.getImages().size() : 0);
+        dto.setVideoCount(course.getVideos() != null ? course.getVideos().size() : 0);
+        dto.setHasSpotifyTrack(course.getSpotifyTrack() != null);
+
+        return dto;
     }
 
 

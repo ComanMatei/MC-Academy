@@ -117,11 +117,13 @@
     border-radius: 8px;
     font-size: 1rem;
     width: 75%;
+    white-space: pre-line;
 }
 
 .inputGroup textarea {
     resize: vertical;
     min-height: 80px;
+    white-space: pre-line;
 }
 
 .buttonGroup {

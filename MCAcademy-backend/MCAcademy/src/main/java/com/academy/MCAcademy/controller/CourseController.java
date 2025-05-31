@@ -1,6 +1,7 @@
 package com.academy.MCAcademy.controller;
 
 import com.academy.MCAcademy.dto.CourseDto;
+import com.academy.MCAcademy.dto.CourseFilesDto;
 import com.academy.MCAcademy.dto.CourseSummaryDto;
 import com.academy.MCAcademy.entity.Instrument;
 import com.academy.MCAcademy.entity.SpotifyTrack;
@@ -31,6 +32,14 @@ public class CourseController {
     @PostMapping("/create-course")
     public ResponseEntity<CourseDto> createCourse(@RequestBody CourseDto dto) {
         CourseDto courseDto = courseService.createCourse(dto);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(courseDto);
+    }
+
+    // Assign images and videos to course
+    @PostMapping("/assign-files")
+    public ResponseEntity<CourseDto> assignFiles(@RequestBody CourseFilesDto dto) {
+        CourseDto courseDto = courseService.assignFilesToCourse(dto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(courseDto);
     }

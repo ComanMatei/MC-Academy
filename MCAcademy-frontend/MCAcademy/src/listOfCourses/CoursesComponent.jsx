@@ -1,12 +1,6 @@
-import './courses_list.css';
-
-import SearchBar from '../search-bar/SearchBar';
-import DataTable from "react-data-table-component";
-
 import { useContext, useState, useEffect, useRef } from 'react';
 import { useNavigate } from "react-router-dom";
 
-import AuthContext from "../context/AuthProvider";
 import { getStudentSpecializations } from '../service/StudentService';
 import { findAllSpec } from '../service/InstructorService';
 import { getAllCourses } from '../service/CourseService';
@@ -15,6 +9,14 @@ import { shareCourses } from '../service/CourseService';
 import { deleteCourse } from '../service/CourseService';
 import { markCourseAsHistory } from '../service/CourseService';
 import { getStudentCourses } from '../service/StudentService';
+
+import SearchBar from '../search-bar/SearchBar';
+import DataTable from "react-data-table-component";
+import AuthContext from "../context/AuthProvider";
+
+import CoursesCSS from './courses.module.css'
+import ShareDialogCSS from './shareDialog.module.css'
+import { FiTrash } from "react-icons/fi";
 
 const CoursesComponent = () => {
     const { auth } = useContext(AuthContext);
@@ -25,28 +27,33 @@ const CoursesComponent = () => {
     const navigate = useNavigate();
     const dialogRef = useRef(null);
 
-    const [loading, setLoading] = useState(false);
-    const [perPage, setPerPage] = useState(10);
     const [viewMode, setViewMode] = useState(false);
 
     const [filteredCourses, setFilteredCourses] = useState([]);
     const [courses, setCourses] = useState([]);
-    const [courseId, setCourseId] = useState('');
 
     const [instruments, setInstruments] = useState([]);
     const [selectedInstrument, setSelectedInstrument] = useState("");
 
     const [students, setStudents] = useState([]);
     const [studentIds, setStudentIds] = useState([]);
-    const [student, setStudent] = useState('');
 
     const [selectedCourses, setSelectedCourses] = useState([]);
-    const [searchResults, setSearchResults] = useState([]);
 
     // Student initializations
     const [studentSpec, setStudentSpec] = useState([]);
     const [selectedInstructor, setSelectedInstructor] = useState('');
 
+    // Pagination fields
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 4;
+
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredCourses.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.max(1, Math.ceil(filteredCourses.length / itemsPerPage));
+
+    // Remove duplicate instructors for dropdown display
     const uniqueInstructors = [
         ...new Map(
             studentSpec.map(spec => [
@@ -59,12 +66,6 @@ const CoursesComponent = () => {
             ])
         ).values()
     ];
-
-    useEffect(() => {
-        if (selectedInstructor) {
-            console.log("Selected instructor: " + selectedInstructor);
-        }
-    }, [selectedInstructor]);
 
     useEffect(() => {
         if (studentSpec.length > 0) {
@@ -83,16 +84,15 @@ const CoursesComponent = () => {
             const fetchStudent = async () => {
                 const studentsSpec = await getStudentSpecializations(userId, token);
                 setStudentSpec(studentsSpec);
-                console.log("Student specializations:", studentsSpec);
             };
 
             fetchStudent();
         }
     }, [userRole]);
-    //const fetchTableData = async (userId, selectedInstructor, viewMode, instrument, token)
+
+    // Returns the list of courses filtered by fields.
     useEffect(() => {
         if (userId && selectedInstrument) {
-            console.log("Selected instrument:", selectedInstructor);
             fetchTableData(
                 userId,
                 selectedInstructor,
@@ -105,7 +105,6 @@ const CoursesComponent = () => {
 
     useEffect(() => {
         if (instruments.length > 0 && !selectedInstrument) {
-            console.log("The starting instrument is: " + instruments[0]);
             setSelectedInstrument(instruments[0]);
         }
     }, [instruments, selectedInstrument]);
@@ -119,12 +118,12 @@ const CoursesComponent = () => {
             if (userId) {
                 const instruments = await findAllSpec(userId, token);
                 setInstruments(instruments);
-                console.log("Instruments:", instruments);
             }
         };
         fetchInstruments();
     }, [userId]);
 
+    // Change course state active to history
     useEffect(() => {
         const markCourses = async () => {
             for (const course of courses) {
@@ -132,7 +131,6 @@ const CoursesComponent = () => {
 
                 if (Date.now() > endDate && course.isHistory == false) {
                     await markCourseAsHistory(course.id, token);
-                    console.log("Course marked as history:", course.id);
                 }
             }
         };
@@ -147,36 +145,32 @@ const CoursesComponent = () => {
         await deleteCourse(userId, courseId, token)
 
         setCourses(courses.filter(course => course.id !== courseId));
-        setCourseId('');
     }
 
+    // Return students/instructors courses
     const fetchTableData = async (userId, selectedInstructor, viewMode, instrument, token) => {
-        setLoading(true);
-
         let transformedData = [];
+        let data;
 
         if (userRole == 'INSTRUCTOR') {
-            const data = await getAllCourses(userId, instrument, viewMode, token);
-            transformedData = data.map(item => ({
-                id: item.id,
-                name: item.name,
-                startDate: item.startDate,
-                endDate: item.endDate
-            }));
+            data = await getAllCourses(userId, instrument, viewMode, token);
         }
 
         if (userRole == 'STUDENT' && instrument) {
-            const data = await getStudentCourses(userId, selectedInstructor, viewMode, instrument, token);
-            transformedData = data.map(item => ({
-                id: item.id,
-                name: item.name,
-                startDate: item.startDate,
-                endDate: item.endDate
-            }));
+            data = await getStudentCourses(userId, selectedInstructor, viewMode, instrument, token);
         }
 
+        transformedData = data.map(item => ({
+            id: item.id,
+            name: item.name,
+            startDate: item.startDate,
+            endDate: item.endDate,
+            imageCount: item.imageCount,
+            videoCount: item.videoCount,
+            hasSpotifyTrack: item.hasSpotifyTrack
+        }));
+
         setCourses(transformedData);
-        setLoading(false);
     }
 
     const handleCheckboxCourses = (courseId) => {
@@ -184,7 +178,6 @@ const CoursesComponent = () => {
             ? prev.filter(id => id !== courseId)
             : [...prev, courseId]
         );
-        console.log(courseId)
     };
 
     const handleCheckboxStudents = (studentId) => {
@@ -192,13 +185,9 @@ const CoursesComponent = () => {
             ? prev.filter(id => id !== studentId)
             : [...prev, studentId]
         );
-        console.log(studentId)
     };
 
     const shareStudentsCourses = async () => {
-        console.log("Courses selected:", selectedCourses);
-        console.log("Students selected:", studentIds);
-
         const assignCourses = { courseIds: selectedCourses, studentIds }
 
         await shareCourses(userId, assignCourses, token);
@@ -207,6 +196,7 @@ const CoursesComponent = () => {
         setStudentIds([]);
     }
 
+    // Returns instructor instruments
     const getInstrumentsForInstructor = (instructorId) => {
         const instruments = studentSpec
             .filter(assign => assign.instructorId == instructorId)
@@ -218,20 +208,15 @@ const CoursesComponent = () => {
     const handleOpenDialog = async () => {
         const students = await getAssignedStudents(userId, "APPROVED", selectedInstrument.instrument, token);
         setStudents(students);
-        console.log("Students:", students);
-        console.log("Open dialog");
+
         if (dialogRef.current) {
             dialogRef.current.showModal();
-        } else {
-            console.log("Dialog doesn't exist");
         }
     };
 
     const handleCloseDialog = () => {
         if (dialogRef.current) {
             dialogRef.current.close();
-        } else {
-            console.error("Dialogue not found");
         }
     };
 
@@ -240,18 +225,10 @@ const CoursesComponent = () => {
     };
 
     const handleCrateCourse = () => {
-        navigate('/course');
+        navigate('/create-course');
     };
 
-    const goBack = () => {
-        if (userRole == 'INSTRUCTOR') {
-            navigate('/instructor');
-        }
-        else {
-            navigate(-1);
-        }
-    };
-
+    // Students list dialog
     const studentColumns = [
         {
             name: "",
@@ -268,77 +245,145 @@ const CoursesComponent = () => {
         { name: "Last name", selector: (row) => row.lastname },
     ];
 
-    const columns = [
-        {
-            name: "",
-            cell: (row) => (
-                <input
-                    type="checkbox"
-                    checked={selectedCourses.includes(row.id)}
-                    onChange={() => handleCheckboxCourses(row.id)}
-                />
-            ),
-            width: "50px"
+    // Custom design for students list dialog
+    const customStyles = {
+        table: {
+            style: {
+                backgroundColor: '#f0f4ff',
+                borderRadius: '8px',
+            },
         },
-        {
-            name: "Name",
-            selector: (row) => row.name,
-            cell: (row) => (
-                <button
-                    onClick={() => handleCourseClick(row.id)}
-                    style={{
-                        background: "none",
-                        border: "none",
-                        color: "blue",
-                        textDecoration: "underline",
-                        cursor: "pointer",
-                    }}
-                >
-                    {row.name}
-                </button>
-            ),
+        headRow: {
+            style: {
+                backgroundColor: '#0b1b77',
+                color: 'white',
+                fontWeight: 'bold',
+                fontSize: '1rem',
+                borderTopLeftRadius: '8px',
+                borderTopRightRadius: '8px',
+                overflow: 'hidden',
+                marginBottom: 0,
+                paddingBottom: 0,
+            },
         },
-        {
-            name: "Start date",
-            selector: (row) => row.startDate,
+        rows: {
+            style: {
+                backgroundColor: 'white',
+                borderBottom: '1px solid #ccc',
+                transition: 'all 0.3s ease',
+            },
+            highlightOnHoverStyle: {
+                backgroundColor: '#e6f0ff',
+                color: '#0b1b77',
+                cursor: 'pointer',
+            },
         },
-        {
-            name: "End date",
-            selector: (row) => row.endDate,
+        headCells: {
+            style: {
+                padding: '12px',
+                marginBottom: 0,
+                paddingBottom: 0,
+            },
         },
-        {
-            name: "Delete",
-            cell: (row) => (
-                <button onClick={() => handleDeleteCourse(row.id, token)}>
-                    Delete
-                </button>
-            ),
+        cells: {
+            style: {
+                padding: '12px',
+                fontSize: '0.95rem',
+            },
         },
-    ]
+    };
 
     return (
-        <div style={{ position: "relative" }}>
-            <h2>List of courses</h2>
+        <div className={CoursesCSS.wrapper}>
 
-            <div style={{ display: "flex" }}>
-                {userRole == 'INSTRUCTOR' && (
+            {/* Instructor instruments */}
+            <div className={CoursesCSS.instrumentButtons}>
+                {userRole == 'INSTRUCTOR' && instruments.length > 0 && (
                     <>
-                        <button className="share-btn" onClick={handleOpenDialog}>Share</button>
-                        <button className="create-btn" onClick={handleCrateCourse}>Create course</button>
+                        {instruments.map((instrument, index) => (
+                            <button
+                                key={index}
+                                onClick={() => setSelectedInstrument(instrument)}
+                                className={`${CoursesCSS.instrumentButton} ${selectedInstrument == instrument ? CoursesCSS.selected : ""}`}
+                            >
+                                {instrument.instrument}
+                            </button>
+                        ))}
                     </>
                 )}
-                <button className="exit-btn" onClick={goBack}>Back</button>
+
+                {/* students instruments based on instructors */}
+                {userRole == 'STUDENT' && selectedInstructor && (
+                    <>
+                        {getInstrumentsForInstructor(selectedInstructor).map((instrument, index) => (
+                            <button
+                                key={index}
+                                onClick={() => setSelectedInstrument(instrument)}
+                                className={`${CoursesCSS.instrumentButton} ${selectedInstrument == instrument ? CoursesCSS.selected : ""}`}
+                            >
+                                {instrument}
+                            </button>
+                        ))}
+                    </>
+                )}
             </div>
 
+            <h2 className={CoursesCSS.title}>List of courses</h2>
+
+            <div className={CoursesCSS.inlineContainer}>
+                <div className={CoursesCSS.buttonsRow}>
+
+                    {/* Course state */}
+                    <div className={CoursesCSS.leftButtons}>
+                        <button
+                            className={viewMode == false ? CoursesCSS.selected : ""}
+                            onClick={() => setViewMode(false)}
+                        >
+                            Active
+                        </button>
+                        <button
+                            className={viewMode == true ? CoursesCSS.selected : ""}
+                            onClick={() => setViewMode(true)}
+                        >
+                            History
+                        </button>
+                    </div>
+
+                    {userRole == 'INSTRUCTOR' && (
+                        <div className={CoursesCSS.rightButtons}>
+                            <button
+                                onClick={handleOpenDialog}>Share
+                            </button>
+
+                            <button
+                                onClick={handleCrateCourse}>Create course
+                            </button>
+                        </div>
+                    )}
+                </div>
+
+                {/* Courses search bar */}
+                <div className={CoursesCSS.searchContainer}>
+                    <SearchBar
+                        data={courses}
+                        setResults={setFilteredCourses}
+                        type="courses"
+                        className={CoursesCSS.smallSearchBar}
+                    />
+                </div>
+            </div>
+
+            {/* List of instructors assigned to the students */}
             {userRole == 'STUDENT' && studentSpec.length > 0 && (
                 <div>
-                    <label htmlFor="instructorSelect">Selectează un instructor: </label>
+                    <label htmlFor="instructorSelect"></label>
                     <select
                         id="instructorSelect"
                         value={selectedInstructor}
                         onChange={(e) => setSelectedInstructor(e.target.value)}
+                        className={CoursesCSS.selectDropdown}
                     >
-                        <option value="">-- Alege un instructor --</option>
+                        <option value="" disabled>Choose instructor</option>
                         {uniqueInstructors.map((instructor) => (
                             <option key={instructor.id} value={instructor.id}>
                                 {instructor.firstname} {instructor.lastname}
@@ -348,82 +393,93 @@ const CoursesComponent = () => {
                 </div>
             )}
 
-            {userRole == 'INSTRUCTOR' && instruments.length > 0 && (
-                <div>
-                    <label>Alege un instrument: </label>
-                    <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-                        {instruments.map((instrument, index) => (
-                            <button
-                                key={index}
-                                onClick={() => setSelectedInstrument(instrument)}
-                            >
-                                {instrument.instrument}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            )}
+            {/* Custom pagination */}
+            <div className={CoursesCSS.pagination}>
+                <button
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                >
+                    Previous
+                </button>
 
-            {userRole == 'STUDENT' && selectedInstructor && (
-                <div>
-                    {getInstrumentsForInstructor(selectedInstructor).map((instrument, index) => (
-                        <button
-                            key={index}
-                            onClick={() => {
-                                setSelectedInstrument(instrument);
-                            }}
-                        >
-                            {instrument}
-                        </button>
-                    ))}
-                </div>
-            )}
-            <div className='inline-container'>
-                <div className='seach-container'>
-                    <SearchBar
-                        data={courses}
-                        setResults={setFilteredCourses}
-                        type="courses"
+                <span> Page {currentPage} of {totalPages} </span>
+
+                <button
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                >
+                    Next
+                </button>
+            </div>
+
+            {/* Courses list */}
+            <div className={CoursesCSS.courseCardContainer}>
+                {filteredCourses.length === 0 ? (
+                    <p className={CoursesCSS.noDataMessage}>No courses available. Please assign to a instructor!</p>
+                ) : (
+                    currentItems.map((course) => (
+                        <div key={course.id} className={CoursesCSS.courseCard}>
+                            <div className={CoursesCSS.cardHeader}>
+                                <input
+                                    type="checkbox"
+                                    checked={selectedCourses.includes(course.id)}
+                                    onChange={() => handleCheckboxCourses(course.id)}
+                                />
+                                <h3
+                                    className={CoursesCSS.courseTitle}
+                                    onClick={() => handleCourseClick(course.id)}
+                                >
+                                    {course.name}
+                                </h3>
+                            </div>
+
+                            {/* Courses info */}
+                            <div className={CoursesCSS.cardDetails}>
+                                <p><strong>Start:</strong> {course.startDate}</p>
+                                <p><strong>End:</strong> {course.endDate}</p>
+                                <p><strong>Images:</strong> {course.imageCount ?? 0}</p>
+                                <p><strong>Videos:</strong> {course.videoCount ?? 0}</p>
+                                <p><strong>Spotify track:</strong> {course.hasSpotifyTrack ? "Yes" : "No"}</p>
+                            </div>
+                            {userRole == "INSTRUCTOR" && (
+                                <div className={CoursesCSS.cardActions}>
+                                    <button
+                                        className={CoursesCSS.deleteButton}
+                                        onClick={() => handleDeleteCourse(course.id, token)}
+                                    >
+                                        <FiTrash size={18} />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    ))
+                )}
+            </div>
+
+            {/* Send courses to students dialog */}
+            <dialog ref={dialogRef} className={ShareDialogCSS.dialogContainer}>
+                <h2 className={ShareDialogCSS.dialogTitle}>Students list</h2>
+
+                <div className={ShareDialogCSS.tableContainer}>
+                    <DataTable
+                        columns={studentColumns}
+                        data={students}
+                        pagination
+                        paginationPerPage={5}
+                        customStyles={customStyles}
+                        highlightOnHover
+                        striped
                     />
                 </div>
 
-                <div className='course-activity'>
-                    <button
-                        className={viewMode == false ? "selected" : ""}
-                        onClick={() => {
-                            setViewMode(false);
-                        }}
-                    >
-                        Activ
+                <div className={ShareDialogCSS.dialogActions}>
+                    <button className={ShareDialogCSS.closeButton} onClick={handleCloseDialog}>
+                        Close
                     </button>
-                    <button
-                        className={viewMode == true ? "selected" : ""}
-                        onClick={() => {
-                            setViewMode(true);
-                        }}
-                    >
-                        History
+                    <button className={ShareDialogCSS.assignButton} onClick={shareStudentsCourses}>
+                        Assign
                     </button>
                 </div>
-            </div>
-
-            <DataTable
-                title="List of courses"
-                columns={columns}
-                data={searchResults.length > 0 ? searchResults : filteredCourses}
-                progressPending={loading}
-            />
-
-            <dialog ref={dialogRef} className="custom-dialog">
-                <h2>Students list</h2>
-                <DataTable columns={studentColumns} data={students} pagination />
-
-                <button className="close-btn" onClick={handleCloseDialog}>
-                    Close
-                </button>
-                <button className="close-btn" onClick={shareStudentsCourses}>
-                    Assign
-                </button>
             </dialog>
         </div>
     )

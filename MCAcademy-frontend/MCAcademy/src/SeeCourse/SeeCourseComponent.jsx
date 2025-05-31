@@ -1,5 +1,5 @@
 import './see_course.css';
-import SpotifySearch from '../components/SpotifySearch';
+import SpotifySearch from '../spotifyTrack/SpotifySearch';
 
 import { useContext, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";

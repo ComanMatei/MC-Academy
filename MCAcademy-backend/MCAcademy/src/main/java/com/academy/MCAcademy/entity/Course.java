@@ -15,14 +15,18 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "courses")
+@Table(
+        name = "courses",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"name", "instrument", "instructor_id"})
+        }
+)
 public class Course {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(unique = true)
     private String name;
 
     private LocalDate startDate;

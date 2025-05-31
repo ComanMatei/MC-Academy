@@ -24,4 +24,10 @@ public class CourseSummaryDto {
     private Boolean isHistory;
 
     private Instrument instrument;
+
+    private int imageCount;
+
+    private int videoCount;
+
+    private Boolean hasSpotifyTrack;
 }
