@@ -1,11 +1,6 @@
 
 // Create images for components
 export const createImages = async (files, token) => {
-    if (!files) {
-        console.log("No file has been selected!");
-        return;
-    }
-
     const formData = new FormData();
     files.forEach((file) => {
         formData.append('file', file);
@@ -39,11 +34,6 @@ export const createImages = async (files, token) => {
 
 // Create videos for components
 export const createVideos = async (files, token) => {
-    if (!files) {
-        console.log("No file has been selected!");
-        return;
-    }
-
     const formData = new FormData();
     files.forEach((file) => {
         formData.append('file', file);
@@ -78,11 +68,6 @@ export const createVideos = async (files, token) => {
 
 // Create profile picture
 export const createprofilePicture = async (files) => {
-    if (!files) {
-        console.log("No file has been selected!");
-        return;
-    }
-
     const formData = new FormData();
     files.forEach((file) => {
         formData.append('file', file);
@@ -101,8 +86,6 @@ export const createprofilePicture = async (files) => {
             if (Array.isArray(data) && data.length > 0) {
 
                 return data;
-            } else {
-                console.error("Unexpected response structure:", data);
             }
         } else {
             console.error('Request failed with status:', response.status);

@@ -40,4 +40,12 @@ public class StudentController {
                                                                     @PathVariable Instrument instrument) {
         return ResponseEntity.ok(assignStudentService.getStudentCourses(studentId, instructorId, instrument, isHistory));
     }
+
+    // Returns a list with instructor specialization based on instrument
+    @GetMapping("/{studentId}/instructor-spec/{instrument}")
+    public ResponseEntity<List<InstructorSpecDto>> getInstructorSpecs(@PathVariable Long studentId,
+                                                                      @PathVariable Instrument instrument) {
+
+        return ResponseEntity.ok(assignStudentService.getInstructorSpecsByInstrument(instrument));
+    }
 }

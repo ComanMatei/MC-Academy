@@ -1,5 +1,5 @@
 .header {
-    height: 60px; /* sau cât vrei tu */
+    height: 65px; /* sau cât vrei tu */
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -25,4 +25,11 @@
 
 .nav a:hover {
     text-decoration: underline;
+}
+
+.logo {
+    width: 70px;
+    margin-left: 30px;
+    display: block;
+    border-radius: 1rem;
 }

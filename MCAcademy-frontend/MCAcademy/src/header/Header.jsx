@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 
 import HeaderCSS from './header.module.css';
 
+import logo from '../assets/MCAcademy_logo.png';
+
 const AdminHeader = ({ userId }) => {
     const navigate = useNavigate();
 
@@ -69,10 +71,21 @@ const DefaultHeader = () => (
 );
 
 const Header = ({ roles = [], userId, onOpenDialog }) => {
+
+    const Logo = (
+        <Link to="/">
+            <img
+                src={logo}
+                alt="MusicFlow Logo"
+                className={HeaderCSS.logo}
+            />
+        </Link>
+    );
+
     if (roles.includes("ADMIN")) {
         return (
             <header className={HeaderCSS.header}>
-                <div className={HeaderCSS.logo}>MyApp</div>
+                {Logo}
                 <AdminHeader userId={userId} />
             </header>
         );
@@ -80,7 +93,7 @@ const Header = ({ roles = [], userId, onOpenDialog }) => {
     if (roles.includes("INSTRUCTOR")) {
         return (
             <header className={HeaderCSS.header}>
-                <div className={HeaderCSS.logo}>MyApp</div>
+                {Logo}
                 <InstructorHeader userId={userId} onOpenDialog={onOpenDialog} />
             </header>
         );
@@ -88,14 +101,14 @@ const Header = ({ roles = [], userId, onOpenDialog }) => {
     if (roles.includes("STUDENT")) {
         return (
             <header className={HeaderCSS.header}>
-                <div className={HeaderCSS.logo}>MyApp</div>
+                {Logo}
                 <StudentHeader userId={userId} />
             </header>
         );
     }
     return (
         <header className={HeaderCSS.header}>
-            <div className={HeaderCSS.logo}>MyApp</div>
+            {Logo}
             <DefaultHeader />
         </header>
     );

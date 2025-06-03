@@ -1,6 +1,7 @@
 import { useContext, useState, useEffect, useRef } from "react";
 
-import { getAllInstruments, findAllSpec, saveSelectedInstrument } from "../service/InstructorService";
+import { findAllSpec, saveSelectedInstrument } from "../service/InstructorService";
+import { getAllInstruments } from "../service/UserService";
 
 import DataTable from "react-data-table-component";
 import AuthContext from "../context/AuthProvider";

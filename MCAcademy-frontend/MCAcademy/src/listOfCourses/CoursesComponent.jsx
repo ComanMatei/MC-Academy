@@ -51,7 +51,7 @@ const CoursesComponent = () => {
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = filteredCourses.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.max(1, Math.ceil(filteredCourses.length / itemsPerPage));
+    const totalPages = filteredCourses.length == 0 ? 0 : Math.ceil(filteredCourses.length / itemsPerPage);
 
     // Remove duplicate instructors for dropdown display
     const uniqueInstructors = [
@@ -396,16 +396,18 @@ const CoursesComponent = () => {
             {/* Custom pagination */}
             <div className={CoursesCSS.pagination}>
                 <button
-                    disabled={currentPage === 1}
+                    disabled={currentPage == 1 || totalPages == 0}
                     onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                 >
                     Previous
                 </button>
 
-                <span> Page {currentPage} of {totalPages} </span>
+                <span>
+                    Page {totalPages == 0 ? 0 : currentPage} of {totalPages}
+                </span>
 
                 <button
-                    disabled={currentPage === totalPages}
+                    disabled={currentPage == totalPages || totalPages == 0}
                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                 >
                     Next
@@ -415,7 +417,7 @@ const CoursesComponent = () => {
             {/* Courses list */}
             <div className={CoursesCSS.courseCardContainer}>
                 {filteredCourses.length === 0 ? (
-                    <p className={CoursesCSS.noDataMessage}>No courses available. Please assign to a instructor!</p>
+                    <p className={CoursesCSS.noDataMessage}>No courses available!</p>
                 ) : (
                     currentItems.map((course) => (
                         <div key={course.id} className={CoursesCSS.courseCard}>

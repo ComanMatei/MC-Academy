@@ -18,18 +18,14 @@ import ChangePasswordComponent from './ForgetPassword/ChangePasswordComponent'
 
 import ValidateStudentSpecComponent from './ValidateStudents/ValidateStudentSpecComponent'
 
-import AssignStudentComponent from './components/AssignStudentComponent'
+import AssignStudentComponent from './AssignStudent/AssignStudentComponent'
 
-import SpotifySearch from './spotifyTrack/SpotifySearch'
 import CourseComponent from './CreateCourse/CourseComponent'
 import CoursesComponent from './listOfCourses/CoursesComponent'
 import SeeCourseComponent from './SeeCourse/SeeCourseComponent'
 
 import ProfileComponent from './Profile/ProfileComponent'
 import ListOfUsersComponent from './Users-list/ListOfUsersComponent'
-
-import SearchComponent from './search-bar/SearchComponent'
-import Metronome from './metronome/Metronome'
 
 const ROLES = {
   'Admin': 'ADMIN',
@@ -45,17 +41,12 @@ export default function App() {
         {/* public routes */}
         <Route path="register" element={<RegisterComponent />} />
         <Route path="login" element={<LoginComponent />} />
+        <Route path="/forgotpassword/reset" element={<ChangePasswordComponent />} />
+        
         <Route path="unauthorized" element={<Unauthorized />} />
         <Route path="url-unauthorized" element={<UrlUnauthorized />} />
-        <Route path="/forgotpassword/reset" element={<ChangePasswordComponent />} />
-        <Route path="/search" element={<SpotifySearch />} />
-        <Route path="/course/:id" element={<SeeCourseComponent />} />
-
-        {/* <Route path='/searchbar' element={<SearchComponent />} />
-        <Route path='/metronome' element={<Metronome />} /> */}
 
         <Route element={<AuthLayout />}>
-
           {/* ADMIN routes */}
           <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
             <Route path="/admin" element={<AdminComponent />} />
@@ -77,6 +68,7 @@ export default function App() {
 
           <Route element={<RequireAuth allowedRoles={[ROLES.Instructor, ROLES.Student]} />}>
             <Route path="/courses" element={<CoursesComponent />} />
+            <Route path="/course/:id" element={<SeeCourseComponent />} />
           </Route>
 
           <Route element={<RequireAuth allowedRoles={[ROLES.Admin, ROLES.Instructor, ROLES.Student]} />}>

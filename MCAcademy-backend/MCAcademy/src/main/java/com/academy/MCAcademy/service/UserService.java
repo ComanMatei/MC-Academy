@@ -4,10 +4,7 @@ import com.academy.MCAcademy.dto.CourseDto;
 import com.academy.MCAcademy.dto.UserDto;
 import com.academy.MCAcademy.dto.UserSummaryDto;
 import com.academy.MCAcademy.dto.ValidatorDto;
-import com.academy.MCAcademy.entity.Course;
-import com.academy.MCAcademy.entity.Role;
-import com.academy.MCAcademy.entity.Status;
-import com.academy.MCAcademy.entity.User;
+import com.academy.MCAcademy.entity.*;
 import com.academy.MCAcademy.repository.CourseRepository;
 import com.academy.MCAcademy.repository.UserRepository;
 import com.academy.MCAcademy.request.RegisterRequest;
@@ -15,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -81,6 +79,10 @@ public class UserService {
 
         User updatedUser = userRepository.save(user);
         return convertUserEntityToDto(updatedUser);
+    }
+
+    public List<Instrument> getAllInstruments() {
+        return Arrays.asList(Instrument.values());
     }
 
     public CourseDto getCourse(Long id) {

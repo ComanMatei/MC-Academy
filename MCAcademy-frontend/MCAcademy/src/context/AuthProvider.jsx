@@ -1,4 +1,6 @@
 import { createContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode"; // 🔄 Corect aici
 
 const AuthContext = createContext({});
 
@@ -7,6 +9,18 @@ export const AuthProvider = ({ children }) => {
         const savedAuth = localStorage.getItem("auth");
         return savedAuth ? JSON.parse(savedAuth) : { userId: '', roles: [], accessToken: '', refreshToken: '' };
     });
+
+    const navigate = useNavigate();
+
+    const isTokenExpired = (token) => {
+        try {
+            const decoded = jwtDecode(token); // 🔄 și aici
+            const currentTime = Date.now() / 1000;
+            return decoded.exp < currentTime + 60;
+        } catch {
+            return true;
+        }
+    };
 
     useEffect(() => {
         localStorage.setItem("auth", JSON.stringify(auth));
@@ -33,18 +47,30 @@ export const AuthProvider = ({ children }) => {
                     }));
                 } else {
                     console.warn("Refresh token invalid sau expirat");
-                    setAuth({});
-                    localStorage.removeItem("auth");
+                    logout();
                 }
             } catch (err) {
-                setAuth({});
-                localStorage.removeItem("auth");
+                logout();
+            }
+        };
+
+        const logout = () => {
+            setAuth({});
+            localStorage.removeItem("auth");
+            navigate("/login");
+        };
+
+        const checkAndRefreshToken = () => {
+            if (auth?.accessToken && isTokenExpired(auth.accessToken)) {
+                refreshAccessToken();
             }
         };
 
         const interval = setInterval(() => {
-            refreshAccessToken();
-        }, 30 * 1000); 
+            checkAndRefreshToken();
+        }, 60 * 1000);
+
+        checkAndRefreshToken();
 
         return () => clearInterval(interval);
     }, [auth?.refreshToken]);

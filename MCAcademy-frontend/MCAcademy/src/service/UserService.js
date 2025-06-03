@@ -14,7 +14,6 @@ export const getUserById = async (id, token) => {
 
         if (response.ok) {
             const data = await response.json();
-            console.log(data);
 
             return data;
         } else {
@@ -39,7 +38,6 @@ export const getUsersValidatorById = async (userId, token) => {
 
         if (response.ok) {
             const data = await response.json();
-            console.log(data);
 
             return data;
         } else {
@@ -64,7 +62,6 @@ export const listOfUsers = async (role, status, token) => {
 
         if (response.ok) {
             const data = await response.json();
-            console.log(data);
 
             return data;
         } else {
@@ -79,6 +76,27 @@ export const getCourse = async (userId, id, token) => {
 
     try {
         const response = await fetch(`${url}/${userId}/only/${id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            withCredentials: true
+        })
+
+        if (response.ok) {
+            const data = await response.json();
+
+            return data;
+        }
+    } catch (err) {
+        console.error("Error:", err);
+    }
+}
+
+export const getAllInstruments = async (token) => {
+    try {
+        const response = await fetch(`${url}/instruments`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

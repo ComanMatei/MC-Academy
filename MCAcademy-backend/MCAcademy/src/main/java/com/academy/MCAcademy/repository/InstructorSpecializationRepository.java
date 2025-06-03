@@ -11,7 +11,9 @@ import java.util.List;
 
 public interface InstructorSpecializationRepository extends JpaRepository<InstructorSpecialization, Long> {
     boolean existsByInstructorAndInstrument(User instructor, Instrument instrument);
-    List<InstructorSpecialization> findAllByInstructorId(Long intructorid);
+    List<InstructorSpecialization> findAllByInstructorId(Long intructorId);
+
+    List<InstructorSpecialization> findAllByInstrument(Instrument instrument);
 
     InstructorSpecialization findByInstructorIdAndInstrument(Long instructorId, Instrument instrument);
 

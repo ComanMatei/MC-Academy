@@ -1,16 +1,16 @@
-import './see_course.css';
-import SpotifySearch from '../spotifyTrack/SpotifySearch';
-
 import { useContext, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 import { createImages } from "../service/FileService";
 import { createVideos } from "../service/FileService";
-import { saveTrack } from '../service/SpotifyTrackService';
 import { getCourse } from '../service/UserService';
-import Metronome from '../metronome/Metronome';
 
+import Metronome from '../metronome/Metronome';
+import SpotifySearch from '../spotifyTrack/SpotifySearch';
 import AuthContext from "../context/AuthProvider";
+
+import SeeCourseCSS from './seeCourse.module.css'
+import { FiUpload } from "react-icons/fi";
 
 const SeeCourseComponent = () => {
 
@@ -23,8 +23,6 @@ const SeeCourseComponent = () => {
     const navigate = useNavigate();
 
     const [course, setCourse] = useState('');
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
 
     const [isEditing, setIsEditing] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -33,9 +31,86 @@ const SeeCourseComponent = () => {
 
     const [imagesPreview, setImagesPreview] = useState([]);
     const [images, setImages] = useState([]);
+    const [deletingImages, setDeletingImages] = useState([]);
 
     const [videosPreview, setVideosPreview] = useState([]);
     const [videos, setVideos] = useState([]);
+    const [deletingVideos, setDeletingVideos] = useState([]);
+
+    // Custom erros fields
+    const [startDateError, setStartDateError] = useState('');
+    const [endDateError, setEndDateError] = useState('');
+    const [nameError, setNameError] = useState('');
+
+    // Navigate images in full screen mode fiels
+    const [selectedImageIndex, setSelectedImageIndex] = useState(null);
+    const allImages = [...(course.images || []), ...imagesPreview];
+    const selectedImage = selectedImageIndex !== null ? allImages[selectedImageIndex] : null;
+
+    const openFullscreenImages = (index) => {
+        setSelectedImageIndex(index);
+    };
+
+    const closeFullscreenImage = () => {
+        setSelectedImageIndex(null);
+    };
+
+    const showNextImage = () => {
+        setSelectedImageIndex((prev) => (prev + 1) % allImages.length);
+    };
+
+    const showPrevImage = () => {
+        setSelectedImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+    };
+
+    // Navigate videos in full screen mode fiels
+    const [selectedVideoIndex, setSelectedVideoIndex] = useState(null);
+    const allVideos = [...(course.videos || []), ...videosPreview];
+    const selectedVideo = selectedVideoIndex !== null ? allVideos[selectedVideoIndex] : null;
+
+    const openFullscreenVideo = (index) => {
+        setSelectedVideoIndex(index);
+    };
+
+    const closeFullscreenVideo = () => {
+        setSelectedVideoIndex(null);
+    };
+
+    const showNextVideo = () => {
+        setSelectedVideoIndex((prev) => (prev + 1) % allVideos.length);
+    };
+
+    const showPrevVideo = () => {
+        setSelectedVideoIndex((prev) => (prev - 1 + allVideos.length) % allVideos.length);
+    };
+
+    // Custom errors for dates
+    useEffect(() => {
+        let startError = '';
+        let endError = '';
+
+        if (!course?.startDate) {
+            startError = 'Start date is required.';
+        }
+
+        if (!course?.endDate) {
+            endError = 'End date is required.';
+        }
+
+        if (course?.startDate && course?.endDate) {
+            const start = new Date(course.startDate);
+            const end = new Date(course.endDate);
+
+            if (start > end) {
+                startError = 'Start date must be before end date.';
+                endError = 'End date must be after start date.';
+            }
+        }
+
+        setStartDateError(startError);
+        setEndDateError(endError);
+
+    }, [course]);
 
     useEffect(() => {
         const fetchCourse = async () => {
@@ -55,44 +130,55 @@ const SeeCourseComponent = () => {
 
     const updateCourse = async () => {
         try {
-            let updatedCourse = { ...course };
-
-            if (images && images.length > 0) {
-                console.log("images: ", images);
-                console.log("imagesPreview: ", imagesPreview);
-
-                const validImages = images.filter(img => img !== undefined);
-                const uploadedImages = await createImages(validImages, token);
-
-                updatedCourse = {
-                    ...updatedCourse,
-                    images: [...updatedCourse.images, ...uploadedImages],
-                };
-            } else {
-                console.log("No images to upload.");
+            // Delete files which are selected
+            for (const image of deletingImages) {
+                await deleteFileFromCourse(image.id, id);
+            }
+            for (const video of deletingVideos) {
+                await deleteFileFromCourse(video.id, id);
             }
 
-            if (videos && videos.length > 0) {
-                console.log("images: ", videos);
-                console.log("imagesPreview: ", videosPreview);
+            // Filter out files marked for deletion
+            const filteredImages = (course.images || []).filter(img => !deletingImages.some(d => d.id === img.id));
+            const filteredVideos = (course.videos || []).filter(vid => !deletingVideos.some(d => d.id === vid.id));
 
-                const validVideos = videos.filter(video => video !== undefined);
-                const uploadedVideos = await createVideos(validVideos, token);
+            // Change course state active to history
+            let isHistory = course.isHistory; 
+            const endDateTimestamp = new Date(course.endDate).getTime();
 
-                updatedCourse = {
-                    ...updatedCourse,
-                    videos: [...updatedCourse.videos, ...uploadedVideos],
-                };
-            } else {
-                console.log("No videos to upload.");
+            if (Date.now() > endDateTimestamp && course.isHistory === false) {
+                isHistory = true;
+            }
+            else {
+                isHistory = false;
+            }
+
+            // Course object
+            let updatedCourse = {
+                name: course.name,
+                instrument: course.instrument,
+                startDate: course.startDate,
+                endDate: course.endDate,
+                instructorId: course.instructorId,
+                spotifyTrack: spotifyTrack,
+                images: [...filteredImages],
+                videos: [...filteredVideos],
+                isHistory: isHistory
+            };
+
+            if (images.length > 0) {
+                const uploadedImages = await createImages(images, token);
+                updatedCourse.images = [...updatedCourse.images, ...uploadedImages];
+            }
+
+            if (videos.length > 0) {
+                const uploadedVideos = await createVideos(videos, token);
+                updatedCourse.videos = [...updatedCourse.videos, ...uploadedVideos];
             }
 
             if (spotifyTrack) {
-                const savedTrack = await saveTrack(spotifyTrack);
-                updatedCourse = { ...updatedCourse, spotifyTrack: savedTrack };
+                updatedCourse.spotifyTrack = spotifyTrack;
             }
-
-            console.log("Updated data:", updatedCourse);
 
             const response = await fetch(`http://localhost:8080/api/v1/course/${userId}/update/${id}`, {
                 method: 'PUT',
@@ -105,22 +191,58 @@ const SeeCourseComponent = () => {
             });
 
             if (response.ok) {
-                const data = await response.json();
-                console.log("Updated course:", data);
+                setCourse(updatedCourse);
+
+                setImages([]);
+                setImagesPreview([]);
+
+                setVideos([]);
+                setVideosPreview([]);
+
+                setDeletingImages([]);
+                setDeletingVideos([]);
             } else {
-                throw new Error('Error updating course');
+                let errorData = null;
+                try {
+                    errorData = await response.json();
+                } catch (e) {
+                    console.error('Something is wrong', e);
+                }
+
+                if (response.status == 400) {
+                    setNameError(errorData?.message || 'Missing or invalid data');
+                }
             }
         } catch (err) {
             console.error("Error updating course", err);
         }
     };
 
-    const handleEditClick = () => {
+    // Toggle edit mode: reset state on cancel or prepare for editing
+    const handleEditClick = async () => {
+        if (isEditing) {
+            const data = await getCourse(userId, id, token);
+            setCourse(data);
+
+            setDeletingImages([]);
+            setDeletingVideos([]);
+
+            setImages([]);
+            setImagesPreview([]);
+
+            setVideos([]);
+            setVideosPreview([]);
+
+            setSpotifyTrack(data.spotifyTrack || null);
+        } else {
+            setImages([]);
+            setImagesPreview([]);
+
+            setVideos([]);
+            setVideosPreview([]);
+        }
+
         setIsEditing(!isEditing);
-        setImages([]);
-        setImagesPreview([]);
-        setVideos([]);
-        setVideosPreview([]);
     };
 
     const handleInputChange = (e) => {
@@ -139,12 +261,11 @@ const SeeCourseComponent = () => {
         setDialogOpen(true);
     };
 
+    // Rendaring and managering files preview in web page
     const handleFileChange = async (event, type) => {
         const selectedFiles = Array.from(event.target.files);
-        console.log("selectedFiles:", selectedFiles);
 
         if (selectedFiles.length === 0) {
-            console.log("No file has been selected!");
             return;
         }
 
@@ -170,22 +291,25 @@ const SeeCourseComponent = () => {
         }
     };
 
+    // Add spotify track to course
     const handleSaveTrack = (track) => {
-        const newSpotifyTrack = {
-            name: track.name,
-            artist: track.artists[0].name,
-            spotifyUrl: track.external_urls.spotify,
-            spotifyId: track.id,
-        };
 
         setSpotifyTrack(track);
 
         setCourse((prevCourse) => ({
             ...prevCourse,
-            spotifyTrack: newSpotifyTrack,
+            spotifyTrack: track,
         }));
 
         setDialogOpen(false);
+    };
+
+    const handleDeleteSpotifyTrack = () => {
+        setSpotifyTrack(null);
+        setCourse(prevCourse => ({
+            ...prevCourse,
+            spotifyTrack: null
+        }));
     };
 
     const getBack = () => {
@@ -204,8 +328,6 @@ const SeeCourseComponent = () => {
             });
 
             if (response.ok) {
-                console.log("Fișier șters cu succes");
-
                 setCourse(prevCourse => {
                     const updatedImages = prevCourse.images.filter(image => image.id !== fileId);
                     const updatedVideos = prevCourse.videos.filter(video => video.id !== fileId);
@@ -225,138 +347,141 @@ const SeeCourseComponent = () => {
         }
     };
 
-    const handleDeleteImage = (index, isPreview = false) => {
-        if (isPreview) {
-            const updatedImagesPreview = imagesPreview.filter((_, i) => i !== index);
-            const updatedImages = images.filter((_, i) => i !== index);
-
-            setImagesPreview(updatedImagesPreview);
-            setImages(updatedImages);
-        }
-        else {
-            const imageToDelete = course.images[index];
-
-            if (imageToDelete?.id) {
-                deleteFileFromCourse(imageToDelete.id, id);
-            }
-            const updatedImages = course.images.filter((_, i) => i !== index);
-            setCourse((prevCourse) => ({
-                ...prevCourse,
-                images: updatedImages
+    const handleDeleteImage = (index, isNew) => {
+        if (isNew) {
+            setImages(prev => prev.filter((_, i) => i !== index));
+            setImagesPreview(prev => prev.filter((_, i) => i !== index));
+        } else {
+            const deleted = course.images[index];
+            setCourse(prev => ({
+                ...prev,
+                images: prev.images.filter((_, i) => i !== index)
             }));
+            setDeletingImages(prev => [...prev, deleted]);
         }
     };
 
-    const handleDeleteVideo = (index, isPreview = false) => {
-        if (isPreview) {
-            const updatedVideosPreview = videosPreview.filter((_, i) => i !== index);
-            const updatedVideos = videos.filter((_, i) => i !== index);
-
-            setVideos(updatedVideosPreview);
-            setVideosPreview(updatedVideos);
-        }
-        else {
-            const videoToDelete = course.videos[index];
-
-            if (videoToDelete?.id) {
-                deleteFileFromCourse(videoToDelete.id, id);
-            }
-            const updatedVideos = course.videos.filter((_, i) => i !== index);
-            setCourse((prevCourse) => ({
-                ...prevCourse,
-                videos: updatedVideos
+    const handleDeleteVideo = (index, isNew) => {
+        if (isNew) {
+            setVideos(prev => prev.filter((_, i) => i !== index));
+            setVideosPreview(prev => prev.filter((_, i) => i !== index));
+        } else {
+            const deleted = course.videos[index];
+            setCourse(prev => ({
+                ...prev,
+                videos: prev.videos.filter((_, i) => i !== index)
             }));
+            setDeletingVideos(prev => [...prev, deleted]);
         }
     };
 
     return (
-        <div className="p-4 border rounded-lg shadow-md">
-            <h2 className="text-xl font-bold">
+        <div className={SeeCourseCSS.wrapper}>
+
+            {/* Name field */}
+            <h2 className={SeeCourseCSS.title}>
                 {isEditing ? (
                     <input
                         type="text"
                         name="name"
                         value={course?.name || ''}
                         onChange={handleInputChange}
-                        className="border p-2 rounded"
+                        className={SeeCourseCSS.input}
                     />
                 ) : (
                     course?.name
                 )}
+                {nameError && <p className={SeeCourseCSS.inputError}>{nameError}</p>}
             </h2>
 
-            <p>
-                <strong>Start Date:</strong>
-                {isEditing ? (
-                    <input
-                        type="date"
-                        name="startDate"
-                        value={course?.startDate || ''}
-                        onChange={handleInputChange}
-                        className="border p-2 rounded"
-                    />
-                ) : (
-                    course?.startDate
-                )}
-            </p>
+            {/* Date fields */}
+            <div className={SeeCourseCSS.dateWrapper}>
+                <div className={SeeCourseCSS.dateItem}>
+                    <strong>Start Date</strong>
+                    {isEditing ? (
+                        <input
+                            type="date"
+                            name="startDate"
+                            value={course?.startDate || ''}
+                            onChange={handleInputChange}
+                            className={SeeCourseCSS.input}
+                        />
+                    ) : (
+                        course?.startDate
+                    )}
+                    {startDateError && <div className={SeeCourseCSS.dateInputError}>{startDateError}</div>}
+                </div>
 
-            <p>
-                <strong>End Date:</strong>
-                {isEditing ? (
-                    <input
-                        type="date"
-                        name="endDate"
-                        value={course?.endDate || ''}
-                        onChange={handleInputChange}
-                        className="border p-2 rounded"
-                    />
-                ) : (
-                    course?.endDate
-                )}
-            </p>
+                <div className={SeeCourseCSS.dateItem}>
+                    <strong>End Date</strong>
+                    {isEditing ? (
+                        <input
+                            type="date"
+                            name="endDate"
+                            value={course?.endDate || ''}
+                            onChange={handleInputChange}
+                            className={SeeCourseCSS.input}
+                        />
+                    ) : (
+                        course?.endDate
+                    )}
+                    {endDateError && <div className={SeeCourseCSS.dateInputError}>{endDateError}</div>}
+                </div>
+            </div>
 
             {/* Spotify Track */}
-            <h3 className="mt-4 font-semibold">Spotify Track:</h3>
-            {course?.spotifyTrack ? (
-                <div className="mt-2 p-4 border rounded-lg shadow-md">
-                    <p className="text-lg font-medium">
-                        {isEditing ? (
-                            <input
-                                type="text"
-                                name="spotifyTrackName"
-                                value={course?.spotifyTrack?.name || ''}
-                                onChange={handleInputChange}
-                                className="border p-2 rounded"
-                                onClick={handleOpenDialog}
-                            />
-                        ) : (
-                            `${course.spotifyTrack.name} - ${course.spotifyTrack.artist}`
+            <h3 className={SeeCourseCSS.sectionTitle}>Spotify Track</h3>
+
+            <div className={SeeCourseCSS.spotifyContainer}>
+                {course?.spotifyTrack ? (
+                    <>
+                        <iframe
+                            src={`https://open.spotify.com/embed/track/${getSpotifyId(course.spotifyTrack.spotifyUrl)}`}
+                            width="100%"
+                            height="80"
+                            frameBorder="0"
+                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                            className={SeeCourseCSS.spotifyPlayer}
+                        ></iframe>
+
+                        <a
+                            href={course.spotifyTrack.spotifyUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={SeeCourseCSS.spotifyLink}
+                        >
+                            Open in Spotify
+                        </a>
+
+                        {isEditing && (
+                            <button
+                                className={SeeCourseCSS.deleteButton}
+                                onClick={handleDeleteSpotifyTrack}
+                            >
+                                X
+                            </button>
                         )}
+                    </>
+                ) : (
+                    <p className={SeeCourseCSS.noTrack}>No track assigned.</p>
+                )}
+
+                {isEditing && (
+                    <p className={SeeCourseCSS.spotifyTrackText}>
+                        <input
+                            type="text"
+                            name="spotifyTrackName"
+                            value={course?.spotifyTrack?.name || ''}
+                            onChange={handleInputChange}
+                            className={SeeCourseCSS.spotifyInput}
+                            onClick={handleOpenDialog}
+                            placeholder="Search or add Spotify track"
+                        />
                     </p>
+                )}
+            </div>
 
-                    <iframe
-                        src={`https://open.spotify.com/embed/track/${getSpotifyId(course?.spotifyTrack?.spotifyUrl)}`}
-                        width="15%"
-                        height="80"
-                        frameBorder="0"
-                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                        className="rounded-lg my-2"
-                    ></iframe>
-
-                    <a
-                        href={course.spotifyTrack.spotifyUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 underline block mt-2"
-                    >
-                        Open in Spotify
-                    </a>
-                </div>
-            ) : (
-                <p className="text-gray-500">No track assigned.</p>
-            )}
-
-            {/* Add dialog for Spotify track selection */}
+            {/* Search bar for spotify tracks */}
             {dialogOpen && (
                 <SpotifySearch
                     openDialog={dialogOpen}
@@ -365,76 +490,149 @@ const SeeCourseComponent = () => {
                 />
             )}
 
+            {/* Images container */}
             {course?.images?.length >= 0 && (
-                <div className="mt-4">
-                    <h3 className="font-semibold">Images:</h3>
+                <div className={SeeCourseCSS.imagesSection}>
+                    <h3 className={SeeCourseCSS.fileTitle}>Images</h3>
 
+                    {/* Upload images */}
                     {isEditing && (
-                        <div className="mt-4">
+                        <div className={SeeCourseCSS.uploadContainer}>
+                            <label htmlFor="image-upload" className={SeeCourseCSS.uploadWrapper}>
+                                <div className={SeeCourseCSS.iconBox}>
+                                    <FiUpload className={SeeCourseCSS.icon} />
+                                </div>
+                                <span className={SeeCourseCSS.uploadText}>Upload images</span>
+                            </label>
                             <input
                                 type="file"
+                                id="image-upload"
                                 multiple
                                 accept="image/*"
                                 onChange={(e) => handleFileChange(e, "image")}
+                                className={SeeCourseCSS.uploadInput}
                             />
                         </div>
                     )}
 
-                    <div className="img-container flex flex-wrap gap-4 mt-4">
+                    <div className={SeeCourseCSS.imgContainer}>
                         {Array.isArray(course?.images) &&
                             course.images.map((img, index) => (
-                                <div key={index} className="relative flex justify-center items-center">
+                                <div key={index} className={SeeCourseCSS.imageWrapper}>
+
+                                    {/* Delete image */}
                                     {isEditing && (
-                                        <button onClick={() => handleDeleteImage(index, false)} className="delete-button">
+                                        <button
+                                            onClick={() => handleDeleteImage(index, false)}
+                                            className={SeeCourseCSS.deleteFileButton}
+                                        >
                                             X
                                         </button>
                                     )}
+
+                                    {/* Full screen images */}
                                     {img?.fileData ? (
                                         <img
                                             src={`data:image/jpeg;base64,${img.fileData}`}
+                                            onClick={() => openFullscreenImages(index)}
                                             alt={img.name}
-                                            className="img-small"
+                                            className={SeeCourseCSS.imgThumb}
                                         />
                                     ) : (
-                                        <div className="no-image-available">
+                                        <div className={SeeCourseCSS.noImageAvailable}>
                                             <p>Image not available</p>
                                         </div>
                                     )}
                                 </div>
                             ))}
 
+                        {/* Delete image preview */}
                         {imagesPreview.length > 0 &&
                             imagesPreview.map((preview, index) => (
-                                <div key={`preview-${index}`} className="relative flex justify-center items-center">
+                                <div key={`preview-${index}`} className={SeeCourseCSS.imageWrapper}>
                                     {isEditing && (
-                                        <button onClick={() => handleDeleteImage(index, true)} className="delete-button">
+                                        <button
+                                            onClick={() => handleDeleteImage(index, true)}
+                                            className={SeeCourseCSS.deleteFileButton}
+                                        >
                                             X
                                         </button>
                                     )}
-                                    <img src={preview.fileData} alt="Preview" className="img-small" />
+                                    <img src={preview.fileData} alt="Preview" className={SeeCourseCSS.imgThumb} />
                                 </div>
                             ))}
                     </div>
+
+                    {/* Navigate images in full screen mode */}
+                    {selectedImageIndex !== null && (
+                        <div className={SeeCourseCSS.fullscreenOverlay} onClick={closeFullscreenImage}>
+                            <div className={SeeCourseCSS.fullscreenContent} onClick={(e) => e.stopPropagation()}>
+                                <button onClick={showPrevImage} className={`${SeeCourseCSS.navButton} ${SeeCourseCSS.leftButton}`}>&lt;</button>
+
+                                <img
+                                    src={selectedImage.fileData.startsWith("data:") || selectedImage.fileData.startsWith("blob:")
+                                        ? selectedImage.fileData
+                                        : `data:image/jpeg;base64,${selectedImage.fileData}`
+                                    }
+                                    alt="Fullscreen"
+                                    className={SeeCourseCSS.fullscreenImage}
+                                />
+
+                                <button onClick={showNextImage} className={`${SeeCourseCSS.navButton} ${SeeCourseCSS.rightButton}`}>&gt;</button>
+
+                                <button className={SeeCourseCSS.closeButton} onClick={closeFullscreenImage}>
+                                    ✕
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
 
+            {/* Videos container */}
             {course?.videos?.length >= 0 && (
-                <div className="mt-4">
-                    <h3 className="font-semibold">Videos:</h3>
+                <div className={SeeCourseCSS.imagesSection}>
+                    <h3 className={SeeCourseCSS.fileTitle}>Videos</h3>
+
+                    {/* Upload videos */}
                     {isEditing && (
-                        <div className="mt-4">
-                            <input type="file" multiple accept="video/*" onChange={(e) => handleFileChange(e, "video")} />
+                        <div className={SeeCourseCSS.uploadContainer}>
+                            <label htmlFor="video-upload" className={SeeCourseCSS.uploadWrapper}>
+                                <div className={SeeCourseCSS.iconBox}>
+                                    <FiUpload className={SeeCourseCSS.icon} />
+                                </div>
+                                <span className={SeeCourseCSS.uploadText}>Upload videos</span>
+                            </label>
+                            <input
+                                type="file"
+                                id="video-upload"
+                                multiple
+                                accept="video/*"
+                                onChange={(e) => handleFileChange(e, "video")}
+                                className={SeeCourseCSS.uploadInput}
+                            />
                         </div>
                     )}
-                    <div className="video-container">
-                        {course.videos.map((video, index) => (
-                            <div key={index} className="video-wrapper">
+
+                    <div className={SeeCourseCSS.imgContainer}>
+                        {course.videos?.map((video, index) => (
+                            <div key={`old-${video.id}`} className={SeeCourseCSS.imageWrapper}>
+
+                                {/* Delete videos */}
                                 {isEditing && (
-                                    <button onClick={() => handleDeleteVideo(index, false)} className="delete-button">
+                                    <button
+                                        onClick={() => handleDeleteVideo(index, false)}
+                                        className={SeeCourseCSS.deleteFileButton}
+                                    >
                                         X
                                     </button>
                                 )}
-                                <video controls className="video-small">
+                                <video
+                                    className={SeeCourseCSS.imgThumb}
+                                    onClick={() => openFullscreenVideo(index)}
+                                    muted
+                                    preload="metadata"
+                                >
                                     <source
                                         src={`data:video/mp4;base64,${video.fileData}`}
                                         type="video/mp4"
@@ -444,15 +642,25 @@ const SeeCourseComponent = () => {
                             </div>
                         ))}
 
-                        {/* Show preview videos */}
+                        {/* Delete videos preview */}
                         {videosPreview.map((preview, index) => (
-                            <div key={`preview-video-${index}`} className="relative flex justify-center items-center">
+                            <div key={`new-${index}`} className={SeeCourseCSS.imageWrapper}>
                                 {isEditing && (
-                                    <button onClick={() => handleDeleteVideo(index, true)} className="delete-button">
+                                    <button
+                                        onClick={() => handleDeleteVideo(index, true)}
+                                        className={SeeCourseCSS.deleteFileButton}
+                                    >
                                         X
                                     </button>
                                 )}
-                                <video controls className="video-small">
+
+                                {/* Open video in full screen */}
+                                <video
+                                    className={SeeCourseCSS.imgThumb}
+                                    onClick={() => openFullscreenVideo(course.videos.length + index)}
+                                    muted
+                                    preload="metadata"
+                                >
                                     <source
                                         src={preview.fileData}
                                         type="video/mp4"
@@ -462,28 +670,64 @@ const SeeCourseComponent = () => {
                             </div>
                         ))}
                     </div>
+
+                    {/* Navigate videos in full screen mode */}
+                    {selectedVideoIndex !== null && (
+                        <div className={SeeCourseCSS.fullscreenOverlay} onClick={closeFullscreenVideo}>
+                            <div className={SeeCourseCSS.fullscreenContent} onClick={(e) => e.stopPropagation()}>
+                                <button
+                                    onClick={showPrevVideo}
+                                    className={`${SeeCourseCSS.navButton} ${SeeCourseCSS.leftButton}`}
+                                >
+                                    &lt;
+                                </button>
+
+                                <video
+                                    src={
+                                        selectedVideo?.fileData?.startsWith("data:") ||
+                                            selectedVideo?.fileData?.startsWith("blob:")
+                                            ? selectedVideo.fileData
+                                            : `data:video/mp4;base64,${selectedVideo.fileData}`
+                                    }
+                                    controls
+                                    className={SeeCourseCSS.fullscreenImage}
+                                />
+
+                                <button
+                                    onClick={showNextVideo}
+                                    className={`${SeeCourseCSS.navButton} ${SeeCourseCSS.rightButton}`}
+                                >
+                                    &gt;
+                                </button>
+
+                                <button className={SeeCourseCSS.closeButton} onClick={closeFullscreenVideo}>
+                                    ✕
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
 
+            <Metronome />
+
             {isEditing && (
-                <button onClick={handleSave} className="ml-4 bg-blue-500 text-white p-2 rounded">
+                <button onClick={handleSave} className={`${SeeCourseCSS.actionButton} ${SeeCourseCSS.save}`}>
                     Save
                 </button>
             )}
 
             {userRole == 'INSTRUCTOR' && (
-                <button onClick={handleEditClick}>
+                <button onClick={handleEditClick} className={`${SeeCourseCSS.actionButton} ${isEditing ? SeeCourseCSS.cancel : SeeCourseCSS.edit}`}>
                     {isEditing ? "Cancel" : "Edit"}
                 </button>
             )}
 
             {!isEditing && (
-                <button onClick={getBack}>
+                <button onClick={getBack} className={`${SeeCourseCSS.actionButton} ${SeeCourseCSS.exit}`}>
                     Exit
                 </button>
             )}
-
-            <Metronome />
         </div>
     );
 }

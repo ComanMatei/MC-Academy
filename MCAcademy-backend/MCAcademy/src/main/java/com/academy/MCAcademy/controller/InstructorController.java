@@ -72,9 +72,4 @@ public class InstructorController {
                                                                       @PathVariable Instrument instrument) {
         return ResponseEntity.ok(instructorSpecializationService.getInstructorSpec(instructorId, instrument));
     }
-
-    @GetMapping("/instruments")
-    public ResponseEntity<List<Instrument>> getAllInstruments() {
-        return ResponseEntity.ok(instructorSpecializationService.getAllInstruments());
-    }
 }

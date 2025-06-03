@@ -4,10 +4,7 @@ import com.academy.MCAcademy.dto.CourseDto;
 import com.academy.MCAcademy.dto.UserDto;
 import com.academy.MCAcademy.dto.UserSummaryDto;
 import com.academy.MCAcademy.dto.ValidatorDto;
-import com.academy.MCAcademy.entity.Course;
-import com.academy.MCAcademy.entity.Role;
-import com.academy.MCAcademy.entity.Status;
-import com.academy.MCAcademy.entity.User;
+import com.academy.MCAcademy.entity.*;
 import com.academy.MCAcademy.request.RegisterRequest;
 import com.academy.MCAcademy.service.UserService;
 import lombok.AllArgsConstructor;
@@ -53,5 +50,10 @@ public class UserController {
     @GetMapping("/{userId}/only/{id}")
     public ResponseEntity<CourseDto> getCourse(@PathVariable Long userId, @PathVariable Long id) {
         return ResponseEntity.ok(userService.getCourse(id));
+    }
+
+    @GetMapping("/instruments")
+    public ResponseEntity<List<Instrument>> getAllInstruments() {
+        return ResponseEntity.ok(userService.getAllInstruments());
     }
 }

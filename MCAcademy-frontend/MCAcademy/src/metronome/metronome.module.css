@@ -1,23 +1,15 @@
-/* @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap');
 
-* {
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    font-family: 'Raleway', sans-serif;
-    color: #525252;
-    user-select: none;
-}
 .container {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 40vh;
-    background-color: azure;
+    background-color: transparent;
     width: 30%; 
+    margin: 30px auto 0 auto;
 }
+
 .metronome {
     display: flex;
     flex-direction: column;
@@ -25,58 +17,71 @@ body {
     height: 250px;
     justify-content: space-between;
 }
-.bpm-display {
+
+.bpmDisplay {
     width: 100%;
     text-align: center;
     color: #fa545c;
     font-weight: bold;
 }
-.bpm-display .tempo {
+
+.tempo {
     font-size: 4em;
 }
-.tempo-text {
-    font-size: .8em;
+
+.bpm {
+    font-size: 0.8em;
     text-transform: uppercase;
     text-align: center;
 }
 
-.tempo-settings {
+.tempoSettings {
     display: flex;
     justify-content: space-between;
 }
 
-.tempo-settings .adjust-tempo-btn {
+.adjustTempoBtn {
     width: 30px;
     height: 30px;
     font-size: 40px;
     border-radius: 50%;
-    border: 1px solid #ddd;
     text-align: center;
     cursor: pointer;
 }
-.tempo-settings .adjust-tempo-btn:hover {
+
+.adjustTempoBtn:hover {
     background: #fa545c;
     color: #fff;
 }
-.tempo-settings .decrease-tempo {
-    line-height: 24px;
-}
-.tempo-settings .increase-tempo {
-    line-height: 28px;
+
+.decreaseTempo {
+    line-height: 16px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    text-align: center;
+    margin: 0 5px;
+    cursor: pointer;
+    background-color: #ff656c;
 }
 
-input[type=range] {
+.increaseTempo {
+    line-height: 20px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    text-align: center;
+    margin: 0 5px;
+    cursor: pointer;
+    background-color: #ff656c;
+}
+
+.slider {
     background-color: transparent;
     width: 70%;
 }
-input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-}
-input[type=range]:focus {
-    outline: none;
-}
 
-input[type=range]::-webkit-slider-thumb {
+.slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     width: 16px;
     height: 16px;
@@ -85,7 +90,8 @@ input[type=range]::-webkit-slider-thumb {
     cursor: pointer;
     margin-top: -8px;
 }
-input[type=range]::-moz-range-thumb {
+
+.slider::-moz-range-thumb {
     width: 16px;
     height: 16px;
     border-radius: 50%;
@@ -94,19 +100,22 @@ input[type=range]::-moz-range-thumb {
     border: none;
 }
 
-input[type=range]::-webkit-slider-runnable-track {
+.slider:focus {
+    outline: none;
+}
+
+.slider::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 1px;
+}
+
+.slider::-moz-range-track {
     width: 100%;
     height: 1px;
     background: #ddd;
 }
 
-input[type=range]::-moz-range-track {
-    width: 100%;
-    height: 1px;
-    background: #ddd;
-}
-
-.start-stop {
+.startStop {
     width: 50px;
     height: 50px;
     font-size: 0.7em;
@@ -119,36 +128,49 @@ input[type=range]::-moz-range-track {
     cursor: pointer;
 }
 
-.start-stop:hover {
+.startStop:hover {
     background: #ff656c;
 }
+
 .measures {
     display: flex;
     justify-content: center;
 }
-.measures .stepper {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    border: 1px solid #ddd;
-    text-align: center;
-    margin: 0 5px;
-    cursor: pointer;
-}
-.measures .stepper:hover {
+
+.stepper:hover {
     background: #ff656c;
     color: #fff;
 }
-.measures .add-beats {
+
+.addBeats {
     line-height: 20px;
-}
-
-.measures .subtract-beats {
-    line-height: 15px;
-}
-
-.beats-per-measure-text {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
     text-align: center;
-    font-size: 0.5em;
+    margin: 0 5px;
+    cursor: pointer;
+    background-color: #ff656c;
+}
+
+.subtractBeats {
+    line-height: 15px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    text-align: center;
+    margin: 0 5px;
+    cursor: pointer;
+    background-color: #ff656c;
+}
+
+.beatsPerMeasureText {
+    text-align: center;
+    font-size: 0.8em;
     text-transform: uppercase;
-} */
+}
+
+.measureCount {
+    font-size: 1.1rem;
+}
+

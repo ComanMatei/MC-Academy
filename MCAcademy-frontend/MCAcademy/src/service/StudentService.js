@@ -13,7 +13,6 @@ export const getStudentSpecializations = async (studentId, token) => {
 
         if (response.ok) {
             const data = await response.json();
-            console.log("Received data:", data);
 
             return data;
         }
@@ -35,25 +34,19 @@ export const assignStudent = async (studentId, assign, token) => {
         });
 
         const contentType = response.headers.get('Content-Type');
+        const isJson = contentType && contentType.includes('application/json');
 
-        if (response.ok) {
-            const data = await response.json();
-            console.log(data);
-            return { success: true, data };
-        } else {
-            let error = {};
-            if (contentType && contentType.includes('application/json')) {
-                error = await response.json();
-            } else {
-                error.message = await response.text();
-            }
-
-            console.error("Backend error:", error);
-            return { success: false, error };
+        if (!response.ok) {
+            const errorData = isJson ? await response.json() : { message: 'Unknown error' };
+            throw {
+                status: response.status,
+                message: errorData.message || 'An error occurred'
+            };
         }
+
+        return await response.json();
     } catch (err) {
-        console.error("Network/client error:", err);
-        return { success: false, error: { message: err.message } };
+        throw err;
     }
 };
 
@@ -77,3 +70,27 @@ export const getStudentCourses = async (studentId, instructorId, isHistory, inst
         console.error("Error: ", err);
     }
 };
+
+export const instructorSpecs = async (studentId, instrument, token) => {
+
+    try {
+        const response = await fetch(`${url}/${studentId}/instructor-spec/${instrument}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            withCredentials: true
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+
+            return data;
+        } else {
+            console.error('Error:', response.status);
+        }
+    } catch (err) {
+        console.error("Error:", err);
+    }
+}

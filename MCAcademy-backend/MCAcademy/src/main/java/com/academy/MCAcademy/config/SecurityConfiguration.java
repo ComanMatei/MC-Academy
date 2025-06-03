@@ -34,7 +34,7 @@ public class SecurityConfiguration {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**", "/api/v1/forgotpassword/**", "/api/v1/file/profile-pic").permitAll()
-                        .requestMatchers("/api/v1/user/edit/{userId}", "/api/v1/user/{role}/{status}", "/api/v1/instructor/specs/{instructorId}").authenticated()
+                        .requestMatchers("/api/v1/user/edit/{userId}", "/api/v1/user/{role}/{status}", "/api/v1/instructor/specs/{instructorId}", "/api/v1/user/instruments").authenticated()
                         .requestMatchers("/api/v1/user/**").access(this.userRequestAuthorizationManager)
                         .requestMatchers("/api/v1/admin/**").access(this.adminRequestAuthorizationManager)
                         .requestMatchers("/api/v1/course/**").access(this.instructorRequestAuthorizationManager)

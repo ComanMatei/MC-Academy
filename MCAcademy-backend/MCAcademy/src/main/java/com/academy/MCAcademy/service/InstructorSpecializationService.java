@@ -69,11 +69,6 @@ public class InstructorSpecializationService {
         return instructorSpecializationRepository.findByInstructorIdAndInstrument(instructorId, instrument);
     }
 
-    public List<Instrument> getAllInstruments() {
-        return Arrays.asList(Instrument.values());
-    }
-
-
     // Private functions for converting Entity class to DTO class
     private ValidatorDto convertValidatorEntityToDto(User user) {
         return modelMapper.map(user, ValidatorDto.class);

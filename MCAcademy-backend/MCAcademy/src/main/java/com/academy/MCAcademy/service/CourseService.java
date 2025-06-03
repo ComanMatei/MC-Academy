@@ -11,12 +11,10 @@ import com.academy.MCAcademy.repository.UserRepository;
 import com.academy.MCAcademy.request.AssignCoursesRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -161,44 +159,98 @@ public class CourseService {
         Course course = courseRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("The course with this id doesn't exist!"));
 
+        Optional<Course> existingCourse = courseRepository.findByNameAndInstrumentAndInstructorId(
+                dto.getName(),
+                dto.getInstrument(),
+                dto.getInstructorId()
+        );
+
+        if (existingCourse.isPresent() && !existingCourse.get().getId().equals(id)) {
+            throw new IllegalStateException("A course with this name already exists for this instrument!");
+        }
+
+        boolean updated = false;
+
         if (dto.getImages() != null && !dto.getImages().isEmpty()) {
             Set<File> newImages = dto.getImages();
+            updated = true;
 
             if (course.getImages() == null) {
                 course.setImages(newImages);
-            } else {
+            } else if (!course.getImages().containsAll(newImages) || !newImages.containsAll(course.getImages())) {
                 course.getImages().addAll(newImages);
             }
         }
 
         if (dto.getVideos() != null && !dto.getVideos().isEmpty()) {
             Set<File> newVideos = dto.getVideos();
+            updated = true;
 
             if (course.getVideos() == null) {
                 course.setVideos(newVideos);
-            } else {
+            } else if (!course.getVideos().containsAll(newVideos) || !newVideos.containsAll(course.getVideos())) {
                 course.getVideos().addAll(newVideos);
             }
         }
 
-        if (dto.getName() != null) {
+        if (dto.getName() != null && !dto.getName().equals(course.getName())) {
             course.setName(dto.getName());
+            updated = true;
         }
-        if (dto.getStartDate() != null) {
+
+        if (dto.getStartDate() != null && !dto.getStartDate().equals(course.getStartDate())) {
             course.setStartDate(dto.getStartDate());
+            updated = true;
         }
-        if (dto.getEndDate() != null) {
+
+        if (dto.getEndDate() != null && !dto.getEndDate().equals(course.getEndDate())) {
             course.setEndDate(dto.getEndDate());
+            updated = true;
         }
-        if (dto.getInstrument() != null) {
+
+        if (dto.getInstrument() != null && !dto.getInstrument().equals(course.getInstrument())) {
             course.setInstrument(dto.getInstrument());
+            updated = true;
         }
+
+        if (dto.getIsHistory() != null && !dto.getIsHistory().equals(course.getIsHistory())) {
+            course.setIsHistory(dto.getIsHistory());
+            updated = true;
+        }
+
+        SpotifyTrack spotifyTrack = null;
         if (dto.getSpotifyTrack() != null) {
-            course.setSpotifyTrack(dto.getSpotifyTrack());
+            Long trackId = dto.getSpotifyTrack().getId();
+            String trackName = dto.getSpotifyTrack().getName();
+
+            if (trackId != null) {
+                spotifyTrack = spotifyTrackRepository.findById(trackId)
+                        .orElseThrow(() -> new RuntimeException("SpotifyTrack with id " + trackId + " not found"));
+            } else {
+                Optional<SpotifyTrack> existingTrack = spotifyTrackRepository.findByName(trackName);
+
+                if (existingTrack.isPresent()) {
+                    spotifyTrack = existingTrack.get();
+                } else {
+                    spotifyTrack = spotifyTrackService.createTrack(dto.getSpotifyTrack());
+                }
+            }
+
+            if (!spotifyTrack.equals(course.getSpotifyTrack())) {
+                course.setSpotifyTrack(spotifyTrack);
+                updated = true;
+            }
+        }
+        else if (course.getSpotifyTrack() != null) {
+            course.setSpotifyTrack(null);
+            updated = true;
+        }
+
+        if (!updated) {
+            throw new IllegalStateException("No changes detected!");
         }
 
         Course savedCourse = courseRepository.save(course);
-
         return convertCourseEntityToDto(savedCourse);
     }
 
@@ -262,14 +314,6 @@ public class CourseService {
                 .isHistory(dto.getIsHistory())
                 .instrument(dto.getInstrument())
                 .instructor(instructor)
-                .build();
-    }
-
-    private Course convertCourseFilesDtoToEntity(Set<File> images, Set<File> videos) {
-        return Course
-                .builder()
-                .images(images)
-                .videos(videos)
                 .build();
     }
 }

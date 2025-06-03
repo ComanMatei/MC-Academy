@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -83,6 +85,16 @@ public class AssignStudentService {
                 .collect(Collectors.toList());
     }
 
+    // Returns a list with instructor specialization based on instrument
+    public List<InstructorSpecDto> getInstructorSpecsByInstrument(Instrument instrument) {
+        List<InstructorSpecialization> instructorspecs = instructorSpecializationRepository
+                .findAllByInstrument(instrument);
+
+        return instructorspecs.stream()
+                .map(this::convertInstructorSpecializationEntityToDto)
+                .collect(Collectors.toList());
+    }
+
 
     // Private functions for converting Entity class to DTO class
     private AssignStudentDto convertAssignStudentEntityToDto(AssignStudent assignStudent) {
@@ -105,6 +117,22 @@ public class AssignStudentService {
         });
 
         return modelMapper.map(instructorSpecialization, InstructorSpecDto.class);
+    }
+
+    private InstructorSpecDto convertInstructorSpecializationEntityToDto(InstructorSpecialization instructorSpecialization) {
+        modelMapper.typeMap(InstructorSpecialization.class, InstructorSpecDto.class).addMappings(mapper -> {
+            mapper.map(src -> src.getInstructor().getId(), InstructorSpecDto::setInstructorId);
+            mapper.map(src -> src.getInstructor().getFirstname(), InstructorSpecDto::setFirstname);
+            mapper.map(src -> src.getInstructor().getLastname(), InstructorSpecDto::setLastname);
+            mapper.map(src -> src.getInstructor().getDescription(), InstructorSpecDto::setDescription);
+            mapper.map(src -> src.getInstructor().getProfilePicture(), InstructorSpecDto::setProfilePicture);
+        });
+
+        InstructorSpecDto dto = modelMapper.map(instructorSpecialization, InstructorSpecDto.class);
+
+        dto.setAge(calculateAge(instructorSpecialization.getInstructor().getDateOfBirth()));
+
+        return dto;
     }
 
     private CourseSummaryDto convertCourseSummaryEntityToDto(Course course) {
@@ -132,5 +160,13 @@ public class AssignStudentService {
                 .instructorSpec(instructorSpecialization)
                 .status(request.getStatus())
                 .build();
+    }
+
+    private int calculateAge(LocalDate birthDate) {
+        if (birthDate == null) {
+            throw new IllegalArgumentException("Birth date cannot be null");
+        }
+
+        return Period.between(birthDate, LocalDate.now()).getYears();
     }
 }

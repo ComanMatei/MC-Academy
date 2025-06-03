@@ -2,7 +2,7 @@ const url = 'http://localhost:8080/api/v1/course';
 
 export const assignFilesToCourse = async (courseFilesobj, token) => {
     try {
-        const response = await fetch(`${url}/assign-files`, {
+        await fetch(`${url}/assign-files`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -12,9 +12,6 @@ export const assignFilesToCourse = async (courseFilesobj, token) => {
             withCredentials: true
         });
 
-        if (response.ok) {
-            console.log("Sanded!");
-        }
     } catch (err) {
         console.error("Error: ", err);
     }
@@ -33,7 +30,6 @@ export const getAllCourses = async (instructorId, selectedInstrument, isHistory,
 
         if (response.ok) {
             const data = await response.json();
-            console.log("Fetched courses:", data);
 
             return data;
         } else {
@@ -46,7 +42,7 @@ export const getAllCourses = async (instructorId, selectedInstrument, isHistory,
 
 export const shareCourses = async (instructorId, assignCourses, token) => {
     try {
-        const response = await fetch(`${url}/${instructorId}/assign-students`, {
+        await fetch(`${url}/${instructorId}/assign-students`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -56,9 +52,6 @@ export const shareCourses = async (instructorId, assignCourses, token) => {
             withCredentials: true
         });
 
-        if (response.ok) {
-            console.log("Sanded!");
-        }
     } catch (err) {
         console.error("Error: ", err);
     }
@@ -66,7 +59,7 @@ export const shareCourses = async (instructorId, assignCourses, token) => {
 
 export const deleteCourse = async (instructorId, courseId, token) => {
     try {
-        const response = await fetch(`${url}/${instructorId}/delete/${courseId}`, {
+        await fetch(`${url}/${instructorId}/delete/${courseId}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -81,7 +74,7 @@ export const deleteCourse = async (instructorId, courseId, token) => {
 
 export const markCourseAsHistory = async (courseId, token) => {
     try {
-        const response = await fetch(`${url}/mark-history/${courseId}`, {
+        await fetch(`${url}/mark-history/${courseId}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',

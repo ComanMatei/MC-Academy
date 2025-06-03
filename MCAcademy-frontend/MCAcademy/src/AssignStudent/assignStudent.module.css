@@ -1,55 +1,16 @@
 .wrapper {
-    padding-top: 50px;
+    padding-top: 60px;
     background: linear-gradient(to right top, #6dd5fa, #2980b9);
     min-height: 100vh;
-}
-
-.instrumentButtons {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    padding: 0 1rem;
-    gap: 3rem;
-}
-
-.instrumentButton {
-    font-size: 1.1rem;
-    font-weight: bold;
-    padding: 0.75rem 2rem;
-    border: 2px dashed #5866b8;
-    border-radius: 1rem;
-    background-color: white;
-    color: #5866b8;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-    position: relative;
-}
-
-.instrumentButton:hover {
-    background-color: #5866b8;
-    color: white;
-    transform: translateY(-2px);
-}
-
-.instrumentButton.selected {
-    background-color: #5866b8;
-    color: white;
-    border-style: solid;
-}
-
-.cardWrapper {
-    max-width: 1200px;
-    margin: 0 auto;
+    padding-left: 1rem;
 }
 
 .title {
-    margin-top: 0;
-    margin-bottom: 1.5rem;
-    text-align: center;
-    font-size: 2rem;
+    font-size: 1.55rem;
     font-weight: 700;
+    margin-bottom: 0.5rem;
     color: #0b1b77;
+    text-align: center;
     border-bottom: 2px solid #0b1b77;
     padding-bottom: 0.5rem;
     display: block;
@@ -58,91 +19,12 @@
     margin-right: auto;
 }
 
-.cardContainer {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, 350px);
-    justify-content: center;
-    gap: 2rem;
-    margin-top: 0.3rem;
-    padding: 1rem;
-}
-
-.studentCard {
-    background: linear-gradient(145deg, #ffffff, #e6e6e6);
-    border-radius: 1rem;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    min-height: 370px;
-}
-
-.studentCard:hover {
-    transform: scale(1.03);
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
-}
-
-.cardHeader {
-    font-size: 1.25rem;
-    font-weight: bold;
-    color: #0b1b77;
-    margin-bottom: 0.75rem;
-    text-align: center;
-    margin-top: 0;
-}
-
-.profileImage {
-    width: 130px;
-    height: 130px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 4px solid #0b1b77;
-    margin-bottom: 1rem;
-    transition: transform 0.3s ease;
-}
-
-.profileImage:hover {
-    transform: scale(1.05);
-}
-
-.description {
-    font-size: 0.95rem;
-    color: #333;
-    text-align: center;
-    margin-bottom: 1rem;
-    padding: 0 0.5rem;
-}
-
-.cardButtons {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    margin-top: auto;
-}
-
-.cardButtons button {
-    padding: 0.5rem 1.25rem;
-    border: none;
+.select {
+    border: 1px solid #ccc;
+    padding: 0.5rem;
     border-radius: 8px;
-    font-weight: bold;
-    color: #fff;
-    cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
-}
-
-.cardButtons button:first-of-type {
-    background-color: #28a745;
-}
-
-.cardButtons button:last-of-type {
-    background-color: #dc3545;
-}
-
-.cardButtons button:hover {
-    transform: translateY(-2px);
-    opacity: 0.9;
+    width: 13%;
+    margin-bottom: 0.3rem;
 }
 
 .searchWrapper {
@@ -162,26 +44,143 @@
     box-sizing: border-box;
 }
 
-.controlsWrapper {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    justify-content: flex-start;
-    margin-bottom: -1rem;
-}
-
-.statusDropdown {
+.verticalGroup {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    gap: 0.5rem;
+    margin-left: 14%;
+    margin-top: 30px;
 }
 
-.statusDropdown select {
-    margin-top: -8px;
-    padding: 13px 17px;
-    font-size: 14px;
+.cardWrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.cardContainer {
+    display: grid;
+    grid-template-columns: repeat(3, 350px);
+    gap: 2rem;
+    margin-top: 0.3rem;
+    padding: 1rem;
+}
+
+.instructorCard {
+    background: linear-gradient(145deg, #ffffff, #e6e6e6);
+    border-radius: 1rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    min-height: 370px;
+}
+
+.instructorCard:hover {
+    transform: scale(1.03);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+}
+
+.cardHeader {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #0b1b77;
+    margin-bottom: 0.75rem;
+    text-align: center;
+    margin: 0 auto 10px;
+}
+
+.profileImage {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #0b1b77;
+    margin: 0 auto 1rem auto;
+    transition: transform 0.3s ease;
+}
+
+.profileImage:hover {
+    transform: scale(1.05);
+}
+
+.description {
+    font-size: 0.95rem;
+    color: #333;
+    text-align: center;
+    margin-bottom: 1rem;
+    padding: 0 0.5rem;
+}
+
+.cardButtons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin: 10px auto 0;
+}
+
+.cardButtons button {
+    padding: 0.5rem 1.25rem;
+    border: none;
     border-radius: 8px;
-    border: 1px solid #ccc;
+    font-weight: bold;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.cardButtons button:last-of-type {
+    background-color: #28a745;
+}
+
+.cardButtons button:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+.profileTitle {
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.profileInfo {
+    text-align: left;
+    margin-bottom: 0.1rem;
+}
+
+.errmsg {
+    background: #ff4d4d;
+    padding: 0.3rem;
+    border-radius: 0.5rem;
+    color: white;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    text-align: center;
+    width: 90%;
+    left: 50%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.successmsg {
+    background: #1dca45;
+    padding: 0.3rem;
+    border-radius: 0.5rem;
+    color: white;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    text-align: center;
+    width: 75%;
+    left: 50%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.errmsg.visible {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .pagination {

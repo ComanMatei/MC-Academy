@@ -18,7 +18,6 @@ import java.util.function.Supplier;
 public class InstructorRequestAuthorizationManager implements AuthorizationManager<RequestAuthorizationContext> {
 
     private static final List<String> PATH_PATTERNS = Arrays.asList(
-            "/api/v1/instructor/instruments",
             "/api/v1/instructor/{instructorId}/**",
             "/api/v1/course/create-course",
             "/api/v1/course/assign-files",

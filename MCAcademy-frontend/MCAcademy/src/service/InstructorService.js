@@ -13,33 +13,10 @@ export const getInstructorSpecId = async (validatorId, instrument, token) => {
 
         if (response.ok) {
             const data = await response.json();
-            console.log("Spec: " + data);
 
             return data;
         } else {
             console.error('Error:', response.status);
-        }
-    } catch (err) {
-        console.error("Error:", err);
-    }
-}
-
-export const getAllInstruments = async (token) => {
-    try {
-        const response = await fetch(`${url}/instruments`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            withCredentials: true
-        })
-
-        if (response.ok) {
-            const data = await response.json();
-            console.log(data);
-
-            return data;
         }
     } catch (err) {
         console.error("Error:", err);
@@ -59,7 +36,6 @@ export const findAllSpec = async (instructorId, token) => {
 
         if (response.ok) {
             const data = await response.json();
-            console.log(data);
 
             return data;
         }
@@ -133,7 +109,7 @@ export const getAssignedStudents = async (instructorId, status, selectedInstrume
 
 export const validateStudentSpec = async (instructorId, assignStudentId, answer, token) => {
     try {
-        const response = await fetch(`${url}/${instructorId}/validation/${assignStudentId}`, {
+        await fetch(`${url}/${instructorId}/validation/${assignStudentId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -143,9 +119,6 @@ export const validateStudentSpec = async (instructorId, assignStudentId, answer,
             withCredentials: true
         });
 
-        if (response.ok) {
-            console.log("Student validated successfully");
-        }
     } catch (err) {
         console.error("Eroare la fetch:", err);
     }
