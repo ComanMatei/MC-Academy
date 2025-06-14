@@ -49,7 +49,7 @@ public class UserController {
 
     @GetMapping("/{userId}/only/{id}")
     public ResponseEntity<CourseDto> getCourse(@PathVariable Long userId, @PathVariable Long id) {
-        return ResponseEntity.ok(userService.getCourse(id));
+        return ResponseEntity.ok(userService.getCourse(userId, id));
     }
 
     @GetMapping("/instruments")

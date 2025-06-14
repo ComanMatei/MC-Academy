@@ -11,6 +11,7 @@ import AuthContext from "../context/AuthProvider";
 
 import CreateCourseCSS from './createCourse.module.css'
 import { FiUpload } from "react-icons/fi";
+import { FaSpotify } from "react-icons/fa";
 
 const CourseComponent = () => {
 
@@ -42,6 +43,15 @@ const CourseComponent = () => {
     const [endDateError, setEndDateError] = useState('');
 
     const [nameError, setNameError] = useState('');
+
+    // Instrument emojis mapping
+    const instrumentEmojis = {
+        DRUMS: "🥁",
+        GUITAR: "🎸",
+        PIANO: "🎹",
+        VIOLIN: "🎻",
+        FLUTE: "🎶",
+    };
 
     // Custom errors for dates
     useEffect(() => {
@@ -226,77 +236,77 @@ const CourseComponent = () => {
     const spotifyId = spotifyTrack?.spotifyUrl?.split('/').pop();
 
     return (
-        <div className={CreateCourseCSS.pageWrapper}>
-            <div className={CreateCourseCSS.container}>
+        <div className={CreateCourseCSS.wrapper}>
+            <div className={CreateCourseCSS.pageWrapper}>
+                <div className={CreateCourseCSS.container}>
 
-                <h3 className={CreateCourseCSS.title}>Create course</h3>
-                <button
-                    className={CreateCourseCSS.trackButton}
-                    onClick={handleOpenDialog}
-                >
-                    Add Sportify track
-                </button>
+                    <h3 className={CreateCourseCSS.title}>Create course</h3>
+                    <button
+                        className={CreateCourseCSS.trackButton}
+                        onClick={handleOpenDialog}
+                    >
+                        <FaSpotify size={20} color="white" /> Spotify track
+                    </button>
 
-                <SpotifySearch
-                    openDialog={openDialog}
-                    setOpenDialog={setOpenDialog}
-                    setSelectedTrack={setSpotifyTrack}
-                />
+                    <SpotifySearch
+                        openDialog={openDialog}
+                        setOpenDialog={setOpenDialog}
+                        setSelectedTrack={setSpotifyTrack}
+                    />
 
-                {/* Spotify track container */}
-                {spotifyTrack ? (
-                    <div className={CreateCourseCSS.spotifyTrackPreview}>
+                    {/* Spotify track container */}
+                    {spotifyTrack ? (
+                        <div className={CreateCourseCSS.spotifyTrackPreview}>
 
-                        <iframe
-                            src={`https://open.spotify.com/embed/track/${spotifyId}`}
-                            width="15%"
-                            height="80"
-                            frameBorder="0"
-                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                            className={CreateCourseCSS.iframe}
-                        ></iframe>
+                            <iframe
+                                src={`https://open.spotify.com/embed/track/${spotifyId}`}
+                                width="15%"
+                                height="80"
+                                frameBorder="0"
+                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                                className={CreateCourseCSS.iframe}
+                            ></iframe>
 
-                        <a
-                            href={spotifyTrack.spotifyUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={CreateCourseCSS.spotifyLink}
-                        >
-                            Open in Spotify
-                        </a>
+                            <a
+                                href={spotifyTrack.spotifyUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={CreateCourseCSS.spotifyLink}
+                            >
+                                Listen via Spotify
+                            </a>
 
-                        <button
-                            className={CreateCourseCSS.deleteButton}
-                            onClick={handleDeleteSpotifyTrack}
-                        >
-                            X
-                        </button>
-                    </div>
-                ) : (
-                    <p className="text-gray-500">No track assigned.</p>
-                )}
+                            <button
+                                className={CreateCourseCSS.deleteButton}
+                                onClick={handleDeleteSpotifyTrack}
+                            >
+                                X
+                            </button>
+                        </div>
+                    ) : (
+                        <p className="text-gray-500">No track assigned.</p>
+                    )}
 
-                {/* Upload images */}
-                <label htmlFor="image-upload" className={CreateCourseCSS.uploadWrapper}>
-                    <div className={CreateCourseCSS.iconBox}>
-                        <FiUpload className={CreateCourseCSS.icon} />
-                    </div>
-                    <span className={CreateCourseCSS.uploadText}>Upload images</span>
-                </label>
-                <input
-                    type="file"
-                    id="image-upload"
-                    multiple
-                    accept="image/*"
-                    onChange={(e) => handleFileChange(e, "image")}
-                    className={CreateCourseCSS.fileInput}
-                />
+                    {/* Upload images */}
+                    <label htmlFor="image-upload" className={CreateCourseCSS.uploadWrapper}>
+                        <div className={CreateCourseCSS.iconBox}>
+                            <FiUpload className={CreateCourseCSS.icon} />
+                        </div>
+                        <span className={CreateCourseCSS.uploadText}>Upload images</span>
+                    </label>
+                    <input
+                        type="file"
+                        id="image-upload"
+                        multiple
+                        accept="image/*"
+                        onChange={(e) => handleFileChange(e, "image")}
+                        className={CreateCourseCSS.fileInput}
+                    />
 
-                {/* Display Images */}
-                <div className={CreateCourseCSS.imgContainer}>
+                    {/* Display Images */}
                     {imagesPreview.length > 0 && (
                         <div>
-                            <h3>Selected Images:</h3>
+                            <h3 className={CreateCourseCSS.imageTitle}>Selected Images:</h3>
                             <div className={CreateCourseCSS.imgContainer}>
                                 {imagesPreview.map((imagePreview, index) => (
                                     <div key={imagePreview.file.name} className={CreateCourseCSS.imageWrapper}>
@@ -322,29 +332,27 @@ const CourseComponent = () => {
                             </div>
                         </div>
                     )}
-                </div>
 
-                {/* Upload videos */}
-                <label htmlFor="video-upload" className={CreateCourseCSS.uploadWrapper}>
-                    <div className={CreateCourseCSS.iconBox}>
-                        <FiUpload className={CreateCourseCSS.icon} />
-                    </div>
-                    <span className={CreateCourseCSS.uploadText}>Upload videos</span>
-                </label>
-                <input
-                    type="file"
-                    id="video-upload"
-                    multiple
-                    accept="video/*"
-                    onChange={(e) => handleFileChange(e, "video")}
-                    className={CreateCourseCSS.fileInput}
-                />
+                    {/* Upload videos */}
+                    <label htmlFor="video-upload" className={CreateCourseCSS.uploadWrapper}>
+                        <div className={CreateCourseCSS.iconBox}>
+                            <FiUpload className={CreateCourseCSS.icon} />
+                        </div>
+                        <span className={CreateCourseCSS.uploadText}>Upload videos</span>
+                    </label>
+                    <input
+                        type="file"
+                        id="video-upload"
+                        multiple
+                        accept="video/*"
+                        onChange={(e) => handleFileChange(e, "video")}
+                        className={CreateCourseCSS.fileInput}
+                    />
 
-                {/* Display Videos */}
-                <div className={CreateCourseCSS.videoContainer}>
+                    {/* Display Videos */}
                     {videosPreview.length > 0 && (
                         <div>
-                            <h3>Selected Videos:</h3>
+                            <h3 className={CreateCourseCSS.imageTitle}>Selected Videos:</h3>
                             <div className={CreateCourseCSS.videoContainer}>
                                 {videosPreview.map((videoPreview, index) => (
                                     <div key={videoPreview.file.name} className={CreateCourseCSS.videoWrapper}>
@@ -371,70 +379,88 @@ const CourseComponent = () => {
                             </div>
                         </div>
                     )}
-                </div>
 
-                {/* Assigned instruments dropdown */}
-                <div className={CreateCourseCSS.formGroup}>
-                    <select
-                        id="instrument"
-                        value={selectedInstrument ? selectedInstrument.id : ""}
-                        onChange={handleSelectInstrument}
-                        className={CreateCourseCSS.select}
-                        disabled={instruments.length == 0}
-                    >
-                        <option value="" disabled>Select instrument</option>
-                        {instruments.map((instrument) => (
-                            <option key={instrument.id} value={instrument.id}>
-                                {instrument.instrument}
-                            </option>
-                        ))}
-                    </select>
+                    {/* Assigned instruments dropdown */}
+                    <div className={CreateCourseCSS.formGroup}>
+                        <div className={CreateCourseCSS.row}>
+                            <div className={CreateCourseCSS.column}>
 
-                    {/* Course fields */}
-                    <div className={CreateCourseCSS.textFieldWrapper}>
-                        <label className={CreateCourseCSS.floatingLabel}>Start date</label>
-                        <input
-                            type="date"
-                            name="startDate"
-                            onChange={(e) => setStartDate(e.target.value)}
-                            value={startDate}
-                            className={CreateCourseCSS.inputDate}
-                        />
-                        {startDateError && <p className={CreateCourseCSS.inputError}>{startDateError}</p>}
+                                <div className={CreateCourseCSS.formGroupHalf}>
+                                    <div className={CreateCourseCSS.textFieldWrapper}>
+                                        <label className={CreateCourseCSS.floatingLabel}>Course name</label>
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            onChange={(e) => setName(e.target.value)}
+                                            value={name}
+                                            className={CreateCourseCSS.textFieldInput}
+                                        />
+                                        {nameError && <p className={CreateCourseCSS.inputError}>{nameError}</p>}
+                                    </div>
+                                </div>
+
+                                <div className={CreateCourseCSS.formGroupHalf}>
+                                    <div className={CreateCourseCSS.textFieldWrapper}>
+                                        <label className={CreateCourseCSS.floatingLabel}>Start date</label>
+                                        <input
+                                            type="date"
+                                            name="startDate"
+                                            onChange={(e) => setStartDate(e.target.value)}
+                                            value={startDate}
+                                            className={CreateCourseCSS.inputDate}
+                                        />
+                                        {startDateError && <p className={CreateCourseCSS.inputError}>{startDateError}</p>}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className={CreateCourseCSS.column}>
+
+                                <div className={CreateCourseCSS.formGroupHalf}>
+                                    <select
+                                        id="instrument"
+                                        value={selectedInstrument ? selectedInstrument.id : ""}
+                                        onChange={handleSelectInstrument}
+                                        className={CreateCourseCSS.select}
+                                        disabled={instruments.length == 0}
+                                    >
+                                        <option value="" disabled>Select instrument</option>
+                                        {instruments.map((instrument) => {
+                                            const emoji = instrumentEmojis[instrument.instrument.toUpperCase()] || "";
+                                            return (
+                                                <option key={instrument.id} value={instrument.id}>
+                                                    {emoji} {instrument.instrument}
+                                                </option>
+                                            );
+                                        })}
+                                    </select>
+                                </div>
+
+                                <div className={CreateCourseCSS.formGroupHalf}>
+                                    <div className={CreateCourseCSS.textFieldWrapper}>
+                                        <label className={CreateCourseCSS.floatingLabel}>End date</label>
+                                        <input
+                                            type="date"
+                                            name="endDate"
+                                            onChange={(e) => setEndDate(e.target.value)}
+                                            value={endDate}
+                                            className={CreateCourseCSS.inputDate}
+                                        />
+                                        {endDateError && <p className={CreateCourseCSS.inputError}>{endDateError}</p>}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div className={CreateCourseCSS.textFieldWrapper}>
-                        <label className={CreateCourseCSS.floatingLabel}>End date</label>
-                        <input
-                            type="date"
-                            name="endDate"
-                            onChange={(e) => setEndDate(e.target.value)}
-                            value={endDate}
-                            className={CreateCourseCSS.inputDate}
-                        />
-                        {endDateError && <p className={CreateCourseCSS.inputError}>{endDateError}</p>}
+                    <div className={CreateCourseCSS.buttonRow}>
+                        <button className={CreateCourseCSS.createButton} onClick={createCourse}>
+                            Save course
+                        </button>
+                        <button className={CreateCourseCSS.cancelButton} onClick={goBack}>
+                            Cancel
+                        </button>
                     </div>
-
-                    <div className={CreateCourseCSS.textFieldWrapper}>
-                        <label className={CreateCourseCSS.floatingLabel}>Course name</label>
-                        <input
-                            type="text"
-                            name="name"
-                            onChange={(e) => setName(e.target.value)}
-                            value={name}
-                            className={CreateCourseCSS.textFieldInput}
-                        />
-                        {nameError && <p className={CreateCourseCSS.inputError}>{nameError}</p>}
-                    </div>
-                </div>
-
-                <div className={CreateCourseCSS.buttonRow}>
-                    <button className={CreateCourseCSS.createButton} onClick={createCourse}>
-                        Save course
-                    </button>
-                    <button className={CreateCourseCSS.cancelButton} onClick={goBack}>
-                        Cancel
-                    </button>
                 </div>
             </div>
         </div>

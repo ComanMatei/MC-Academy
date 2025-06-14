@@ -88,7 +88,7 @@ const ChangePasswordComponent = () => {
                 </p>
 
                 {/* Form for changing password */}
-                <h1>Change your password</h1>
+                <h1>Change password</h1>
                 <form onSubmit={handleSubmit} className={changePasswordCSS.form}>
                     <div className={changePasswordCSS.formGroup}>
                         <input
@@ -126,7 +126,8 @@ const ChangePasswordComponent = () => {
 
                 {/* Navigate to Log in */}
                 <p className={changePasswordCSS.line}>
-                    Already registered? <a href='/login' className={changePasswordCSS.signUpLink}>Sign In</a>
+                    <span className={changePasswordCSS.promptText}>Already registered?</span>{' '}
+                    <a href='/login' className={changePasswordCSS.signUpLink}>Sign In</a>
                 </p>
 
             </section>

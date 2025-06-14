@@ -61,6 +61,7 @@ public class InstructorController {
         return assignStudentService.getAssignedStudents(status, instructorId, instrument);
     }
 
+    // Returns instructor specializations
     @GetMapping("/{instructorId}/instruments")
     public List<String> getIntrIntruments(@PathVariable Long instructorId) {
         return instructorSpecializationService.getInstrInstruments(instructorId);

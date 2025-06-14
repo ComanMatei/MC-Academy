@@ -272,7 +272,7 @@ const RegisterComponent = () => {
 
                 {/* Choose role btns */}
                 <div className={registerCSS.roleButtons}>
-                    <p>Choose what role you wanna be</p>
+                    <p>How would you like to join?</p>
                     <div className={registerCSS.buttonGroup}>
                         <button
                             className={`${registerCSS.instructor} ${role == "INSTRUCTOR" ? registerCSS.active : ""}`}

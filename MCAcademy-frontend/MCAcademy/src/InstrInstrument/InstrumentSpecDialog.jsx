@@ -24,6 +24,15 @@ const InstrumentSpecDialog = ({ isOpen, onClose }) => {
   const [errMsg, setErrMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
+  // Instrument emojis mapping
+  const instrumentEmojis = {
+    DRUMS: "🥁",
+    GUITAR: "🎸",
+    PIANO: "🎹",
+    VIOLIN: "🎻",
+    FLUTE: "🎶",
+  };
+
   // Open/Close dialog based on isOpen prop
   useEffect(() => {
     if (dialogRef.current) {
@@ -138,20 +147,24 @@ const InstrumentSpecDialog = ({ isOpen, onClose }) => {
     headCells: {
       style: {
         color: 'white',
-        fontWeight: '600',
+        fontWeight: '800',
         paddingLeft: '15px',
         paddingRight: '15px',
         justifyContent: 'center',
         textAlign: 'center',
+        fontSize: '1rem',
       }
     },
     rows: {
       style: {
         backgroundColor: '#c3d6d9',
+        color: '#000000',
+        fontSize: '0.875rem',
         borderRadius: '8px',
         marginBottom: '12px',
         cursor: 'default',
         borderBottom: '1px solid #ddd',
+        fontWeight: '600',
       },
       highlightOnHoverStyle: {
         backgroundColor: '#e0e7ff',
@@ -184,7 +197,7 @@ const InstrumentSpecDialog = ({ isOpen, onClose }) => {
         </p>
       )}
 
-      <h2 className={InstrInstrumentCSS.title}>Assign Instrument Specialization</h2>
+      <h2 className={InstrInstrumentCSS.title}>Assign instrument</h2>
 
       {/* Dropdown with all the instruments */}
       <label htmlFor="instrument" className={InstrInstrumentCSS.label}>
@@ -197,11 +210,14 @@ const InstrumentSpecDialog = ({ isOpen, onClose }) => {
         className={InstrInstrumentCSS.select}
       >
         <option value="" disabled>Instruments</option>
-        {instruments.map((instrument) => (
-          <option key={instrument} value={instrument}>
-            {instrument}
-          </option>
-        ))}
+        {instruments.map((instrument) => {
+          const emoji = instrumentEmojis[instrument.toUpperCase()] || "";
+          return (
+            <option key={instrument} value={instrument}>
+              {emoji} {instrument}
+            </option>
+          );
+        })}
       </select>
 
       <button
@@ -214,7 +230,6 @@ const InstrumentSpecDialog = ({ isOpen, onClose }) => {
       {/* DataTable of assigned instruments */}
       <div className={InstrInstrumentCSS.tableWrapper}>
         <DataTable
-          title="List of assigned instruments"
           columns={columns}
           data={specializations}
           customStyles={customStyles}

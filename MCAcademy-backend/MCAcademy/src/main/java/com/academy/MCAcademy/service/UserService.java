@@ -10,8 +10,12 @@ import com.academy.MCAcademy.repository.UserRepository;
 import com.academy.MCAcademy.request.RegisterRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import org.springframework.security.access.AccessDeniedException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,15 +30,27 @@ public class UserService {
 
     private final CourseRepository courseRepository;
 
-    // Returns users info based on given ID
+    // Returns user info based on given ID
     public UserDto getUserById(Long userId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User principal = (User) authentication.getPrincipal();
+
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+
+        boolean isSameUser = principal.getId().equals(userId);
+
+        if (!isAdmin && !isSameUser) {
+            throw new AccessDeniedException("You do not have permission to access this user.");
+        }
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("The user with this id doesn't exist!"));
 
         return convertUserEntityToDto(user);
     }
 
-    // Returns users validator info based on given ID
+    // Returns user validator info based on given ID
     public ValidatorDto getUsersValidatorById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("This validator with this email doesn't exist!"));
@@ -85,9 +101,18 @@ public class UserService {
         return Arrays.asList(Instrument.values());
     }
 
-    public CourseDto getCourse(Long id) {
-        Course course = courseRepository.findById(id)
+    public CourseDto getCourse(Long userId, Long courseId) {
+        Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new RuntimeException("The course with this id doesn't exist!"));
+
+        boolean isInstructor = course.getInstructor().getId().equals(userId);
+
+        boolean isStudentAssigned = course.getStudents().stream()
+                .anyMatch(student -> student.getId().equals(userId));
+
+        if (!isInstructor && !isStudentAssigned) {
+            throw new AccessDeniedException("You do not have permission to access this course.");
+        }
 
         return convertCourseEntityToDto(course);
     }

@@ -53,6 +53,15 @@ const CoursesComponent = () => {
     const currentItems = filteredCourses.slice(indexOfFirstItem, indexOfLastItem);
     const totalPages = filteredCourses.length == 0 ? 0 : Math.ceil(filteredCourses.length / itemsPerPage);
 
+    // Instrument emojis for display
+    const instrumentEmojis = {
+        DRUMS: "🥁",
+        GUITAR: "🎸",
+        PIANO: "🎹",
+        VIOLIN: "🎻",
+        FLUTE: "🎶",
+    };
+
     // Remove duplicate instructors for dropdown display
     const uniqueInstructors = [
         ...new Map(
@@ -304,9 +313,11 @@ const CoursesComponent = () => {
                             <button
                                 key={index}
                                 onClick={() => setSelectedInstrument(instrument)}
-                                className={`${CoursesCSS.instrumentButton} ${selectedInstrument == instrument ? CoursesCSS.selected : ""}`}
+                                className={`${CoursesCSS.instrumentButton} ${selectedInstrument?.instrument === instrument.instrument ? CoursesCSS.selected : ""
+                                    }`}
+                                title={instrument.instrument} // Tooltip la hover
                             >
-                                {instrument.instrument}
+                                {instrumentEmojis[instrument.instrument]}
                             </button>
                         ))}
                     </>
@@ -319,9 +330,10 @@ const CoursesComponent = () => {
                             <button
                                 key={index}
                                 onClick={() => setSelectedInstrument(instrument)}
-                                className={`${CoursesCSS.instrumentButton} ${selectedInstrument == instrument ? CoursesCSS.selected : ""}`}
+                                className={`${CoursesCSS.instrumentButton} ${selectedInstrument?.instrument === instrument.instrument ? CoursesCSS.selected : ""
+                                    }`}
                             >
-                                {instrument}
+                                {instrumentEmojis[instrument]}
                             </button>
                         ))}
                     </>
@@ -371,6 +383,27 @@ const CoursesComponent = () => {
                         className={CoursesCSS.smallSearchBar}
                     />
                 </div>
+
+                {/* Custom pagination */}
+                <div className={CoursesCSS.pagination}>
+                    <button
+                        disabled={currentPage == 1 || totalPages == 0}
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    >
+                        Previous
+                    </button>
+
+                    <span>
+                        Page {totalPages == 0 ? 0 : currentPage} of {totalPages}
+                    </span>
+
+                    <button
+                        disabled={currentPage == totalPages || totalPages == 0}
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    >
+                        Next
+                    </button>
+                </div>
             </div>
 
             {/* List of instructors assigned to the students */}
@@ -392,27 +425,6 @@ const CoursesComponent = () => {
                     </select>
                 </div>
             )}
-
-            {/* Custom pagination */}
-            <div className={CoursesCSS.pagination}>
-                <button
-                    disabled={currentPage == 1 || totalPages == 0}
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                >
-                    Previous
-                </button>
-
-                <span>
-                    Page {totalPages == 0 ? 0 : currentPage} of {totalPages}
-                </span>
-
-                <button
-                    disabled={currentPage == totalPages || totalPages == 0}
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                >
-                    Next
-                </button>
-            </div>
 
             {/* Courses list */}
             <div className={CoursesCSS.courseCardContainer}>
@@ -443,16 +455,16 @@ const CoursesComponent = () => {
                                 <p><strong>Videos:</strong> {course.videoCount ?? 0}</p>
                                 <p><strong>Spotify track:</strong> {course.hasSpotifyTrack ? "Yes" : "No"}</p>
                             </div>
-                            {userRole == "INSTRUCTOR" && (
-                                <div className={CoursesCSS.cardActions}>
+                            <div className={CoursesCSS.cardActions}>
+                                {userRole == "INSTRUCTOR" ? (
                                     <button
                                         className={CoursesCSS.deleteButton}
                                         onClick={() => handleDeleteCourse(course.id, token)}
                                     >
                                         <FiTrash size={18} />
                                     </button>
-                                </div>
-                            )}
+                                ) : null}
+                            </div>
                         </div>
                     ))
                 )}

@@ -6,7 +6,7 @@ import com.academy.MCAcademy.response.EmailResponse;
 import com.academy.MCAcademy.request.ResetPasswordRequest;
 import com.academy.MCAcademy.entity.ConfirmationToken;
 import com.academy.MCAcademy.entity.User;
-import com.academy.MCAcademy.mailing.EmailSender;
+import com.academy.MCAcademy.mailing.EmailSenderRepository;
 import com.academy.MCAcademy.repository.ConfirmationTokenRepository;
 import com.academy.MCAcademy.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -30,7 +30,7 @@ public class ForgotPasswordService {
 
     private final ConfirmationTokenRepository confirmationTokenRepository;
 
-    private final EmailSender emailSender;
+    private final EmailSenderRepository emailSender;
 
     private final BuildEmailService buildEmailService;
 
@@ -56,7 +56,7 @@ public class ForgotPasswordService {
 
     public EmailResponse verifyEmail(EmailRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new EmailNotFoundException("Email not found"));
+                .orElseThrow(() -> new EmailNotFoundException("Email not found!"));
 
         String token = generateResetToken(user);
 

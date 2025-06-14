@@ -100,13 +100,17 @@ const VerifyEmailDialog = ({ isOpen, onClose }) => {
                 />
 
                 {/* Submit or cancel button */}
-                <button type="submit">Verify</button>
-                <button type="button" onClick={onClose}>Cancel</button>
+                <div className={verifyEmailCSS.buttonGroup}>
+                    <button type="submit" className={verifyEmailCSS.verify}>Verify</button>
+                    <button type="button" onClick={onClose} className={verifyEmailCSS.cancel}>Cancel</button>
+                </div>
+
             </form>
 
             {/* Link to sign up */}
             <p className={verifyEmailCSS.line}>
-                Need an Account? <a href='/register' className={verifyEmailCSS.signUpLink}>Sign Up</a>
+                <span className={verifyEmailCSS.promptText}>Need an Account?</span>{' '}
+                <a href='/register' className={verifyEmailCSS.signUpLink}>Sign Up</a>
             </p>
         </dialog>
     )

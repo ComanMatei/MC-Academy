@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "instructor_validation")
+@Table(name = "user_validation")
 public class UserValidation {
 
     @Id

@@ -23,6 +23,17 @@ const ValidateStudentSpecComponent = () => {
     const [selectedInstrument, setSelectedInstrument] = useState("");
     const [selectedStatus, setSelectedStatus] = useState("PENDING");
 
+    const [statusError, setStatusError] = useState('');
+
+    // Instrument emojis for display
+    const instrumentEmojis = {
+        DRUMS: "🥁",
+        GUITAR: "🎸",
+        PIANO: "🎹",
+        VIOLIN: "🎻",
+        FLUTE: "🎶",
+    };
+
     // Pagination fields
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 3;
@@ -30,7 +41,7 @@ const ValidateStudentSpecComponent = () => {
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = filteredAssignedStudents.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.max(1, Math.ceil(filteredAssignedStudents.length / itemsPerPage));
+    const totalPages = filteredAssignedStudents.length == 0 ? 0 : Math.ceil(filteredAssignedStudents.length / itemsPerPage);
 
     // Sets default instrument and return all
     useEffect(() => {
@@ -43,6 +54,10 @@ const ValidateStudentSpecComponent = () => {
         }
         fetchInstruments(token);
     }, [instructorId]);
+
+    useEffect(() => {
+        setStatusError('');
+    }, [selectedStatus]);
 
     useEffect(() => {
         setFilteredAssignedStudents(assignedStudents);
@@ -66,6 +81,7 @@ const ValidateStudentSpecComponent = () => {
             lastname: item.lastname,
             description: item.description,
             profilePicture: item.profilePicture,
+            age: item.age,
             assignStudentId: item.id
         }));
 
@@ -77,7 +93,16 @@ const ValidateStudentSpecComponent = () => {
 
     // Validate students
     const FetchValidation = async (instructorId, assignStudentId, answer) => {
-        await validateStudentSpec(instructorId, assignStudentId, answer, token);
+
+        try {
+            await validateStudentSpec(instructorId, assignStudentId, answer, token);
+
+            setStatusError('')
+        } catch (error) {
+            const errorMessage = error?.message || 'Validation failed';
+            console.error("Error during validation:", errorMessage);
+            setStatusError(errorMessage);
+        }
 
         await fetchTableData(instructorId, selectedInstrument, selectedStatus);
     };
@@ -92,10 +117,11 @@ const ValidateStudentSpecComponent = () => {
                         <button
                             key={index}
                             onClick={() => setSelectedInstrument(instrument)}
-                            className={`${ValidateStudentsCSS.instrumentButton} ${selectedInstrument == instrument ? ValidateStudentsCSS.selected : ""
+                            className={`${ValidateStudentsCSS.instrumentButton} ${selectedInstrument === instrument ? ValidateStudentsCSS.selected : ""
                                 }`}
+                            title={instrument} // tooltip la hover
                         >
-                            {instrument}
+                            {instrumentEmojis[instrument] || "🎵"}
                         </button>
                     ))
                 ) : (
@@ -105,7 +131,7 @@ const ValidateStudentSpecComponent = () => {
                 )}
             </div>
 
-            <h2 className={ValidateStudentsCSS.title}>Assign students</h2>
+            <h2 className={ValidateStudentsCSS.title}>Validate students</h2>
 
             {/* Status dropdown */}
             <div className={ValidateStudentsCSS.controlsWrapper}>
@@ -133,16 +159,18 @@ const ValidateStudentSpecComponent = () => {
             {/* Custom pagination */}
             <div className={ValidateStudentsCSS.pagination}>
                 <button
-                    disabled={currentPage === 1}
+                    disabled={currentPage == 1 || totalPages == 0}
                     onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                 >
                     Previous
                 </button>
 
-                <span> Page {currentPage} of {totalPages} </span>
+                <span>
+                    Page {totalPages == 0 ? 0 : currentPage} of {totalPages}
+                </span>
 
                 <button
-                    disabled={currentPage === totalPages}
+                    disabled={currentPage == totalPages || totalPages == 0}
                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                 >
                     Next
@@ -154,7 +182,7 @@ const ValidateStudentSpecComponent = () => {
                 {currentItems.length == 0 && !loading && (
                     <div className={ValidateStudentsCSS.noDataMessageWrapper}>
                         <p className={ValidateStudentsCSS.noDataMessage}>
-                            No students are assigned to this instrument!
+                            No student was found!
                         </p>
                     </div>
                 )}
@@ -164,6 +192,17 @@ const ValidateStudentSpecComponent = () => {
                     {/* Students information */}
                     {currentItems.map(student => (
                         <div key={student.id} className={ValidateStudentsCSS.studentCard}>
+
+                            {/* Error messages */}
+                            {statusError && (
+                                <p
+                                    className={`${ValidateStudentsCSS.statusError} ${ValidateStudentsCSS.visible}`}
+                                    aria-live="assertive"
+                                >
+                                    {statusError}
+                                </p>
+                            )}
+
                             <div className={ValidateStudentsCSS.cardHeader}>
                                 {student.firstname} {student.lastname}
                             </div>
@@ -177,8 +216,16 @@ const ValidateStudentSpecComponent = () => {
                             )}
 
                             {student.description && (
-                                <p className={ValidateStudentsCSS.description}>
-                                    {student.description}
+                                <p className={ValidateStudentsCSS.info}>
+                                    <span className={ValidateStudentsCSS.headerTitle}>Description: </span>
+                                    <span className={ValidateStudentsCSS.value}>{student.description}</span>
+                                </p>
+                            )}
+
+                            {student.age && (
+                                <p className={ValidateStudentsCSS.info}>
+                                    <span className={ValidateStudentsCSS.headerTitle}>Age: </span>
+                                    <span className={ValidateStudentsCSS.value}>{student.age}</span>
                                 </p>
                             )}
 

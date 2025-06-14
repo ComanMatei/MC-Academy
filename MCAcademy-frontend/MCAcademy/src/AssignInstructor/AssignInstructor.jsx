@@ -9,7 +9,7 @@ import SearchBar from "../search-bar/SearchBar";
 
 import AssignStudentCSS from './assignStudent.module.css';
 
-const AssignStudentComponent = () => {
+const AssignInstructor = () => {
 
     const { auth } = useContext(AuthContext);
     const token = auth?.accessToken;
@@ -35,6 +35,15 @@ const AssignStudentComponent = () => {
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = filteredinstructors.slice(indexOfFirstItem, indexOfLastItem);
     const totalPages = filteredinstructors.length == 0 ? 0 : Math.ceil(filteredinstructors.length / itemsPerPage);
+
+    // Instrument emojis for display
+    const instrumentEmojis = {
+        DRUMS: "🥁",
+        GUITAR: "🎸",
+        PIANO: "🎹",
+        VIOLIN: "🎻",
+        FLUTE: "🎶",
+    };
 
     // Returns all instruments
     useEffect(() => {
@@ -80,6 +89,8 @@ const AssignStudentComponent = () => {
         setSelectedInstrument(instrument);
         setFilteredInstructors([]);
         fetchTableData(instrument);
+
+        setAssignStatus(' ');
     };
 
     // Instructors info
@@ -121,42 +132,47 @@ const AssignStudentComponent = () => {
                     className={AssignStudentCSS.select}
                 >
                     <option value="" disabled>Instruments</option>
-                    {instruments.map((instrument) => (
-                        <option key={instrument} value={instrument}>
-                            {instrument}
-                        </option>
-                    ))}
+                    {instruments.map((instrument) => {
+                        const emoji = instrumentEmojis[instrument.toUpperCase()] || "";
+                        return (
+                            <option key={instrument} value={instrument}>
+                                {emoji} {instrument}
+                            </option>
+                        );
+                    })}
                 </select>
             </div>
 
             {/* Search bar for instructors */}
-            <div className={AssignStudentCSS.searchWrapper}>
-                <SearchBar
-                    data={instructors}
-                    setResults={setFilteredInstructors}
-                    type="users"
-                />
-            </div>
+            <div className={AssignStudentCSS.containerColumn}>
+                <div className={AssignStudentCSS.searchWrapper}>
+                    <SearchBar
+                        data={instructors}
+                        setResults={setFilteredInstructors}
+                        type="users"
+                    />
+                </div>
 
-            {/* Custom pagination */}
-            <div className={AssignStudentCSS.pagination}>
-                <button
-                    disabled={currentPage == 1 || totalPages == 0} 
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                >
-                    Previous
-                </button>
+                {/* Custom pagination */}
+                <div className={AssignStudentCSS.pagination}>
+                    <button
+                        disabled={currentPage == 1 || totalPages == 0}
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    >
+                        Previous
+                    </button>
 
-                <span>
-                    Page {totalPages == 0 ? 0 : currentPage} of {totalPages}
-                </span>
+                    <span>
+                        Page {totalPages == 0 ? 0 : currentPage} of {totalPages}
+                    </span>
 
-                <button
-                    disabled={currentPage == totalPages || totalPages == 0} 
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                >
-                    Next
-                </button>
+                    <button
+                        disabled={currentPage == totalPages || totalPages == 0}
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    >
+                        Next
+                    </button>
+                </div>
             </div>
 
             {/* Instructors list */}
@@ -209,13 +225,13 @@ const AssignStudentComponent = () => {
                                         </p>
                                     )}
 
-                                    {instructor.description && (
+                                    {instructor.age && (
                                         <p className={AssignStudentCSS.profileInfo}>
                                             <span className={AssignStudentCSS.profileTitle}>Age:</span> {instructor.age}
                                         </p>
                                     )}
 
-                                    {instructor.description && (
+                                    {instructor.timeAssigned && (
                                         <p className={AssignStudentCSS.profileInfo}>
                                             <span className={AssignStudentCSS.profileTitle}>Instructor since:</span> {instructor.timeAssigned}
                                         </p>
@@ -242,4 +258,4 @@ const AssignStudentComponent = () => {
     );
 }
 
-export default AssignStudentComponent
+export default AssignInstructor

@@ -1,13 +1,15 @@
 .wrapper {
   padding-top: 70px;
-  background: linear-gradient(to right top, #6dd5fa, #2980b9);
-  font-family: 'Poppins', sans-serif;
+  background-image: url('/profile.png');
+  font-family: "Spectral", serif;
   text-align: center;
   min-height: calc(100vh - 70px);
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .searchWrapper {
-  margin-bottom: -19px;
+  margin-bottom: -15px;
   display: flex;
   justify-content: flex-start; 
   padding-left: 0%; 
@@ -23,9 +25,10 @@
   width: 100%;
   padding: 7px 12px;
   border: 1px solid #ccc;
-  border-radius: 8px;
   font-size: 14px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 3.1);
+  font-weight: 800;
+  font-family: "Spectral", serif;
 }
 
 .controlsWrapper {
@@ -66,31 +69,57 @@
 }
 
 .rightButtons button {
-  padding: 13px 22px;
+  padding: 12px 22px;
   font-size: 16px;
   border-radius: 8px;
   margin-bottom: -25px;
   cursor: pointer;
   transition: background-color 0.3s ease;
   border: 1px solid #ccc;
+  font-weight: 700;
+  color: #0b1b77;
+  font-family: 'Spectral', serif;
 }
 
 .active {
-  background-color: #0b1b77;
-  border: 1px solid #0b1b77 !important;
-  color: #ffffff;
+  background-color: #e00d3b;
+  border: 1px solid #e00d3b !important;
+  color: #ffffff !important;
 }
 
 .title {
-  font-size: 32px;         
-  text-align: center;      
+  font-size: 32px;          
   margin-bottom: 20px;     
-  color: #0b1b77;          
+  color:  #e00d3b;         
   font-weight: 600;   
-  margin: 0px 0 30px 60px; 
+  margin: 30px 0 30px 60px;
+  font-weight: 900;
+  font-size: 50px;
 }
 
 .dataTable {
   margin-bottom: 0 !important;
   padding-bottom: 0 !important;
+}
+
+.dropdown {
+  font-size: 16px;
+  font-weight: 500;
+  color: #0b1b77;
+  border: 2px solid #0b1b77;
+  border-radius: 8px;
+  outline: none;
+  transition: 0.3s ease;
+  font-weight: 700;
+  font-family: 'Spectral', serif;
+  margin-top: 0px;
+  padding: 12px 25px !important;
+}
+
+.dropdown:hover {
+  background-color: #e6edff;
+}
+
+.dropdown:focus {
+  border-color: #0b1b77;;
 }

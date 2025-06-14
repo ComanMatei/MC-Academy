@@ -1,6 +1,6 @@
 package com.academy.MCAcademy.service;
 
-import com.academy.MCAcademy.mailing.EmailSender;
+import com.academy.MCAcademy.mailing.EmailSenderRepository;
 import com.academy.MCAcademy.request.ValidationRequest;
 import com.academy.MCAcademy.entity.UserValidation;
 import com.academy.MCAcademy.entity.Role;
@@ -10,6 +10,9 @@ import com.academy.MCAcademy.repository.UserValidationRepository;
 import com.academy.MCAcademy.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,9 +20,9 @@ public class UserValidationService {
 
     private final UserRepository userRepository;
 
-    private final UserValidationRepository instructorValidationRepository;
+    private final UserValidationRepository userValidationRepository;
 
-    private final EmailSender emailSender;
+    private final EmailSenderRepository emailSender;
 
     private final BuildEmailService buildEmailService;
 
@@ -34,11 +37,30 @@ public class UserValidationService {
             throw new RuntimeException("Only admins can validate users account!");
         }
 
-        UserValidation instructorValidation = UserValidation.builder()
-                .admin(admin)
-                .user(user)
-                .answer(request.getAnswer())
-                .build();
+        Optional<UserValidation> existingValidationOpt = userValidationRepository.findByUserId(userId);
+
+        UserValidation instructorValidation;
+
+        if (existingValidationOpt.isPresent()) {
+            instructorValidation = existingValidationOpt.get();
+
+            if (instructorValidation.getAnswer().equals(request.getAnswer())) {
+                if (request.getAnswer())
+                    throw new IllegalStateException("This user has already been approved");
+                else
+                    throw new IllegalStateException("This user has already been declined");
+            }
+
+            instructorValidation.setAnswer(request.getAnswer());
+            instructorValidation.setAdmin(admin);
+
+        } else {
+            instructorValidation = UserValidation.builder()
+                    .admin(admin)
+                    .user(user)
+                    .answer(request.getAnswer())
+                    .build();
+        }
 
         // For email sender
         String subject = "Status account!";
@@ -71,17 +93,6 @@ public class UserValidationService {
             throw new RuntimeException("Something is wrong!");
         }
 
-        return instructorValidationRepository.save(instructorValidation);
-    }
-
-    public User getAdmin(String email) {
-        User admin = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("This user doesn't exist"));
-
-        if (admin.getRole() != Role.ADMIN) {
-            throw new RuntimeException("This user is not an admin!");
-        }
-
-        return admin;
+        return userValidationRepository.save(instructorValidation);
     }
 }

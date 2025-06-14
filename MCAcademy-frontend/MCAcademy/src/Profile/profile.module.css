@@ -4,8 +4,10 @@
     min-height: 100%;
     width: 100%;
     overflow-x: hidden;
-    background: linear-gradient(to right top, #6dd5fa, #2980b9);
-    font-family: 'Poppins', sans-serif;
+    background-image: url('/profile.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    font-family: "Spectral", serif;
     padding: 1rem 0;
     box-sizing: border-box;
 }
@@ -13,28 +15,32 @@
 .profileContainer {
     display: flex;
     justify-content: center;
-    padding: 2rem;
-    background-color: #f7f7f7;
+    background-color: #e9eeee;
     min-height: 100%;
-    width: 45%;
+    width: 65%;
     box-sizing: border-box;
+    border-radius: 70px;
     max-height: 100%;
+    margin-top: 70px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 3.1)
 }
 
 .profileCard {
-    padding: 2rem;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    max-width: 600px;
+    padding: 0.1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+    max-width: 100%;
     width: 100%;
     position: relative;
+    border-radius: 70px;
+    margin: 10px;
 }
 
 .title {
     text-align: center;
     margin-bottom: 2rem;
     color: #0b1b77;
-    font-size: 2rem;
-    font-weight: 700;
+    font-size: 2.5rem;
+    font-weight: 800;
 }
 
 .form {
@@ -59,65 +65,99 @@
 }
 
 .uploadWrapper {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background-color: #e0e0e0;
-  padding: 0.3rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  width: fit-content;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #e0e0e0;
+    padding: 0.3rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    width: fit-content;
 }
 
 .uploadWrapper:hover {
-  background-color: #d5d5d5;
+    background-color: #d5d5d5;
 }
 
 .iconBox {
-  width: 32px;
-  height: 32px;
-  background-color: #e0e0e0;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .icon {
-  font-size: 18px;
-  color: #333;
+    font-size: 18px;
+    color: #333;
 }
 
 .uploadText {
-  font-weight: 500;
-  color: #333;
+    font-weight: 500;
+    color: #333;
 }
 
 .fileInput {
-  display: none;
+    display: none;
 }
 
 .inputGroup {
     display: flex;
     flex-direction: column;
     position: relative;
+    margin-left: 40px;
+    width: 80%;
 }
 
 .inputGroup label {
-    font-weight: 600;
+    font-weight: 700;
     margin-bottom: 0.3rem;
-    color: #444;
+    color: #0b1b77;
 }
 
-.inputGroup input,
-.inputGroup textarea {
+.inputGroup input {
     padding: 0.6rem;
     border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 1rem;
-    width: 75%;
+    width: 68%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
     white-space: pre-line;
+    border: 2px solid #0b1b77;
+    background-color: #f0f4ff;
+    font-family: 'Spectral', serif;
+    font-weight: 700;
+}
+
+.inputGroup input:focus {
+    outline: none;
+    border-color: #3a51d1;
+    box-shadow: 0 0 0 3px rgba(58, 81, 209, 0.2);
+}
+
+.inputGroup textarea {
+    padding: 0.75rem 1rem;
+    border: 2px solid #0b1b77;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: 'Spectral', serif;
+    width: 55%;
+    min-height: 120px;
+    resize: vertical;
+    background-color: #f0f4ff;
+    color: #000000;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    white-space: pre-line;
+}
+
+.inputGroup textarea:focus {
+    outline: none;
+    border-color: #3a51d1;
+    box-shadow: 0 0 0 3px rgba(58, 81, 209, 0.2);
 }
 
 .inputGroup textarea {
@@ -132,42 +172,86 @@
     gap: 1rem;
     justify-content: center;
     margin-top: 2rem;
+    margin-bottom: 2rem;
 }
 
-.lockButton {
-    background-color: #e74c3c;
+.declineButton {
+    background-color: #ff4d4d;
     color: white;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+    margin-bottom: 40px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 2.1);
+    font-family: 'Spectral', serif;
+    font-weight: 700;
 }
 
-.unlockButton {
+.declineButton:hover:enabled {
+    background-color: #eb3333;
+    
+}
+
+.declineButton:disabled {
+    background-color: #7f8c8d;
+    cursor: not-allowed;
+    color: #ffffff;
+}
+
+.approveButton {
     background-color: #27ae60;
     color: white;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+    margin-bottom: 40px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 2.1);
+    font-family: 'Spectral', serif;
+    font-weight: 700;
+}
+
+.approveButton:hover:enabled {
+    background-color: #25ce6c;
+    
+}
+
+.approveButton:disabled {
+    background-color: #7f8c8d;
+    cursor: not-allowed;
+    color: #ffffff;
 }
 
 .saveButton {
-  background-color: #3498db; /* albastru */
-  color: white;
-  transition: background-color 0.3s ease;
-  cursor: pointer;
+    background-color: #3498db;
+    color: white;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+    margin-bottom: 40px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 2.1);
+    font-family: 'Spectral', serif;
+    font-weight: 700;
 }
 
 .saveButton:hover:enabled {
-  background-color: #0b1b77; /* verde la hover doar dacă e activ */
+    background-color: #27ae60;
+    
 }
 
 .saveButton:disabled {
-  background-color: #7f8c8d; /* gri */
-  cursor: not-allowed;
-  color: #ffffff;
+    background-color: #7f8c8d;
+    cursor: not-allowed;
+    color: #ffffff;
 }
 
 .backButton {
-    background-color: #7f8c8d;
+    background-color: #3498db;
     color: white;
+    margin-bottom: 40px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 2.1);
+    font-family: 'Spectral', serif;
+    font-weight: 700;
 }
 
 .backButton:hover {
-    background-color: #0b1b77;;
+    background-color: #e00d3b;
     color: white;
 }
 
@@ -187,7 +271,7 @@ button:hover {
 .inlineGroup {
     display: flex;
     gap: 1rem;
-    justify-content: space-between;
+    justify-content: space-around;
     flex-wrap: wrap;
 }
 
@@ -236,12 +320,13 @@ button:hover {
 }
 
 .inputError {
-  color: #e74c3c;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
+    color: #e74c3c;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    font-weight: 700;
 }
 
 .status {
-  color: #79a11c !important;
-  font-weight: 700 !important;
+    color: #79a11c !important;
+    font-weight: 700 !important;
 }

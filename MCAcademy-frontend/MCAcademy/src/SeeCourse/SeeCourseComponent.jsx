@@ -117,6 +117,7 @@ const SeeCourseComponent = () => {
             const data = await getCourse(userId, id, token);
 
             setCourse(data);
+            setSpotifyTrack(data.spotifyTrack || null);
         }
 
         fetchCourse();
@@ -143,7 +144,7 @@ const SeeCourseComponent = () => {
             const filteredVideos = (course.videos || []).filter(vid => !deletingVideos.some(d => d.id === vid.id));
 
             // Change course state active to history
-            let isHistory = course.isHistory; 
+            let isHistory = course.isHistory;
             const endDateTimestamp = new Date(course.endDate).getTime();
 
             if (Date.now() > endDateTimestamp && course.isHistory === false) {
@@ -160,7 +161,7 @@ const SeeCourseComponent = () => {
                 startDate: course.startDate,
                 endDate: course.endDate,
                 instructorId: course.instructorId,
-                spotifyTrack: spotifyTrack,
+                spotifyTrack: spotifyTrack ?? course.spotifyTrack,
                 images: [...filteredImages],
                 videos: [...filteredVideos],
                 isHistory: isHistory
@@ -313,7 +314,7 @@ const SeeCourseComponent = () => {
     };
 
     const getBack = () => {
-        navigate(-1);
+        navigate('/courses');
     }
 
     const deleteFileFromCourse = async (fileId, id) => {
@@ -450,7 +451,7 @@ const SeeCourseComponent = () => {
                             rel="noopener noreferrer"
                             className={SeeCourseCSS.spotifyLink}
                         >
-                            Open in Spotify
+                            Listen via Spotify
                         </a>
 
                         {isEditing && (
@@ -463,7 +464,7 @@ const SeeCourseComponent = () => {
                         )}
                     </>
                 ) : (
-                    <p className={SeeCourseCSS.noTrack}>No track assigned.</p>
+                    <p className={SeeCourseCSS.noTrack}>No track assigned!</p>
                 )}
 
                 {isEditing && (
@@ -491,7 +492,7 @@ const SeeCourseComponent = () => {
             )}
 
             {/* Images container */}
-            {course?.images?.length >= 0 && (
+            {course?.images?.length > 0 && (
                 <div className={SeeCourseCSS.imagesSection}>
                     <h3 className={SeeCourseCSS.fileTitle}>Images</h3>
 
@@ -590,7 +591,7 @@ const SeeCourseComponent = () => {
             )}
 
             {/* Videos container */}
-            {course?.videos?.length >= 0 && (
+            {course?.videos?.length > 0 && (
                 <div className={SeeCourseCSS.imagesSection}>
                     <h3 className={SeeCourseCSS.fileTitle}>Videos</h3>
 
@@ -711,23 +712,25 @@ const SeeCourseComponent = () => {
 
             <Metronome />
 
-            {isEditing && (
-                <button onClick={handleSave} className={`${SeeCourseCSS.actionButton} ${SeeCourseCSS.save}`}>
-                    Save
-                </button>
-            )}
+            <div className={SeeCourseCSS.buttonGroup}>
+                {isEditing && (
+                    <button onClick={handleSave} className={`${SeeCourseCSS.actionButton} ${SeeCourseCSS.save}`}>
+                        Save
+                    </button>
+                )}
 
-            {userRole == 'INSTRUCTOR' && (
-                <button onClick={handleEditClick} className={`${SeeCourseCSS.actionButton} ${isEditing ? SeeCourseCSS.cancel : SeeCourseCSS.edit}`}>
-                    {isEditing ? "Cancel" : "Edit"}
-                </button>
-            )}
+                {userRole == 'INSTRUCTOR' && (
+                    <button onClick={handleEditClick} className={`${SeeCourseCSS.actionButton} ${isEditing ? SeeCourseCSS.cancel : SeeCourseCSS.edit}`}>
+                        {isEditing ? "Cancel" : "Edit"}
+                    </button>
+                )}
 
-            {!isEditing && (
-                <button onClick={getBack} className={`${SeeCourseCSS.actionButton} ${SeeCourseCSS.exit}`}>
-                    Exit
-                </button>
-            )}
+                {!isEditing && (
+                    <button onClick={getBack} className={`${SeeCourseCSS.actionButton} ${SeeCourseCSS.exit}`}>
+                        Exit
+                    </button>
+                )}
+            </div>
         </div>
     );
 }

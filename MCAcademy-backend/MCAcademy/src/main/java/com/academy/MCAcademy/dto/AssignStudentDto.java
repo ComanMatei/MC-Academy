@@ -25,5 +25,7 @@ public class AssignStudentDto {
 
     private File profilePicture;
 
+    private int age;
+
     private Status status;
 }

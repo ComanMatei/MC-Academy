@@ -109,7 +109,7 @@ export const getAssignedStudents = async (instructorId, status, selectedInstrume
 
 export const validateStudentSpec = async (instructorId, assignStudentId, answer, token) => {
     try {
-        await fetch(`${url}/${instructorId}/validation/${assignStudentId}`, {
+        const response = await fetch(`${url}/${instructorId}/validation/${assignStudentId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -119,7 +119,21 @@ export const validateStudentSpec = async (instructorId, assignStudentId, answer,
             withCredentials: true
         });
 
+        const contentType = response.headers.get('Content-Type');
+        const isJson = contentType && contentType.includes('application/json');
+
+        if (!response.ok) {
+            const errorData = isJson ? await response.json() : { message: 'Unknown error' };
+            throw {
+                status: response.status,
+                message: errorData.message || 'An error occurred'
+            };
+        }
+
+        return await response.json();
+
     } catch (err) {
         console.error("Eroare la fetch:", err);
+        throw err;
     }
 };

@@ -80,17 +80,13 @@ const ListOfUsersComponent = () => {
         navigate(`/profile/${userId}`);
     }
 
-    const goBack = () => {
-        navigate(-1);
-    }
-
     // Customization DataTable
     const customStyles = {
         tableWrapper: {
             style: {
                 maxWidth: '80%',
                 margin: '20px auto',
-                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+                boxShadow: '0 2px 10px rgba(0, 0, 0, 3.1)',
                 backgroundColor: '#fff',
                 padding: '20px 20px 0px 20px',
                 marginBottom: '0px',
@@ -133,14 +129,15 @@ const ListOfUsersComponent = () => {
         pagination: {
             style: {
                 borderTop: '1px solid #e5e7eb',
+                boxShadow: '0 2px 10px rgba(0, 0, 0, 3.1)',
                 marginTop: 0,
-                paddingTop: 0,
-                paddingBottom: 0,
-                maxWidth: '1022px',
-                marginLeft: '103px',
-                marginRight: '0',
+                paddingTop: '10px',
+                paddingBottom: '10px',
                 display: 'flex',
-                justifyContent: 'flex-end',
+                justifyContent: 'right',
+                width: '83.2%',             
+                margin: '0 auto',
+                boxSizing: 'border-box',
             }
         },
         cells: {
@@ -177,6 +174,7 @@ const ListOfUsersComponent = () => {
                     <select
                         name="status"
                         value={selectedStatus}
+                        className={UsersListCSS.dropdown}
                         onChange={(e) => setSelectedStatus(e.target.value)}
                     >
                         <option value="PENDING">Pending</option>
@@ -222,8 +220,6 @@ const ListOfUsersComponent = () => {
                     className={UsersListCSS.dataTable}
                 />
             </div>
-
-            <button onClick={goBack}>Back</button>
         </div>
     );
 

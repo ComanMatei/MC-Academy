@@ -18,7 +18,7 @@ public class StudentSpecValidation {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "assign_student_id", nullable = false)
     private AssignStudent assignStudent;
 

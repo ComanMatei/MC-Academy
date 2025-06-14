@@ -23,7 +23,7 @@ const RegisterDialog = ({ isOpen, onClose }) => {
   return (
     <dialog ref={dialogRef} className={DialogCSS.dialogNative} onClose={onClose}>
       <h2>Registration Successful!</h2>
-      <p>Please check your email inbox to activate your account.</p>
+      <p>Please check your email inbox to activate your account!</p>
       <button onClick={handleGoToLogin} className={DialogCSS.closeButton}>Back to Log In</button>
     </dialog>
   );

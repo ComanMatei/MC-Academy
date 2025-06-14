@@ -48,6 +48,7 @@ const ProfileComponent = () => {
     const [firstnameError, setFirstnameError] = useState('');
     const [lastnameError, setLastnameError] = useState('');
     const [descriptionError, setDescriptionError] = useState('');
+    const [statusError, setStatusError] = useState('');
 
     // Testing fields with custom errors
     useEffect(() => {
@@ -100,15 +101,6 @@ const ProfileComponent = () => {
         fetchUser();
     }, []);
 
-    useEffect(() => {
-        if (role == "INSTRUCTOR" || role == "STUDENT") {
-            if (id != validatorUserId) {
-                navigate("/url-unauthorized");
-                return;
-            }
-        }
-    }, [id, validatorUserId, navigate]);
-
     // Sets if the user acces his own profile or not
     useEffect(() => {
         if (!validator) {
@@ -126,10 +118,16 @@ const ProfileComponent = () => {
 
         const validatorId = validator.id;
 
-        await usersValidation(validatorId, id, answer, token);
-
-        const updatedUser = await getUserById(id, token);
-        setUser(updatedUser);
+        try {
+            await usersValidation(validatorId, id, answer, token);
+            const updatedUser = await getUserById(id, token);
+            setUser(updatedUser);
+            
+            setStatusError('')
+        } catch (error) {
+            const errorMessage = error?.message || 'Validation failed';
+            setStatusError(errorMessage);
+        }
     };
 
     const updateUser = async () => {
@@ -350,19 +348,21 @@ const ProfileComponent = () => {
                                     readOnly
                                     className={ProfileCSS.smallInput}
                                 />
+                                {statusError && <p className={ProfileCSS.inputError}>{statusError}</p>}
                             </div>
                         )}
+
                     </form>
 
                     {/* These buttons are only available to admins */}
                     <div className={ProfileCSS.buttonGroup}>
                         {(validator.role == "ADMIN") && !isOwnProfile && (
                             <>
-                                <button onClick={() => handleValidation(false)} className={ProfileCSS.lockButton}>
-                                    Decline
-                                </button>
-                                <button onClick={() => handleValidation(true)} className={ProfileCSS.unlockButton}>
+                                <button onClick={() => handleValidation(true)} className={ProfileCSS.approveButton}>
                                     Approve
+                                </button>
+                                <button onClick={() => handleValidation(false)} className={ProfileCSS.declineButton}>
+                                    Decline
                                 </button>
                             </>
                         )}

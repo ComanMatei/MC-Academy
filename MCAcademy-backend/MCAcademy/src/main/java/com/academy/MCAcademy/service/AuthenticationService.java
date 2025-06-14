@@ -1,6 +1,5 @@
 package com.academy.MCAcademy.service;
 
-import com.academy.MCAcademy.exception.AuthForbiddenException;
 import com.academy.MCAcademy.request.AuthenticationRequest;
 import com.academy.MCAcademy.request.RefreshTokenRequest;
 import com.academy.MCAcademy.response.AuthenticationResponse;
@@ -9,7 +8,7 @@ import com.academy.MCAcademy.entity.ConfirmationToken;
 import com.academy.MCAcademy.entity.Role;
 import com.academy.MCAcademy.entity.Status;
 import com.academy.MCAcademy.entity.User;
-import com.academy.MCAcademy.mailing.EmailSender;
+import com.academy.MCAcademy.mailing.EmailSenderRepository;
 import com.academy.MCAcademy.mailing.EmailValidator;
 import com.academy.MCAcademy.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.net.ConnectException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -41,7 +39,7 @@ public class AuthenticationService {
 
     private final ConfirmationTokenService confirmationTokenService;
 
-    private final EmailSender emailSender;
+    private final EmailSenderRepository emailSender;
 
     private final BuildEmailService buildEmailService;
 
@@ -52,13 +50,13 @@ public class AuthenticationService {
             throw new IllegalStateException("Email already taken!");
         }
 
-        if (request.getProfilePicture() == null) {
-            throw new IllegalStateException("Must have a profile picture!");
-        }
-
-        if (request.getProfilePicture().getType() == "video") {
-            throw new IllegalStateException("This file is not an image!");
-        }
+//        if (request.getProfilePicture() == null) {
+//            throw new IllegalStateException("Must have a profile picture!");
+//        }
+//
+//        if (request.getProfilePicture().getType() == "video") {
+//            throw new IllegalStateException("This file is not an image!");
+//        }
 
         var user = User.builder()
                 .firstname(request.getFirstname())

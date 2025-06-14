@@ -28,7 +28,8 @@ public class UserRequestAuthorizationManager implements AuthorizationManager<Req
     private static final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     @Override
-    public AuthorizationDecision check(Supplier<Authentication> authenticationSupplier, RequestAuthorizationContext context) {
+    public AuthorizationDecision check(Supplier<Authentication> authenticationSupplier,
+                                       RequestAuthorizationContext context) {
         String requestUri = context.getRequest().getRequestURI();
         Authentication authentication = authenticationSupplier.get();
 
@@ -41,7 +42,8 @@ public class UserRequestAuthorizationManager implements AuthorizationManager<Req
         boolean isAdmin = authentication.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
         boolean isStudentOrInstructor = authentication.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ROLE_STUDENT") || auth.getAuthority().equals("ROLE_INSTRUCTOR"));
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_STUDENT") || auth.getAuthority()
+                        .equals("ROLE_INSTRUCTOR"));
 
         for (String pattern : ADMIN_ALLOWED_PATTERNS) {
             if (pathMatcher.match(pattern, requestUri)) {

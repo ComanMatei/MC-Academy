@@ -1,7 +1,7 @@
 package com.academy.MCAcademy.service;
 
 import com.academy.MCAcademy.dto.StudentSpecValidationDto;
-import com.academy.MCAcademy.mailing.EmailSender;
+import com.academy.MCAcademy.mailing.EmailSenderRepository;
 import com.academy.MCAcademy.entity.*;
 import com.academy.MCAcademy.repository.AssignStudentRepository;
 import com.academy.MCAcademy.repository.StudentSpecValidationRepository;
@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -23,7 +25,7 @@ public class StudentSpecValidationService {
 
     private final StudentSpecValidationRepository studentValidationRepository;
 
-    private final EmailSender emailSender;
+    private final EmailSenderRepository emailSender;
 
     private final BuildEmailService buildEmailService;
 
@@ -40,7 +42,25 @@ public class StudentSpecValidationService {
         AssignStudent assignStudent = assignStudentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Student assign was not found with this id!"));
 
-        StudentSpecValidation studentSpecValidation = convertStudentSpecValidationDtoToEntity(assignStudent, dto);
+        Optional<StudentSpecValidation> existingStudentValidationOpt = studentValidationRepository
+                .findByAssignStudentId(assignStudent.getId());
+
+        StudentSpecValidation studentSpecValidation;
+
+        if (existingStudentValidationOpt.isPresent()) {
+            studentSpecValidation = existingStudentValidationOpt.get();
+
+            if (studentSpecValidation.getAnswer().equals(dto.getAnswer())) {
+                if (dto.getAnswer())
+                    throw new IllegalStateException("This student has already been approved");
+                else
+                    throw new IllegalStateException("This student has already been declined");
+            }
+
+            studentSpecValidation.setAnswer(dto.getAnswer());
+        } else {
+            studentSpecValidation = convertStudentSpecValidationDtoToEntity(assignStudent, dto);
+        }
 
         String subject = "Status instrument assign!";
         String name = assignStudent.getStudent().getFirstname() + " " + assignStudent.getStudent().getLastname();
@@ -49,7 +69,6 @@ public class StudentSpecValidationService {
         String signature = "Thank you, " + instructor.getFirstname() + " " + instructor.getLastname();
 
         if (dto.getAnswer() == true) {
-            System.out.println("Ajunge la approve");
             assignStudent.setStatus(Status.APPROVED);
 
             assignStudentRepository.save(assignStudent);

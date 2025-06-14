@@ -1,17 +1,22 @@
 .wrapper {
     padding-top: 50px;
-    background: linear-gradient(to right top, #6dd5fa, #2980b9);
+    background-image: url('/profile.png');
+    background-repeat: no-repeat;
+    background-size: cover;
     min-height: 100vh;
+    font-family: "Spectral", serif;
+    overflow-y: auto;
 }
 
 .courseCardContainer {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     max-width: 1200px;
-    margin: 2rem auto;
+    margin: 1.7rem auto;
     gap: 1.7rem;
     padding: 0 1rem;
     justify-items: center;
+    font-family: "Spectral", serif;
 }
 
 .courseCard {
@@ -24,6 +29,7 @@
     flex-direction: column;
     justify-content: space-between;
     transition: transform 0.2s ease;
+    background-color: #d1e6e6;
 }
 
 .courseCard:hover {
@@ -41,7 +47,7 @@
     color: #007bff;
     cursor: pointer;
     margin: 0;
-    
+
     transition: color 0.2s ease;
 }
 
@@ -54,7 +60,16 @@
     margin-top: 0.5rem;
     font-size: 1rem;
     color: #333;
-    font-weight: 400;
+    font-weight: 600;
+    font-family: "Spectral", serif;
+}
+
+.cardDetails strong {
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    color: #0b1b77;
+    font-weight: 800;
+    font-family: "Spectral", serif;
 }
 
 .cardActions {
@@ -95,13 +110,6 @@
     box-shadow: 0 4px 10px rgba(0, 123, 255, 0.5);
 }
 
-.selected {
-    background-color: #0b1b77;
-    color: white;
-    border-color: #0056b3;
-    box-shadow: 0 4px 12px rgba(0, 86, 179, 0.6);
-}
-
 .instrumentButtons {
     display: flex;
     flex-wrap: wrap;
@@ -111,61 +119,60 @@
 }
 
 .instrumentButton {
-    font-size: 1.1rem;
+    font-size: 2rem;
     font-weight: bold;
     padding: 0.75rem 2rem;
-    border: 2px dashed #5866b8;
     border-radius: 1rem;
-    background-color: white;
-    color: #5866b8;
+    background-color: transparent;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
     position: relative;
 }
 
 .instrumentButton:hover {
-    background-color: #5866b8;
     color: white;
     transform: translateY(-2px);
 }
 
 .instrumentButton.selected {
     background-color: #5866b8;
-    color: white;
-    border-style: solid;
+    box-shadow: 0 4px 12px rgba(0, 86, 179, 0.6);
 }
 
 .title {
     margin-top: 10px;
     margin-bottom: 1.5rem;
-    text-align: center;
-    font-size: 2rem;
+    text-align: left;
+    font-size: 2.7rem;
     font-weight: 700;
-    color: #0b1b77;
+    color: #e00d3b;
     border-bottom: 2px solid #0b1b77;
-    padding-bottom: 0.5rem;
+    padding-bottom: 4px;
     display: block;
     width: fit-content;
-    margin-left: auto;
-    margin-right: auto;
+    margin-left: 5%;
+    margin-top: 10px;
+    margin-bottom: 3rem;
 }
 
 .pagination {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 20px;
+    margin-top: -45px;
     gap: 1rem;
+    margin-left: -10%;
 }
 
 .pagination button {
     padding: 0.5rem 1rem;
     border-radius: 6px;
     border: 1px solid #ccc;
-    background: white;
+    background-color: #d1e6e6;
+    font-weight: 700;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    font-family: "Spectral", serif;
 }
 
 .pagination button:disabled {
@@ -174,9 +181,9 @@
 }
 
 .pagination button:hover:not(:disabled) {
-    background-color: #0b1b77;
+    background-color: #5866b8;
     color: white;
-    border-color: #0b1b77;
+    border-color: #5866b8;
 }
 
 .inlineContainer {
@@ -196,7 +203,27 @@
     gap: 10px;
     width: 100%;
     box-sizing: border-box;
-    margin: 0 auto;
+    margin: 3px auto;
+}
+
+.buttonsRow button {
+    font-family: "Spectral", serif;
+    font-weight: 700;
+    background-color: #d1e6e6;
+    color: #0b1b77;
+}
+
+.leftButtons {
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+}
+
+.leftButtons .selected,
+.rightButtons button:hover,
+.leftButtons button:hover {
+    background-color: #5866b8;
+    color: white;
 }
 
 .rightButtons {
@@ -206,45 +233,58 @@
     margin-right: 11%;
 }
 
-.rightButtons button:hover {
-  background-color:  #0b1b77;
-  color: white;
-}
-
 .searchContainer {
     width: 25%;
 }
 
 .selectDropdown {
-  width: 200px;
-  padding: 8px 12px;
-  font-size: 1rem;
-  border-radius: 6px;
-  background-color: white;
-  color: #000000;
-  cursor: pointer;
-  transition: border-color 0.3s ease;
-  outline: none;
-  margin-left: 10%;
+    width: 200px;
+    padding: 8px 12px;
+    font-size: 1rem;
+    border-radius: 6px;
+    background-color: #fff;
+    color: #333;
+    cursor: pointer;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    outline: none;
+    margin-left: 10%;
+    margin-top: 5px;
+    border: 2px solid #ccc;
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px 16px;
+    font-family: "Spectral", serif;
+    font-weight: 700;
+}
+
+.selectDropdown option {
+    font-weight: 700;
 }
 
 .selectDropdown:hover {
-  border-color: #1451a3;
+    border-color: #1451a3;
 }
 
 .selectDropdown:focus {
-  border-color: #2980b9;
-  box-shadow: 0 0 5px #2980b9;
+    border-color: #2980b9;
+    box-shadow: 0 0 8px rgba(41, 128, 185, 0.6);
 }
 
 .noDataMessage {
     max-width: 250px;
-    background-color: #f8f9fa;
+    background-color: #d1e6e6;
     padding: 1rem 2rem;
     border-radius: 0.75rem;
     font-size: 1.1rem;
     font-weight: 500;
     color: #333;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.5);
     text-align: center;
+}
+
+.cardActions {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+    min-height: 15px;
 }

@@ -1,5 +1,5 @@
 package com.academy.MCAcademy.mailing;
 
-public interface EmailSender {
+public interface EmailSenderRepository {
     void send(String to, String email);
 }

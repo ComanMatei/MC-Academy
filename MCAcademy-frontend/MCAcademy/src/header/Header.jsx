@@ -1,31 +1,59 @@
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { useContext } from "react";
+
+import AuthContext from "../context/AuthProvider";
 
 import HeaderCSS from './header.module.css';
+import { FiUser } from "react-icons/fi";
+import { FiLogOut } from 'react-icons/fi';
+import { FaGuitar } from 'react-icons/fa';
+import { FaUsers } from 'react-icons/fa';
+import { FaUserPlus } from "react-icons/fa";
+import { FaGraduationCap } from 'react-icons/fa';
 
 import logo from '../assets/MCAcademy_logo.png';
 
 const AdminHeader = ({ userId }) => {
+    const { setAuth } = useContext(AuthContext);
+
     const navigate = useNavigate();
+
+    const handleUsers = () => {
+        navigate(`/users`);
+    }
 
     const handleUserProfile = () => {
         navigate(`/profile/${userId}`);
     }
 
+    const logout = async () => {
+        setAuth({});
+        localStorage.removeItem("auth");
+    }
+
     return (
         <nav className={HeaderCSS.nav}>
-            <Link to="/admin">Dashboard</Link>
-            <Link to="/users">Users</Link>
-            <button onClick={() => handleUserProfile(userId)} className={HeaderCSS.navButton}>Profile</button>
+            <button onClick={handleUsers} className={HeaderCSS.iconButton} title="Users">
+                <FaUsers size={25} />
+            </button>
+            <button onClick={() => handleUserProfile(userId)} className={HeaderCSS.iconButton} title="My profile">
+                <FiUser size={25} />
+            </button>
+            <button onClick={logout} className={HeaderCSS.iconButton} title="Log out">
+                <FiLogOut size={25} />
+            </button>
         </nav>
     );
 };
 
 const InstructorHeader = ({ userId, onOpenDialog }) => {
+    const { setAuth } = useContext(AuthContext);
+
     const navigate = useNavigate();
 
-    const handleUserProfile = () => {
-        navigate(`/profile/${userId}`);
+    const handleCourses = () => {
+        navigate('/courses');
     };
 
     const handleValidateStudents = () => {
@@ -36,39 +64,96 @@ const InstructorHeader = ({ userId, onOpenDialog }) => {
         navigate('/', { state: { openDialog: true } });
     };
 
+    const handleUserProfile = () => {
+        navigate(`/profile/${userId}`);
+    };
+
+    const logout = async () => {
+        setAuth({});
+        localStorage.removeItem("auth");
+    }
+
     return (
         <nav className={HeaderCSS.nav}>
-            <Link to="/courses">Courses</Link>
-            <button onClick={handleValidateStudents}>Validate students</button>
-            <button onClick={handleAssignInstrument}>Assign Instrument</button>
-            <button onClick={handleUserProfile} className={HeaderCSS.navButton}>Profile</button>
+            <button onClick={handleCourses} className={HeaderCSS.iconButton} title="Courses">
+                <FaGraduationCap size={25} />
+            </button>
+            <button onClick={handleValidateStudents} className={HeaderCSS.iconButton} title="Validate students">
+                <FaUserPlus size={25} />
+            </button>
+            <button onClick={handleAssignInstrument} className={HeaderCSS.iconButton} title="Assign instrument">
+                <FaGuitar size={25} />
+            </button>
+            <button onClick={() => handleUserProfile(userId)} className={HeaderCSS.iconButton} title="My profile">
+                <FiUser size={25} />
+            </button>
+            <button onClick={logout} className={HeaderCSS.iconButton} title="Log out">
+                <FiLogOut size={25} />
+            </button>
         </nav>
     );
 };
 
 const StudentHeader = ({ userId }) => {
+    const { setAuth } = useContext(AuthContext);
+
+    const handleCourses = () => {
+        navigate('/courses');
+    };
+
     const navigate = useNavigate();
+
+    const handleAssignSpec = () => {
+        navigate(`/assign-instr`);
+    }
 
     const handleUserProfile = (userId) => {
         navigate(`/profile/${userId}`);
     }
 
+    const logout = async () => {
+        setAuth({});
+        localStorage.removeItem("auth");
+    }
+
     return (
         <nav className={HeaderCSS.nav}>
-            <Link to="/dashboard">Dashboard</Link>
-            <Link to="/profile">Profile</Link>
-            <button onClick={() => handleUserProfile(userId)} className={HeaderCSS.navButton}>Profile</button>
+            <button onClick={handleCourses} className={HeaderCSS.iconButton} title="Courses">
+                <FaGraduationCap size={25} />
+            </button>
+            <button onClick={handleAssignSpec} className={HeaderCSS.iconButton} title="Assign instrument">
+                <FaGuitar size={25} />
+            </button>
+            <button onClick={() => handleUserProfile(userId)} className={HeaderCSS.iconButton} title="My profile">
+                <FiUser size={25} />
+            </button>
+            <button onClick={logout} className={HeaderCSS.iconButton} title="Log out">
+                <FiLogOut size={25} />
+            </button>
         </nav>
     );
 };
 
-const DefaultHeader = () => (
-    <nav className={HeaderCSS.nav}>
-        <Link to="/">Home</Link>
-        <Link to="/about">About</Link>
-        <Link to="/login">Login</Link>
-    </nav>
-);
+const DefaultHeader = () => {
+    const navigate = useNavigate();
+
+    const handleSignIn = () => {
+        navigate('/register');
+    };
+
+    const handleSignUp = () => {
+        navigate('/login');
+    };
+
+
+    return (
+        <nav className={HeaderCSS.nav}>
+            <button onClick={handleSignIn} className={HeaderCSS.homeButton}>Sign Up</button>
+            <button onClick={handleSignUp} className={HeaderCSS.homeButton}>Sign In</button>
+        </nav>
+    );
+};
+
 
 const Header = ({ roles = [], userId, onOpenDialog }) => {
 
@@ -90,7 +175,7 @@ const Header = ({ roles = [], userId, onOpenDialog }) => {
             </header>
         );
     }
-    if (roles.includes("INSTRUCTOR")) {
+    else if (roles.includes("INSTRUCTOR")) {
         return (
             <header className={HeaderCSS.header}>
                 {Logo}
@@ -98,7 +183,7 @@ const Header = ({ roles = [], userId, onOpenDialog }) => {
             </header>
         );
     }
-    if (roles.includes("STUDENT")) {
+    else if (roles.includes("STUDENT")) {
         return (
             <header className={HeaderCSS.header}>
                 {Logo}
@@ -106,12 +191,15 @@ const Header = ({ roles = [], userId, onOpenDialog }) => {
             </header>
         );
     }
-    return (
-        <header className={HeaderCSS.header}>
-            {Logo}
-            <DefaultHeader />
-        </header>
-    );
+    else {
+        return (
+            <header className={HeaderCSS.header}>
+                {Logo}
+                <DefaultHeader />
+            </header>
+        );
+    }
+
 };
 
 export default Header;

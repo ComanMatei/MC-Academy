@@ -31,19 +31,21 @@ public class AssignStudentService {
 
     private final CourseRepository courseRepository;
 
+    // Assigning a student to an instructor's specialization
     public AssignStudentDto assignStudent(Long studentId, AssignStudentRequest request) {
         User student = userRepository.findById(studentId)
                 .orElseThrow(() -> new RuntimeException("This user doesn't exist"));
 
         if (student.getRole() != Role.STUDENT) {
-            throw new RuntimeException("Only students can assign to a specializations!");
+            throw new RuntimeException("Only students can assign to specializations!");
         }
 
         if (assignStudentRepository.existsByStudentAndInstructorSpec_Id(student, request.getInstructorSpecId())) {
             throw new AlreadyAssignedException("You have already assigned to this instructor for this instrument!");
         }
 
-        InstructorSpecialization instructorSpecialization = instructorSpecializationRepository.findById(request.getInstructorSpecId())
+        InstructorSpecialization instructorSpecialization = instructorSpecializationRepository
+                .findById(request.getInstructorSpecId())
                 .orElseThrow(() -> new RuntimeException("This doesn't exist!"));
 
         AssignStudent assignStudent = convertAssignStudentDtoToEntity(student, instructorSpecialization, request);
@@ -106,7 +108,10 @@ public class AssignStudentService {
             mapper.map(src -> src.getStudent().getProfilePicture(), AssignStudentDto::setProfilePicture);
         });
 
-        return modelMapper.map(assignStudent, AssignStudentDto.class);
+        AssignStudentDto dto = modelMapper.map(assignStudent, AssignStudentDto.class);
+        dto.setAge(calculateAge(assignStudent.getStudent().getDateOfBirth()));
+
+        return dto;
     }
 
     private InstructorSpecDto convertInstructorSpecEntityToDto(InstructorSpecialization instructorSpecialization) {

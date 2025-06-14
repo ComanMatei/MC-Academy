@@ -1,102 +1,160 @@
 .dialogOverlay::backdrop {
-    background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.5);
 }
 
 .dialogNative {
-    padding: 2rem;
-    border: none;
-    border-radius: 12px;
-    background-color: #fff;
-    max-width: 400px;
-    width: 90%;
-    text-align: left;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
-    animation: fadeIn 0.3s ease-in-out;
+  padding: 2rem;
+  border: none;
+  border-radius: 12px;
+  background-color: #f0f4ff;
+  max-width: 400px;
+  width: 90%;
+  text-align: left;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-in-out;
 }
 
 .dialogNative h1 {
-    margin-top: 0;
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
+  margin-top: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-family: 'Spectral', serif;
+  text-align: center;
+  color: #0b1b77;
+  font-weight: 800;
 }
 
 .dialogNative form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  color: #0b1b77;
 }
 
 .dialogNative input[type="email"] {
-    padding: 0.6rem;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 1rem;
+  padding: 0.55rem 1rem;
+  border: 2px solid #a3b5e0;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  font-family: 'Spectral', serif;
+  background-color: #ffffff;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  font-weight: 700;
+}
+
+.dialogNative input[type="email"]:focus {
+  border-color: #4a6ee0;
+  box-shadow: 0 0 0 3px rgba(74, 110, 224, 0.3);
+  outline: none;
+}
+
+.promptText {
+  font-family: 'Spectral', serif;
+  font-weight: 800;
+  color: #0b1b77;
+  font-size: 1.2rem;
 }
 
 .dialogNative button {
-    padding: 0.6rem;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    cursor: pointer;
-    background-color: #0077ff;
-    color: white;
-    transition: background-color 0.2s ease;
+  padding: 0.6rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  background-color: #0077ff;
+  color: white;
+  transition: background-color 0.2s ease;
+}
+
+.dialogNative button {
+  padding: 0.6rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  background-color: #0077ff;
+  color: white;
+  transition: background-color 0.2s ease;
+}
+
+.dialogNative .buttonGroup {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.dialogNative .buttonGroup button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 3.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: 'Spectral', serif;
+  font-weight: 700;
 }
 
 .dialogNative button[type="button"] {
-    background-color: #ccc;
-    color: black;
+  background-color: #ccc;
+  color: black;
+}
+
+.dialogNative button {
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .dialogNative button:hover {
-    background-color: #005fc1;
+  background-color: #005fc1;
+  transform: translateY(-2px);
 }
 
 .dialogNative button[type="button"]:hover {
-    background-color: #999;
+  background-color: #999;
 }
 
 .dialogNative .link {
-    margin-top: 1rem;
-    font-size: 0.9rem;
+  margin-top: 1rem;
+  font-size: 0.9rem;
 }
 
 .errmsg {
-    background: #ff4d4d;
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    color: white;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    text-align: center;
-    width: 90%;
-    margin-left: auto;
-    margin-right: auto;
+  background: #ff4d4d;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  color: white;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-align: center;
+  width: 50%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .successmsg {
-    background: #1dca45;
-    padding: 0.3rem;
-    border-radius: 0.5rem;
-    color: white;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    text-align: center;
-    width: 80%;
-    margin-left: auto;
-    margin-right: auto;
+  background: #1dca45;
+  padding: 0.3rem;
+  border-radius: 0.5rem;
+  color: white;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-align: center;
+  width: 95%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .offscreen {
-    position: absolute;
-    left: -9999px;
+  position: absolute;
+  left: -9999px;
 }
 
 .visible {
-    position: static;
+  position: static;
 }
 
 .signUpLink {
@@ -108,18 +166,18 @@
 }
 
 .signUpLink:hover {
-  color: #ffffff !important;
+  color: #0b1b77 !important;
   text-decoration: underline;
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
 
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }

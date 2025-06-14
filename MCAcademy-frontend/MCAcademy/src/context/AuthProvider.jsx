@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode"; // 🔄 Corect aici
+
+import { jwtDecode } from "jwt-decode";
 
 const AuthContext = createContext({});
 
@@ -14,7 +15,7 @@ export const AuthProvider = ({ children }) => {
 
     const isTokenExpired = (token) => {
         try {
-            const decoded = jwtDecode(token); // 🔄 și aici
+            const decoded = jwtDecode(token);
             const currentTime = Date.now() / 1000;
             return decoded.exp < currentTime + 60;
         } catch {
