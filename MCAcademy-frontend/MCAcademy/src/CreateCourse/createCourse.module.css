@@ -421,7 +421,6 @@
     color: white !important;
 }
 
-/* Responsive */
 @media (max-width: 600px) {
     .imgSmall {
         width: 100px;

@@ -119,7 +119,7 @@ const ValidateStudentSpecComponent = () => {
                             onClick={() => setSelectedInstrument(instrument)}
                             className={`${ValidateStudentsCSS.instrumentButton} ${selectedInstrument === instrument ? ValidateStudentsCSS.selected : ""
                                 }`}
-                            title={instrument} // tooltip la hover
+                            title={instrument}
                         >
                             {instrumentEmojis[instrument] || "🎵"}
                         </button>

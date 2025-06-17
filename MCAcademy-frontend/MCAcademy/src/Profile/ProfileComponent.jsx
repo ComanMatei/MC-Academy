@@ -99,7 +99,7 @@ const ProfileComponent = () => {
         };
 
         fetchUser();
-    }, []);
+    }, [id, token]);
 
     // Sets if the user acces his own profile or not
     useEffect(() => {
@@ -149,7 +149,7 @@ const ProfileComponent = () => {
         }
 
         try {
-            const response = await fetch(`http://localhost:8080/api/v1/user/edit/${id}`, {
+            const response = await fetch(`http://localhost:8080/api/v1/user/${id}/edit`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -196,7 +196,7 @@ const ProfileComponent = () => {
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
-        console.log(file);
+        
         if (file) {
             const newImageUrl = URL.createObjectURL(file);
 

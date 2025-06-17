@@ -5,14 +5,13 @@ import { useContext } from "react";
 import AuthContext from "../context/AuthProvider";
 
 import HeaderCSS from './header.module.css';
+import logo from '../assets/MCAcademy_logo.png';
 import { FiUser } from "react-icons/fi";
 import { FiLogOut } from 'react-icons/fi';
 import { FaGuitar } from 'react-icons/fa';
 import { FaUsers } from 'react-icons/fa';
 import { FaUserPlus } from "react-icons/fa";
 import { FaGraduationCap } from 'react-icons/fa';
-
-import logo from '../assets/MCAcademy_logo.png';
 
 const AdminHeader = ({ userId }) => {
     const { setAuth } = useContext(AuthContext);

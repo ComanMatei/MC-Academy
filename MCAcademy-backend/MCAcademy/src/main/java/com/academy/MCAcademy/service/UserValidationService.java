@@ -62,7 +62,7 @@ public class UserValidationService {
                     .build();
         }
 
-        // For email sender
+        // Email sender
         String subject = "Status account!";
         String name = user.getFirstname() + " " + user.getLastname();
         String link = "http://localhost:5173/login";

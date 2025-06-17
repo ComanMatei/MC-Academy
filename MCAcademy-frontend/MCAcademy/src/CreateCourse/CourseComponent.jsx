@@ -95,7 +95,6 @@ const CourseComponent = () => {
         const selectedFiles = Array.from(event.target.files);
 
         if (selectedFiles.length == 0) {
-            console.log("No file has been selected!");
             return;
         }
 

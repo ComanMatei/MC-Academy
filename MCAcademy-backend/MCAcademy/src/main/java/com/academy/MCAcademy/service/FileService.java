@@ -106,15 +106,6 @@ public class FileService {
         fileRepository.delete(file);
     }
 
-    public List<File> getFilesByIds(List<Long> fileIds, String fileType) {
-        List<File> files = fileRepository.findAllById(fileIds);
-
-        return files.stream()
-                .filter(file -> file.getType().equalsIgnoreCase(fileType))
-                .collect(Collectors.toList());
-    }
-
-
     public byte[] getFile(String fileName) {
         return fileRepository.findByName(fileName).getFileData();
     }

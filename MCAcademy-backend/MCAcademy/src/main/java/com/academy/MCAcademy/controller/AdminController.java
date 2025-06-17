@@ -16,7 +16,7 @@ public class AdminController {
     private final UserValidationService instructorValidationService;
 
     @PostMapping("/{adminId}/validation/{userId}")
-    public ResponseEntity<UserValidation> validateInstructor(
+    public ResponseEntity<UserValidation> validateUser(
             @PathVariable Long adminId,
             @PathVariable Long userId,
             @RequestBody ValidationRequest request) {

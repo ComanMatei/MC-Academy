@@ -19,11 +19,5 @@ public interface AssignStudentRepository extends JpaRepository<AssignStudent, Lo
 
     List<AssignStudent> findAllByStudent_IdAndStatus(Long studentId, Status status);
 
-    Long findByStudent_IdAndInstructorSpec_Id(Long studentId, Long instructorSpecId);
     boolean existsByStudentAndInstructorSpec_Id(User student, Long instructorSpecId);
-
-    @Modifying
-    @Transactional
-    @Query("UPDATE AssignStudent a SET a.status = :status WHERE a.id = :id")
-    void updateStatus(@Param("id") Long id, @Param("status") Status status);
 }

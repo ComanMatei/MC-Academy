@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from 'react';
-import DialogCSS from './dialog.module.css';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import DialogCSS from './dialog.module.css';
 
 const RegisterDialog = ({ isOpen, onClose }) => {
   const dialogRef = useRef(null);

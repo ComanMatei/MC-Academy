@@ -10,9 +10,9 @@ const Unauthorized = () => {
     return (
         <div className={UnauthorizedCSS.wrapper}>
             <section className={UnauthorizedCSS.section}>
-                <h1>Unauthorized</h1>
+                <h1 className={UnauthorizedCSS.title}>Unauthorized</h1>
                 <br />
-                <p>You do not have access to this page!</p>
+                <p className={UnauthorizedCSS.text}>You do not have access to this page!</p>
                 <div className={UnauthorizedCSS.flexGrow}>
                     <button onClick={goBack} className={UnauthorizedCSS.button}>Main menu</button>
                 </div>

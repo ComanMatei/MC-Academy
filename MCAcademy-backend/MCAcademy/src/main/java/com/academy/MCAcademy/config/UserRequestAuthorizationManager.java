@@ -21,7 +21,7 @@ public class UserRequestAuthorizationManager implements AuthorizationManager<Req
     );
 
     private static final List<String> STUDENT_INSTRUCTOR_ONLY_PATTERNS = List.of(
-            "/api/v1/user/edit/{userId}",
+            "/api/v1/user/{userId}/edit",
             "/api/v1/user/{userId}/only/{id}"
     );
 

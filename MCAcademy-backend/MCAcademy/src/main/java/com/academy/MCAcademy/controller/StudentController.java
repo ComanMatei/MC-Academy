@@ -20,6 +20,7 @@ public class StudentController {
 
     private final AssignStudentService assignStudentService;
 
+    // Student assigning an instructor specialization
     @PostMapping("/{studentId}/assign-spec")
     public ResponseEntity<AssignStudentDto> assignStudentSpec(@PathVariable Long studentId,
                                                               @RequestBody AssignStudentRequest request) {

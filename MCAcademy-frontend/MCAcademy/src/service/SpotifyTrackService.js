@@ -1,4 +1,3 @@
-
 export const saveTrack = async (track, token) => {
     try {
         const response = await fetch('http://localhost:8080/api/v1/course/create-track', {

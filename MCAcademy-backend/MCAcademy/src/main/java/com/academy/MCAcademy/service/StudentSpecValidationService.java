@@ -81,12 +81,10 @@ public class StudentSpecValidationService {
             emailSender.send(assignStudent.getStudent().getEmail(),
                     buildEmailService.buildEmail(subject, name, body, link, linkName, "", signature));
         } else if (dto.getAnswer() == false) {
-            System.out.println("Ajunge la decline");
             assignStudent.setStatus(Status.DECLINED);
 
             assignStudentRepository.save(assignStudent);
             assignStudentRepository.flush();
-            System.out.println("Status setat: " + assignStudent.getStatus());
             String body = "I am sorry to inform you that your "
                     + assignStudent.getInstructorSpec().getInstrument()
                     + " assign has been declined. Try to assign to another instructor";

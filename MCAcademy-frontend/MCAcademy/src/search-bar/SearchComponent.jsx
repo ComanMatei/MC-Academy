@@ -1,9 +1,9 @@
+import { useEffect, useState } from "react";
+
 import SearchBar from "./SearchBar"
 import SearchResults from "./SearchResults"
 
 import SearchBarCSS from "./searchBar.module.css";
-
-import { useEffect, useState } from "react";
 
 const SearchComponent = ({ instructors, onSelectInstructor }) => {
     const [filteredInstructors, setFilteredInstructors] = useState(instructors);

@@ -492,9 +492,11 @@ const SeeCourseComponent = () => {
             )}
 
             {/* Images container */}
-            {course?.images?.length > 0 && (
+            {course?.images?.length >= 0 && (
                 <div className={SeeCourseCSS.imagesSection}>
-                    <h3 className={SeeCourseCSS.fileTitle}>Images</h3>
+                    {course?.images?.length > 0 && (
+                        <h3 className={SeeCourseCSS.fileTitle}>Images</h3>
+                    )}
 
                     {/* Upload images */}
                     {isEditing && (
@@ -591,9 +593,11 @@ const SeeCourseComponent = () => {
             )}
 
             {/* Videos container */}
-            {course?.videos?.length > 0 && (
+            {course?.videos?.length >= 0 && (
                 <div className={SeeCourseCSS.imagesSection}>
-                    <h3 className={SeeCourseCSS.fileTitle}>Videos</h3>
+                    {course?.videos?.length > 0 && (
+                        <h3 className={SeeCourseCSS.fileTitle}>Videos</h3>
+                    )}
 
                     {/* Upload videos */}
                     {isEditing && (

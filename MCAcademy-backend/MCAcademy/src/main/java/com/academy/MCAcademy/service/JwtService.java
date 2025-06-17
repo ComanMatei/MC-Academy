@@ -102,7 +102,7 @@ public class JwtService{
                     .collect(Collectors.toList());
         }
 
-        return Collections.emptyList(); // fallback safe
+        return Collections.emptyList();
     }
 
     private Key getSignInKey() {

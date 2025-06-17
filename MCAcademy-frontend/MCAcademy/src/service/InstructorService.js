@@ -80,7 +80,7 @@ export const getInstrInstruments = async (instructorId, token) => {
             return data;
         }
     } catch (err) {
-        console.error("Eroare la fetch:", err);
+        console.error("Error:", err);
     }
 };
 
@@ -133,7 +133,7 @@ export const validateStudentSpec = async (instructorId, assignStudentId, answer,
         return await response.json();
 
     } catch (err) {
-        console.error("Eroare la fetch:", err);
+        console.error("Error:", err);
         throw err;
     }
 };

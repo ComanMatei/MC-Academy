@@ -214,7 +214,7 @@ const RegisterComponent = () => {
                         errorMsg = errorData.message;
                     }
                 } catch (e) {
-                    console.log('Something is wrong', e);
+                    console.error('Something is wrong', e);
                 }
                 setErrMsg(errorMsg);
                 errRef.current?.focus();

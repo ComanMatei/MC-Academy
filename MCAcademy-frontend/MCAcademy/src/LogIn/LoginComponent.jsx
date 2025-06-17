@@ -12,7 +12,6 @@ const LoginComponent = () => {
 
     const navigate = useNavigate();
     const location = useLocation();
-    const from = location.state?.from?.pathname || "/";
 
     const userRef = useRef();
     const errRef = useRef();
@@ -35,7 +34,6 @@ const LoginComponent = () => {
         e.preventDefault();
 
         const user = { email, password };
-        console.log(user);
 
         try {
             const response = await fetch('http://localhost:8080/api/v1/auth/authenticate', {
@@ -49,7 +47,6 @@ const LoginComponent = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                console.log(data);
 
                 const userId = data.userId;
                 const accessToken = data.token;
@@ -65,7 +62,7 @@ const LoginComponent = () => {
                 try {
                     errorData = await response.json();
                 } catch (e) {
-                    console.log('Something is wrong', e);
+                    console.error('Something is wrong', e);
                 }
 
                 if (response.status == 400) {

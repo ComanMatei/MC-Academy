@@ -22,13 +22,13 @@
   box-shadow: 0 0 15px rgba(224, 13, 59, 0.5);
 }
 
-h1 {
+.title {
   color: #e00d3b;
   margin-bottom: 16px;
   font-size: 2.5rem;
 }
 
-p {
+.text {
   color: #030000;
   font-size: 1.3rem;
   margin-bottom: 24px;

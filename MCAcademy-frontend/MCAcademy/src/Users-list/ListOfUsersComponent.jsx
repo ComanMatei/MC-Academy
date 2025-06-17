@@ -6,9 +6,9 @@ import SearchBar from "../search-bar/SearchBar";
 import AuthContext from "../context/AuthProvider";
 
 import { listOfUsers } from "../service/UserService";
-import { FaUser } from 'react-icons/fa';
 
 import UsersListCSS from './usersList.module.css';
+import { FaUser } from 'react-icons/fa';
 
 const ListOfUsersComponent = () => {
 
